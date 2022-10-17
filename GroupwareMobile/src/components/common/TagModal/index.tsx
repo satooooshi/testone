@@ -4,7 +4,6 @@ import {
   Button,
   Div,
   Dropdown,
-  DropdownProps,
   Icon,
   Input,
   Modal,
@@ -12,10 +11,13 @@ import {
   ScrollDiv,
   Text,
 } from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag, TagType, TagTypeInApp} from '../../../types';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../../utils/dropdown/helper';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 
 type TagModalContainerProps = Omit<ModalProps, 'children'>;
@@ -66,22 +68,6 @@ const TagModal: React.FC<TagModalProps> = props => {
     modalTags,
   );
   const dropdownRef = useRef<any | null>(null);
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {width: windowWidth} = useWindowDimensions();
   return (
     <Modal {...props}>

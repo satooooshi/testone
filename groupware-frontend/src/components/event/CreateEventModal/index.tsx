@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
@@ -13,7 +19,7 @@ import {
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import TagModal from '../../common/TagModal';
-import { DateTimePicker } from 'react-rainbow-components';
+import DateTimePicker from 'node_modules/react-rainbow-components/components/DateTimePicker';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import ReactCrop from 'react-image-crop';
@@ -36,6 +42,8 @@ import {
   Box,
   Image,
   useMediaQuery,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -43,6 +51,7 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { Crop } from 'react-image-crop';
 import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -52,7 +61,7 @@ import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { darkFontColor } from 'src/utils/colors';
 import { isCreatableEvent } from 'src/utils/factory/isCreatableEvent';
 
-type ExcludeFilesAndVideos = Pick<
+type ExcludeFilesAndVideosAndType = Pick<
   EventSchedule,
   | 'title'
   | 'description'
@@ -60,13 +69,13 @@ type ExcludeFilesAndVideos = Pick<
   | 'endAt'
   | 'tags'
   | 'imageURL'
-  | 'type'
   | 'hostUsers'
   | 'chatNeeded'
 >;
 
-export type CreateEventRequest = ExcludeFilesAndVideos & {
+export type CreateEventRequest = ExcludeFilesAndVideosAndType & {
   id?: number;
+  type?: EventType;
   videos: Partial<EventVideo>[];
   files: Partial<EventFile>[];
 };
@@ -78,27 +87,6 @@ type CreateEventModalProps = {
   createEvent: (newEvent: CreateEventRequest) => void;
 };
 
-const setDateTime = (addDays: number, hours: number, minutes: number) => {
-  const today = new Date();
-  today.setDate(today.getDate() + addDays);
-  today.setHours(hours, minutes);
-  return today;
-};
-
-const initialEventValue = {
-  title: '',
-  description: '',
-  startAt: setDateTime(1, 19, 0),
-  endAt: setDateTime(1, 21, 0),
-  type: EventType.CLUB,
-  imageURL: '',
-  chatNeeded: false,
-  hostUsers: [],
-  tags: [],
-  files: [],
-  videos: [],
-};
-
 const CreateEventModal: React.FC<CreateEventModalProps> = ({
   enabled,
   onCancelPressed,
@@ -106,16 +94,40 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   createEvent,
 }) => {
   const { data: tags } = useAPIGetTag();
-  const { data: users } = useAPIGetUsers('ALL');
+  const { data: users, refetch: refetchGetUsers } = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const setDateTime = (addDays: number, hours: number, minutes: number) => {
+    const today = new Date();
+    today.setDate(today.getDate() + addDays);
+    today.setHours(hours, minutes);
+    return today;
+  };
+  const initialEventValue = useMemo(() => {
+    return {
+      title: '',
+      description: '',
+      startAt: setDateTime(1, 19, 0),
+      endAt: setDateTime(1, 21, 0),
+      type: undefined,
+      imageURL: '',
+      chatNeeded: false,
+      hostUsers: [],
+      tags: [],
+      files: [],
+      videos: [],
+    };
+  }, []);
 
   const {
     values: newEvent,
     handleSubmit: onFinish,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -123,7 +135,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     validateOnBlur: false,
     validationSchema: createEventSchema,
     onSubmit: async (submittedValues) => {
-      if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
+      if (!croppedImageURL || !selectThumbnailName) {
         createEvent(submittedValues);
         return;
       }
@@ -132,6 +144,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadFiles([result], {
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+          resetForm();
+          dispatchCrop({ type: 'resetImage', value: 'resetImage' });
         },
       });
     },
@@ -148,18 +162,34 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
+  const [isLoadingTN, setIsloadingTN] = useState(false);
+  const [isLoadingRF, setIsloadingRF] = useState(false);
+
+  useEffect(() => {
+    if (enabled) {
+      setWillSubmit(false);
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+  }, [willSubmit, onFinish]);
 
   const [
     {
       crop,
-      completedCrop,
       croppedImageURL,
       imageName: selectThumbnailName,
       imageURL: selectThumbnailUrl,
@@ -167,9 +197,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     dispatchCrop,
   ] = useImageCrop();
   const imgRef = useRef<HTMLImageElement | null>(null);
-
   const onEventThumbnailDrop = useCallback(
     (f: File[]) => {
+      setIsloadingTN(true);
       dispatchCrop({ type: 'setImageFile', value: f[0] });
     },
     [dispatchCrop],
@@ -177,7 +207,36 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCropAndImage',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+      ref: img,
+    });
+    setIsloadingTN(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({
+        type: 'setCropAndImage',
+        value: newCrop,
+        ref: imgRef.current,
+      });
+  };
 
   const {
     getRootProps: getEventThumbnailRootProps,
@@ -192,13 +251,20 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     getInputProps: getRelatedFileInputProps,
   } = useDropzone({
     onDrop: (files: File[]) => {
+      setIsloadingRF(true);
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
-          const newFiles: Partial<EventFile>[] = urls.map((u) => ({ url: u }));
+          const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
+            url: u,
+            name: files[i].name,
+          }));
           setNewEvent((e) => ({
             ...e,
             files: [...(e.files || []), ...newFiles],
           }));
+        },
+        onSettled: () => {
+          setIsloadingRF(false);
         },
       });
     },
@@ -269,45 +335,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     user?.role,
   );
 
-  useEffect(() => {
-    const getInitialEventType = () => {
-      if (isCreatableImpressiveUniversity) {
-        return EventType.IMPRESSIVE_UNIVERSITY;
-      }
-      if (isCreatableBolday) {
-        return EventType.BOLDAY;
-      }
-      if (isCreatableStudyMeeting) {
-        return EventType.STUDY_MEETING;
-      }
-      if (isCreatableCoach) {
-        return EventType.COACH;
-      }
-      if (isCreatableClub) {
-        return EventType.CLUB;
-      }
-      if (isCreatableSubmissionEtc) {
-        return EventType.SUBMISSION_ETC;
-      }
-      return undefined;
-    };
-    const initialEventType = getInitialEventType();
-    if (!event && initialEventType) {
-      setNewEvent((e) => ({
-        ...e,
-        type: initialEventType,
-      }));
-    }
-  }, [
-    event,
-    isCreatableBolday,
-    isCreatableClub,
-    isCreatableCoach,
-    isCreatableImpressiveUniversity,
-    isCreatableStudyMeeting,
-    isCreatableSubmissionEtc,
-    setNewEvent,
-  ]);
+  const isCreatableOther = isCreatableEvent(EventType.OTHER, user?.role);
 
   const pushYoutube = () => {
     const youtubeRegex =
@@ -362,6 +390,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           justifyContent={isSmallerThan768 ? 'space-between' : 'flex-end'}
           w="100%">
           <Button
+            disabled={isLoadingTN || isLoadingRF}
             mr="40px"
             onClick={() => {
               checkErrors();
@@ -576,6 +605,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 colorScheme="teal"
                 bg="white"
                 onChange={(e) => {
+                  if (!e.target.value) {
+                    setNewEvent((e) => ({ ...e, type: undefined }));
+                    return;
+                  }
                   const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
                     ...prev,
@@ -587,6 +620,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
+                <option label={'指定なし'}></option>
                 {isCreatableImpressiveUniversity && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
                     感動大学
@@ -607,11 +641,16 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 {isCreatableSubmissionEtc && (
                   <option value={EventType.SUBMISSION_ETC}>提出物等</option>
                 )}
+                {isCreatableOther && (
+                  <option value={EventType.OTHER}>その他</option>
+                )}
               </Select>
             </FormControl>
           </Box>
           <Text mb="15px">サムネイル</Text>
-          {((newEvent.imageURL && !selectThumbnailUrl) || completedCrop) && (
+
+          {((newEvent.imageURL && !selectThumbnailUrl) ||
+            selectThumbnailUrl) && (
             <Button
               mb="15px"
               onClick={() => {
@@ -634,29 +673,32 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <ReactCrop
                 src={selectThumbnailUrl}
                 crop={crop}
-                onChange={(newCrop) =>
-                  dispatchCrop({ type: 'setCrop', value: newCrop })
-                }
+                onChange={(newCrop) => onChange(newCrop)}
                 keepSelection={true}
-                onComplete={(c) =>
-                  dispatchCrop({
-                    type: 'setCompletedCrop',
-                    value: c,
-                    ref: imgRef.current,
-                  })
-                }
                 onImageLoaded={onLoad}
+                onImageError={() => setIsloadingTN(false)}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '300px',
+                  minWidth: '100px',
+                }}
               />
             ) : (
               <Box
                 {...getEventThumbnailRootProps({
                   className: createEventModalStyle.image_dropzone,
                 })}>
-                <input {...getEventThumbnailInputProps()} />
-                <Text>
-                  クリックかドラッグアンドドロップで
-                  {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
-                </Text>
+                {isLoadingTN ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <input {...getEventThumbnailInputProps()} />
+                    <Text>
+                      クリックかドラッグアンドドロップで
+                      {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
+                    </Text>
+                  </>
+                )}
               </Box>
             )}
           </Box>
@@ -666,8 +708,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {...getRelatedFileRootProps({
                 className: createEventModalStyle.image_dropzone,
               })}>
-              <input {...getRelatedFileInputProps()} />
-              <Text>クリックかドラッグアンドドロップで投稿</Text>
+              {isLoadingRF ? (
+                <Spinner />
+              ) : (
+                <>
+                  <input {...getRelatedFileInputProps()} />
+                  <Text>クリックかドラッグアンドドロップで投稿</Text>
+                </>
+              )}
             </div>
           </Box>
           {newEvent.files?.length ? (
@@ -697,7 +745,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     overflowX="auto"
                     w="95%"
                     css={hideScrollbarCss}>
-                    {fileNameTransformer(f.url || '')}
+                    {f.name}
                   </Text>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
@@ -705,7 +753,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       setNewEvent({
                         ...newEvent,
                         files: newEvent.files.filter(
-                          (file) => file.id !== f.id,
+                          (file) => file.url !== f.url,
                         ),
                       })
                     }
@@ -716,24 +764,29 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Text mb="16px">関連動画</Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
-            <Input
-              background="white"
-              placeholder="Youtubeの動画URLを設定してください"
-              type="text"
-              w="100%"
-              h="40px"
-              color={darkFontColor}
-              bg="white"
-              rounded="md"
-              textAlign="left"
-              pr={'40px'}
-              value={newYoutube}
-              onChange={(e) => setNewYoutube(e.currentTarget.value)}
-            />
-            <IoMdAddCircle
-              className={createEventModalStyle.icon}
-              onClick={pushYoutube}
-            />
+            <InputGroup>
+              <Input
+                background="white"
+                placeholder="Youtubeの動画URLを設定してください"
+                type="text"
+                w="100%"
+                h="40px"
+                color={darkFontColor}
+                bg="white"
+                rounded="md"
+                textAlign="left"
+                pr={'40px'}
+                value={newYoutube}
+                onChange={(e) => setNewYoutube(e.currentTarget.value)}
+              />
+
+              <InputRightElement right={-10}>
+                <IoMdAddCircle
+                  className={createEventModalStyle.icon}
+                  onClick={pushYoutube}
+                />
+              </InputRightElement>
+            </InputGroup>
           </Box>
           <Box display="flex" flexDir="column" mb="16px">
             {newEvent?.videos?.map((y) => (

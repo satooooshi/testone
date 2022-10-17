@@ -25,6 +25,11 @@ import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { User } from './user.entity';
 
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
 @Entity({ name: 'chat_groups' })
 export class ChatGroup {
   @PrimaryGeneratedColumn()
@@ -47,6 +52,22 @@ export class ChatGroup {
     default: '',
   })
   imageURL: string;
+
+  @Column({
+    type: 'enum',
+    name: 'room_type',
+    enum: RoomType,
+    default: RoomType.TALK_ROOM,
+  })
+  roomType: RoomType;
+
+  @Column({
+    type: 'int',
+    name: 'member_count',
+    nullable: false,
+    default: 0,
+  })
+  memberCount: number;
 
   @OneToOne(() => EventSchedule, (eventSchedule) => eventSchedule.chatGroup, {
     onUpdate: 'CASCADE',
@@ -96,6 +117,36 @@ export class ChatGroup {
   })
   members?: User[];
 
+  @ManyToMany(() => User, (user) => user.leftChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chat_leaving',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  previousMembers?: User[];
+
+  @ManyToMany(() => User, (user) => user.muteChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chat_mute',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  muteUsers?: User[];
+
   @CreateDateColumn({
     type: 'datetime',
     name: 'created_at',
@@ -109,7 +160,9 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+  isMute?: boolean;
   hasBeenRead?: boolean;
+  unreadCount?: number;
 
   @AfterInsert()
   async saveNewSystemMessage?() {
@@ -134,10 +187,10 @@ export class ChatGroup {
     this.imageURL = genStorageURL(this.imageURL);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.imageURL = await genSignedURL(this.imageURL);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.imageURL = await genSignedURL(this.imageURL);
+  // }
 }

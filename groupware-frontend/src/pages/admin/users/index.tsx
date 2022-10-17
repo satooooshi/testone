@@ -6,7 +6,15 @@ import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
-import { Avatar, Button, Progress, Select, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Button,
+  Progress,
+  Select,
+  Text,
+  useToast,
+  Spinner,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -27,15 +35,18 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
   const [searchWord, setSearchWord] = useState(query.word);
+  const [isDeletingUser, setIsDeletingUser] = useState(-1);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
+
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
@@ -46,17 +57,24 @@ const UserAdmin: React.FC = () => {
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
   };
+  const toast = useToast();
   const { mutate: deleteUser } = useAPIDeleteUser({
-    onSuccess: () => {
+    onSuccess: (_, user) => {
+      setIsDeletingUser(-1);
       refetch();
+      toast({
+        description: `${userNameFactory(user)} さんを削除しました。`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const onDeleteClicked = (user: User) => {
-    if (
-      confirm(`${user.lastName} ${user.firstName}さんを削除して宜しいですか？`)
-    ) {
+    if (confirm(`${userNameFactory(user)} さんを削除して宜しいですか？`)) {
+      setIsDeletingUser(user.id);
       deleteUser(user);
     }
   };
@@ -69,6 +87,7 @@ const UserAdmin: React.FC = () => {
       tag: tagQuery,
       word: query.word || '',
       sort: query.sort,
+      branch: query.branch,
       role: query.role,
       duration: query.duration,
     };
@@ -120,10 +139,11 @@ const UserAdmin: React.FC = () => {
       </Head>
       <div className={userAdminStyles.search_form_wrapper}>
         <SearchForm
-          onClearTag={() => setSelectedTags([])}
           value={searchWord || ''}
           onChange={(e) => setSearchWord(e.currentTarget.value)}
-          onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
+          onClearTag={() => setSelectedTags([])}
+          onClear={() => setSelectedTags([])}
+          onClickButton={(w) => queryRefresh({ page: '1', word: w })}
           tags={tags || []}
           selectedTags={selectedTags}
           toggleTag={onToggleTag}
@@ -217,11 +237,15 @@ const UserAdmin: React.FC = () => {
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <RiDeleteBin6Line
-                    onClick={() => onDeleteClicked(u)}
-                    className={userAdminStyles.delete_icon}
-                    color="tomato"
-                  />
+                  {isDeletingUser == u.id ? (
+                    <Spinner />
+                  ) : (
+                    <RiDeleteBin6Line
+                      onClick={() => onDeleteClicked(u)}
+                      className={userAdminStyles.delete_icon}
+                      color="tomato"
+                    />
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import { BoardCategory, RuleCategory, Wiki, WikiType } from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
@@ -31,8 +31,13 @@ const getWikiList = async (
   return response.data;
 };
 
-export const useAPIGetWikiList = (query: SearchQueryToGetWiki) => {
-  return useQuery<SearchResultToGetWiki, AxiosError>(['QAs', query], () =>
-    getWikiList(query),
+export const useAPIGetWikiList = (
+  query: SearchQueryToGetWiki,
+  options?: UseQueryOptions<SearchResultToGetWiki, AxiosError>,
+) => {
+  return useQuery<SearchResultToGetWiki, AxiosError>(
+    ['QAs', query],
+    () => getWikiList(query),
+    options,
   );
 };

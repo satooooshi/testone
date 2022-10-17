@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 import {
   BoardCategory,
   RuleCategory,
@@ -21,7 +22,6 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import SaveWikiDto from './dto/saveWikiDto';
 import { WikiService } from './wiki.service';
-
 export interface SearchQueryToGetWiki {
   page?: string;
   word?: string;
@@ -47,14 +47,29 @@ export class WikiController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getWikiList(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
-    return await this.qaService.getWikiList(query);
+    const userID = req.user.id;
+    return await this.qaService.getWikiList(userID, query);
+  }
+
+  @Get('/user-good-list/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async getWikiUserGoodList(
+    @Req() request: RequestWithUser,
+    @Param('id') userID: string,
+  ): Promise<UserGoodForBoard[]> {
+    return await this.qaService.getWikiGoodList(userID, request.user.id);
   }
 
   @Get('detail/:id')
-  async getWikiDetail(@Param('id') id: number): Promise<Wiki> {
-    return await this.qaService.getWikiDetail(id);
+  @UseGuards(JwtAuthenticationGuard)
+  async getWikiDetail(
+    @Req() request: RequestWithUser,
+    @Param('id') id: number,
+  ): Promise<Wiki> {
+    return await this.qaService.getWikiDetail(request.user.id, id);
   }
 
   @Get('latest')
@@ -121,5 +136,20 @@ export class WikiController {
       ...wiki,
       resolvedAt: new Date(),
     });
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('get-goods-for-board/:id')
+  async getHearts(@Param('id') id: number): Promise<UserGoodForBoard[]> {
+    return this.qaService.getHearts(id);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('toggle-good-for-board')
+  async toggleGoodForBoard(
+    @Req() req: RequestWithUser,
+    @Body() WikiID: { id: number },
+  ): Promise<Partial<Wiki>> {
+    return this.qaService.toggleGoodForBoard(req.user, WikiID.id);
   }
 }

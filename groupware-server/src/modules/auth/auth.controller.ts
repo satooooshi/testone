@@ -9,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import { NotificationService } from '../notification/notification.service';
+import { Roles, RolesGuard } from './roles.guard';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import JwtAuthenticationGuard from './jwtAuthentication.guard';
@@ -25,6 +26,8 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('register')
   async register(@Body() registrationData: User): Promise<User> {
     const registeredUser = await this.authService.register(registrationData);
@@ -82,6 +85,8 @@ ${registrationData.password}
   async logout(@Res() response: Response) {
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
     response.clearCookie('Authentication');
-    return response.sendStatus(200);
+    response.status(200).json({
+      status: 'OK',
+    });
   }
 }

@@ -12,6 +12,8 @@ import Link from 'next/link';
 import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
 import { GiCancel } from 'react-icons/gi';
 import { useMediaQuery } from '@chakra-ui/media-query';
+import { Box, Badge } from '@chakra-ui/react';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -72,6 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       : clsx(sidebarStyles.icon, sidebarStyles.icon__disable);
   const { user } = useAuthenticate();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const { unreadChatCount } = useHandleBadge();
 
   return (
     <>
@@ -138,11 +141,27 @@ const Sidebar: React.FC<SidebarProps> = ({
           <LinkWithIcon
             screenName="/chat"
             icon={
-              <BsChatDotsFill
-                className={iconClass(
-                  activeScreenName === SidebarScreenName.CHAT,
+              <Box display="flex">
+                <BsChatDotsFill
+                  className={iconClass(
+                    activeScreenName === SidebarScreenName.CHAT,
+                  )}
+                />
+                {unreadChatCount > 0 && (
+                  <Badge
+                    bg="red"
+                    color="white"
+                    w="20px"
+                    h="20px"
+                    position="fixed"
+                    borderRadius="50%"
+                    textAlign="center"
+                    lineHeight="20px"
+                    ml="40px">
+                    {unreadChatCount}
+                  </Badge>
                 )}
-              />
+              </Box>
             }
             iconName={SidebarScreenName.CHAT}
           />

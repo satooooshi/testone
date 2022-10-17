@@ -5,7 +5,11 @@ import SearchForm from '../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../components/common/SearchForm/SearchFormOpenerButton';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
-import {UserRole} from '../../types';
+import {
+  SearchQueryToGetUsers,
+  useAPISearchUsers,
+} from '../../hooks/api/user/useAPISearchUsers';
+import {User, UserRole} from '../../types';
 import {UsersListRouteProps} from '../../types/navigator/drawerScreenProps';
 import {userRoleNameFactory} from '../../utils/factory/userRoleNameFactory';
 import UserCardList from './UserCardList';
@@ -17,7 +21,42 @@ const UserList: React.FC = () => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState(tagPassedByRouteParam || '');
-  const isFocused = useIsFocused();
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
+    page: '1',
+  });
+  const {isLoading, refetch} = useAPISearchUsers(
+    {
+      ...searchQuery,
+      page: searchQuery?.page || '1',
+      word,
+      tag,
+    },
+    {
+      enabled: false,
+      onSuccess: fetchedUser => {
+        setUsersForInfiniteScroll(u => {
+          if (u.length && searchQuery?.page !== '1') {
+            return [...u, ...fetchedUser.users];
+          }
+          return fetchedUser.users;
+        });
+      },
+    },
+  );
+  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
+    [],
+  );
+
+  useEffect(() => {
+    setSearchQuery(q => ({...q, word, tag, page: '1'}));
+  }, [tag, word]);
+
+  useEffect(() => {
+    if (searchQuery.page) {
+      refetch();
+    }
+  }, [searchQuery, refetch]);
+
   const topTabNames = [
     'AllRole',
     UserRole.ADMIN,
@@ -64,10 +103,11 @@ const UserList: React.FC = () => {
           name={topTabNames[0]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
-              userRole={'All'}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
+              userRole={undefined}
             />
           )}
           options={{title: '全て'}}
@@ -76,9 +116,10 @@ const UserList: React.FC = () => {
           name={topTabNames[1]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
               userRole={UserRole.ADMIN}
             />
           )}
@@ -88,9 +129,10 @@ const UserList: React.FC = () => {
           name={topTabNames[2]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
               userRole={UserRole.COMMON}
             />
           )}
@@ -100,9 +142,10 @@ const UserList: React.FC = () => {
           name={topTabNames[3]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
               userRole={UserRole.COACH}
             />
           )}
@@ -112,9 +155,10 @@ const UserList: React.FC = () => {
           name={topTabNames[4]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
               userRole={UserRole.INTERNAL_INSTRUCTOR}
             />
           )}
@@ -124,9 +168,10 @@ const UserList: React.FC = () => {
           name={topTabNames[5]}
           children={() => (
             <UserCardList
-              focused={isFocused}
-              word={word}
-              tag={tag}
+              userList={usersForInfiniteScroll}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isLoading={isLoading}
               userRole={UserRole.EXTERNAL_INSTRUCTOR}
             />
           )}

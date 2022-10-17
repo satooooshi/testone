@@ -9,6 +9,7 @@ import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenPro
 import {useNavigation} from '@react-navigation/native';
 import {darkFontColor} from '../../../utils/colors';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type ReplyListProps = {
   answer: QAAnswer;
@@ -55,19 +56,34 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                   reply =>
                     reply.writer && (
                       <>
-                        <Div flexDir="row" alignItems="center" mb={16}>
-                          <TouchableOpacity
-                            onPress={() => {
-                              if (reply.writer && reply.writer.existence) {
-                                onPressAvatar(reply.writer);
-                              }
-                            }}>
-                            <Div>
-                              <UserAvatar w={64} h={64} user={reply.writer} />
-                            </Div>
-                          </TouchableOpacity>
-                          <Text fontSize={18} color={darkFontColor}>
-                            {userNameFactory(reply.writer)}
+                        <Div flexDir="column" mb={16}>
+                          <Div
+                            flexDir="row"
+                            justifyContent="flex-start"
+                            alignItems="center">
+                            <TouchableOpacity
+                              onPress={() => {
+                                if (reply.writer && reply.writer.existence) {
+                                  onPressAvatar(reply.writer);
+                                }
+                              }}>
+                              <Div>
+                                <UserAvatar
+                                  w={64}
+                                  h={64}
+                                  user={reply.writer}
+                                  GoProfile={true}
+                                />
+                              </Div>
+                            </TouchableOpacity>
+                            <Text fontSize={18} color={darkFontColor}>
+                              {userNameFactory(reply.writer)}
+                            </Text>
+                          </Div>
+                          <Text textAlignVertical="bottom" textAlign="right">
+                            {`投稿日: ${dateTimeFormatterFromJSDDate({
+                              dateTime: new Date(reply.createdAt),
+                            })}`}
                           </Text>
                         </Div>
                         <Div bg="white" rounded="md" p={8} mb={16}>

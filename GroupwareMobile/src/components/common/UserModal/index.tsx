@@ -4,7 +4,6 @@ import {
   Button,
   Div,
   Dropdown,
-  DropdownProps,
   Icon,
   Input,
   Modal,
@@ -12,11 +11,14 @@ import {
   ScrollDiv,
   Text,
 } from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../../utils/dropdown/helper';
 import tailwind from 'tailwind-rn';
 import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
-import {User, UserRole, UserRoleInApp} from '../../../types';
+import {RoomType, User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import UserAvatar from '../UserAvatar';
@@ -29,6 +31,7 @@ type UserModalProps = ModalContainerProps & {
   users: User[];
   selectedUserRole: UserRoleInApp;
   defaultSelectedUsers?: Partial<User>[];
+  creationType?: RoomType;
 };
 
 const UserModal: React.FC<UserModalProps> = props => {
@@ -38,11 +41,13 @@ const UserModal: React.FC<UserModalProps> = props => {
     onCompleteModal,
     selectedUserRole: alreadySelectedUserRole,
     defaultSelectedUsers,
+    creationType,
   } = props;
   const {
     toggleUser,
     isSelected,
     selectedUsers: selectedUsersInModal,
+    setSelectedUsers,
     clear,
   } = useSelectedUsers(defaultSelectedUsers || []);
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
@@ -61,9 +66,18 @@ const UserModal: React.FC<UserModalProps> = props => {
     return;
   };
 
+  useEffect(() => {
+    if (defaultSelectedUsers) {
+      setSelectedUsers(defaultSelectedUsers);
+    }
+  }, [defaultSelectedUsers, setSelectedUsers]);
+
   const onCloseUserModal = () => {
     onCloseModal();
     setModalUsers(users);
+    setSearchWords(undefined);
+    selectUserRole('All');
+    clear();
   };
   useEffect(() => {
     if (!searchWords) {
@@ -77,41 +91,32 @@ const UserModal: React.FC<UserModalProps> = props => {
     setModalUsers(searchedTags);
   }, [searchWords, users]);
 
+  const onSubmitPress = () => {
+    onCompleteModal(selectedUsersInModal as User[], clear);
+    setSearchWords(undefined);
+    onCloseModal();
+  };
+
   const dropdownRef = useRef<any | null>(null);
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {width: windowWidth} = useWindowDimensions();
   return (
     <Modal {...props}>
-      <Button
-        bg="purple600"
-        position="absolute"
-        right={10}
-        bottom={10}
-        h={60}
-        zIndex={20}
-        rounded="circle"
-        w={60}
-        onPress={() => {
-          onCompleteModal(selectedUsersInModal as User[], clear);
-          onCloseModal();
-        }}>
-        <Icon color="white" fontSize="6xl" name="check" />
-      </Button>
+      {selectedUsersInModal?.length || creationType !== RoomType.TALK_ROOM ? (
+        <Button
+          bg="purple600"
+          position="absolute"
+          right={10}
+          bottom={10}
+          h={60}
+          zIndex={20}
+          rounded="circle"
+          w={60}
+          onPress={onSubmitPress}>
+          <Icon color="white" fontSize="6xl" name="check" />
+        </Button>
+      ) : (
+        <></>
+      )}
       <Button
         bg="gray400"
         h={35}
@@ -222,12 +227,6 @@ const UserModal: React.FC<UserModalProps> = props => {
           onPress={() => selectUserRole(UserRole.INTERNAL_INSTRUCTOR)}
           value={UserRole.INTERNAL_INSTRUCTOR}>
           {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() => selectUserRole(UserRole.EXTERNAL_INSTRUCTOR)}
-          value={UserRole.EXTERNAL_INSTRUCTOR}>
-          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
         </Dropdown.Option>
       </Dropdown>
       <ScrollDiv contentContainerStyle={{width: '100%'}}>

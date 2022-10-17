@@ -32,6 +32,10 @@ export const isCreatableWiki = (context: Context): boolean => {
             return true;
           case BoardCategory.STUDY_MEETING:
             return userRole === UserRole.ADMIN;
+          case BoardCategory.SELF_IMPROVEMENT:
+            return true;
+          case BoardCategory.PERSONAL_ANNOUNCEMENT:
+            return true;
           case BoardCategory.CELEBRATION:
             return userRole === UserRole.ADMIN;
           case BoardCategory.OTHER:
@@ -42,6 +46,8 @@ export const isCreatableWiki = (context: Context): boolean => {
     case WikiType.ALL_POSTAL:
       return userRole === UserRole.ADMIN;
     case WikiType.RULES:
+      return userRole === UserRole.ADMIN;
+    case WikiType.MAIL_MAGAZINE:
       return userRole === UserRole.ADMIN;
   }
 };
@@ -54,12 +60,5 @@ export const isWikiAuthor = (event: Wiki, targetUser?: Partial<User>) => {
 };
 
 export const isEditableWiki = (wiki: Wiki, targetUser?: Partial<User>) => {
-  return (
-    isWikiAuthor(wiki, targetUser) ||
-    isCreatableWiki({
-      type: wiki.type,
-      boardCategory: wiki.boardCategory,
-      userRole: targetUser?.role,
-    })
-  );
+  return isWikiAuthor(wiki, targetUser);
 };

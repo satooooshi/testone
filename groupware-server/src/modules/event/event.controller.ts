@@ -25,6 +25,13 @@ import CreateCommentDto from './dto/createCommentDto';
 import SaveEventDto from './dto/saveEventDto';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { NotificationService } from '../notification/notification.service';
+import { ConfigService } from '@nestjs/config';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 
 export interface QueryToGetZipSubmission {
   id: string;
@@ -38,6 +45,7 @@ export interface SearchQueryToGetEvents {
   type?: EventType;
   from?: string;
   to?: string;
+  personal?: string;
   participant_id?: string;
   host_user_id?: string;
 }
@@ -68,6 +76,8 @@ const eventTypeName = (eventType: EventType) => {
       return 'コーチ制度';
     case EventType.SUBMISSION_ETC:
       return '提出物等';
+    case EventType.OTHER:
+      return 'その他';
   }
 };
 
@@ -76,6 +86,8 @@ export class EventScheduleController {
   constructor(
     private readonly eventService: EventScheduleService,
     private readonly chatService: ChatService,
+    private readonly notifService: NotificationService,
+    private readonly configService: ConfigService,
   ) {}
 
   //@TODO this endpoint is for inputting data
@@ -118,11 +130,12 @@ export class EventScheduleController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getEvents(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
     const { from, to } = query;
     if (from || to) {
-      return await this.eventService.getEventAtSpecificTime(query);
+      return await this.eventService.getEventAtSpecificTime(query, req.user.id);
     }
     return await this.eventService.getEvents(query);
   }
@@ -149,6 +162,12 @@ export class EventScheduleController {
     @Body() submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
     return await this.eventService.saveSubmission(submissionFiles);
+  }
+
+  @Post('delete-submission')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteSubmission(@Body() body: { submissionId: number }) {
+    await this.eventService.deleteSubmission(body.submissionId);
   }
 
   //get 10 latest event randomly
@@ -239,10 +258,7 @@ export class EventScheduleController {
       req.user,
     );
     if (joinedEvent.chatNeeded && joinedEvent.chatGroup) {
-      await this.chatService.joinChatGroup(
-        req.user.id,
-        joinedEvent.chatGroup.id,
-      );
+      await this.chatService.joinChatGroup(req.user, joinedEvent.chatGroup.id);
     }
     return joinedEvent;
   }
@@ -277,5 +293,29 @@ export class EventScheduleController {
   ): Promise<EventComment> {
     comment.writer = request.user;
     return await this.eventService.createComment(comment);
+  }
+
+  @Get('send-notif-events-starts-in-hour')
+  async sendNotifEventsStartsInHour() {
+    const eventsStartAtAnHourLater =
+      await this.eventService.getEventsStartAtAnHourLater();
+    for (const e of eventsStartAtAnHourLater) {
+      const notificationData: CustomPushNotificationData = {
+        title: 'イベントの開始の1時間前になりました。',
+        body: e.title,
+        custom: {
+          screen: 'event',
+          id: e.id.toString(),
+        },
+      };
+      await sendPushNotifToSpecificUsers(
+        [
+          e.author.id,
+          ...e.hostUsers.map((u) => u.id),
+          ...e.userJoiningEvent.map((e) => e.user.id),
+        ],
+        notificationData,
+      );
+    }
   }
 }

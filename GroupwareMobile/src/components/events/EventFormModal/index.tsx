@@ -2,6 +2,7 @@ import {DateTime} from 'luxon';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
+  Platform,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -47,6 +48,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import tailwind from 'tailwind-rn';
+import {ActivityIndicator} from 'react-native-paper';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -64,13 +66,23 @@ type DateTimeModalStateValue = {
 };
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
-  const {onCloseModal, event, onSubmit, type, isSuccess = false} = props;
+  const {
+    onCloseModal,
+    event,
+    onSubmit,
+    type,
+    isSuccess = false,
+    isVisible,
+  } = props;
   const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers('ALL');
+  const {data: users, refetch: refetchGetUsers} = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialEventValue = {
     title: '',
     description: '',
@@ -79,7 +91,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: type || EventType.CLUB,
+    type: type || undefined,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -103,37 +115,37 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   });
 
   useEffect(() => {
-    isSuccess && resetForm();
+    if (isSuccess) {
+      resetForm();
+    }
   }, [isSuccess, resetForm]);
+
+  useEffect(() => {
+    if (isVisible) {
+      setWillSubmit(false);
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      onComplete();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, onComplete]);
 
   const [dateTimeModal, setDateTimeModal] = useState<DateTimeModalStateValue>({
     visible: undefined,
     date: new Date(),
   });
   const {width: windowWidth} = useWindowDimensions();
-  const {mutate: uploadFile} = useAPIUploadStorage({
-    onSuccess: uploadedURL => {
-      setNewEvent(e => {
-        const newEventFile = {url: uploadedURL[0]};
-        if (e.files && e.files.length) {
-          return {
-            ...e,
-            files: [...e.files, newEventFile],
-          };
-        }
-        return {
-          ...e,
-          files: [newEventFile],
-        };
-      });
-    },
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
-  const {mutate: uploadImage} = useAPIUploadStorage({
+  const {mutate: uploadFile, isLoading: isLoadingRF} = useAPIUploadStorage();
+  const {mutate: uploadImage, isLoading: isLoadingTN} = useAPIUploadStorage({
     onSuccess: uploadedURL => {
       setNewEvent(e => ({...e, imageURL: uploadedURL[0]}));
     },
@@ -153,7 +165,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     if (messages) {
       Alert.alert(messages);
     } else {
-      onComplete();
+      setWillSubmit(true);
     }
   };
   const normalizeURL = (url: string) => {
@@ -173,10 +185,31 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       const formData = new FormData();
       formData.append('files', {
         name: res.name,
-        uri: normalizeURL(res.uri),
+        uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
         type: res.type,
       });
-      uploadFile(formData);
+      uploadFile(formData, {
+        onSuccess: uploadedURL => {
+          setNewEvent(e => {
+            const newEventFile = {url: uploadedURL[0], name: res.name};
+            if (e.files && e.files.length) {
+              return {
+                ...e,
+                files: [...e.files, newEventFile],
+              };
+            }
+            return {
+              ...e,
+              files: [newEventFile],
+            };
+          });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
+      });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
       } else {
@@ -231,17 +264,20 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     });
   };
 
+  const removeFile = (fileUrl: string) => {
+    setNewEvent(e => {
+      if (e.files?.length) {
+        return {...e, files: e.files.filter(f => f.url !== fileUrl)};
+      }
+      return e;
+    });
+  };
+
   useEffect(() => {
     if (event) {
       setNewEvent(event);
     }
   }, [event, setNewEvent]);
-
-  useEffect(() => {
-    if (type && isCreatableEvent(type, user?.role)) {
-      setNewEvent(e => ({...e, type}));
-    }
-  }, [setNewEvent, type, user?.role]);
 
   useEffect(() => {
     event?.tags && setSelectedTags(event.tags);
@@ -537,6 +573,18 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             ) : (
               <></>
             )}
+            {isCreatableEvent(EventType.OTHER, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.OTHER}))
+                }
+                value={EventType.OTHER}>
+                {eventTypeNameFactory(EventType.OTHER)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
           </Dropdown>
           {newEvent.imageURL ? (
             <>
@@ -562,11 +610,17 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               alignItems="flex-start"
               alignSelf="center"
               mb={'lg'}>
-              <Text fontSize={16}>サムネイルを選択</Text>
-              <DropdownOpenerButton
-                name={'タップで画像を選択'}
-                onPress={handlePickImage}
-              />
+              {isLoadingTN ? (
+                <ActivityIndicator />
+              ) : (
+                <>
+                  <Text fontSize={16}>サムネイルを選択</Text>
+                  <DropdownOpenerButton
+                    name={'タップで画像を選択'}
+                    onPress={handlePickImage}
+                  />
+                </>
+              )}
             </Div>
           )}
           <Div
@@ -574,17 +628,24 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignItems="flex-start"
             alignSelf="center"
             mb={'lg'}>
-            <Text fontSize={16}>参考資料を選択</Text>
-            <DropdownOpenerButton
-              name={'タップでファイルを選択'}
-              onPress={() => handlePickDocument()}
-            />
+            {isLoadingRF ? (
+              <ActivityIndicator />
+            ) : (
+              <>
+                <Text fontSize={16}>参考資料を選択</Text>
+                <DropdownOpenerButton
+                  name={'タップでファイルを選択'}
+                  onPress={() => handlePickDocument()}
+                />
+              </>
+            )}
           </Div>
           {newEvent.files?.map(f => (
             <Div
               key={f.id}
               mb={'lg'}
               w={'100%'}
+              h={'5%'}
               borderColor={blueColor}
               borderWidth={1}
               px={8}
@@ -593,14 +654,9 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               justifyContent="space-between"
               rounded="md">
               <Text fontSize={16} color={blueColor} w="80%">
-                {
-                  (decodeURI(f.url || '')?.match('.+/(.+?)([?#;].*)?$') || [
-                    '',
-                    f.url,
-                  ])[1]
-                }
+                {f.name}
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => removeFile(f.url || '')}>
                 <Icon name="closecircle" color="gray900" fontSize={24} />
               </TouchableOpacity>
             </Div>

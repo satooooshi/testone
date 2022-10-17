@@ -34,6 +34,10 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       onPress: () => setType(WikiType.ALL_POSTAL),
     },
     {
+      name: 'メルマガ',
+      onPress: () => setType(WikiType.MAIL_MAGAZINE),
+    },
+    {
       name: '掲示板',
       onPress: () => setType(WikiType.BOARD),
     },

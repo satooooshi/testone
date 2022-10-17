@@ -67,7 +67,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const router = useRouter();
   const { type } = router.query as { type: WikiType };
   const { user } = useAuthenticate();
-
   const [tagModal, setTagModal] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
@@ -77,10 +76,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
     boardCategory:
-      type === WikiType.BOARD ? BoardCategory.QA : BoardCategory.NON_BOARD,
+      type === WikiType.BOARD || !type
+        ? BoardCategory.QA
+        : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
   const draftJsEmptyError = '入力必須です';
@@ -127,6 +128,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
       name: '内容の編集',
     },
   ];
+
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
 
   const headerTabName = '内容を編集';
 
@@ -175,6 +189,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    if (!e.target.value) {
+      return setNewQuestion((e) => ({ ...e, type: undefined }));
+    }
     if (
       e.target.value === RuleCategory.RULES ||
       e.target.value === RuleCategory.ABC ||
@@ -195,6 +212,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
       e.target.value === BoardCategory.CLUB ||
       e.target.value === BoardCategory.STUDY_MEETING ||
+      e.target.value === BoardCategory.SELF_IMPROVEMENT ||
+      e.target.value === BoardCategory.PERSONAL_ANNOUNCEMENT ||
       e.target.value === BoardCategory.CELEBRATION ||
       e.target.value === BoardCategory.OTHER
     ) {
@@ -295,22 +314,20 @@ const WikiForm: React.FC<WikiFormProps> = ({
               flexDir={isSmallerThan768 ? 'column' : undefined}
               mb={isSmallerThan768 ? '16px' : undefined}>
               <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
+              {errors.type && touched.type ? (
+                <Text color="tomato">{errors.type}</Text>
+              ) : null}
               <Select
                 colorScheme="teal"
                 bg="white"
                 onChange={onTypeSelectionChange}
-                defaultValue={
-                  type === WikiType.RULES
-                    ? RuleCategory.RULES
-                    : type === WikiType.ALL_POSTAL
-                    ? type
-                    : BoardCategory.QA
-                }>
+                defaultValue={newQuestion.type}>
                 {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
                   <>
+                    <option label={'指定なし'}></option>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
                         WikiType.RULES,
@@ -354,6 +371,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 }) ? (
                   <option value={WikiType.ALL_POSTAL}>
                     {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.MAIL_MAGAZINE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.MAIL_MAGAZINE}>
+                    {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
                   </option>
                 ) : null}
 
@@ -426,6 +451,34 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.STUDY_MEETING,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.SELF_IMPROVEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.SELF_IMPROVEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.SELF_IMPROVEMENT,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.PERSONAL_ANNOUNCEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.PERSONAL_ANNOUNCEMENT,
                     )}
                   </option>
                 ) : null}
@@ -516,7 +569,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSubmit()}>
+              <Button colorScheme="pink" onClick={() => setWillSubmit(true)}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </Box>

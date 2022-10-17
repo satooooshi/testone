@@ -13,6 +13,8 @@ export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Main: undefined;
+  Call: undefined;
+  TabBar: undefined;
   EventList: {
     type?: EventType;
     tag?: string;
@@ -30,6 +32,7 @@ export type RootStackParamList = {
   };
   WikiDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   PostWiki: {
     type?: WikiType;
@@ -69,6 +72,7 @@ export type RootStackParamList = {
   EditRoom: {room: ChatGroup};
   ChatMenu: {
     room: ChatGroup;
+    removeCache?: () => void;
   };
   ChatNotes: {
     room: ChatGroup;

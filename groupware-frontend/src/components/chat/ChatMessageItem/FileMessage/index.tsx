@@ -12,8 +12,7 @@ type FileMessageProps = {
 const FileMessage: React.FC<FileMessageProps> = ({ message }) => {
   return (
     <Link
-      href={message.content}
-      download={true}
+      onClick={() => saveAs(message.content, message.fileName)}
       target="_blank"
       mr="8px"
       display="flex"
@@ -27,7 +26,7 @@ const FileMessage: React.FC<FileMessageProps> = ({ message }) => {
         style={{ height: '48px', width: '48px' }}
         color={darkFontColor}
       />
-      <p>{fileNameTransformer(message.content)}</p>
+      <p>{message.fileName}</p>
     </Link>
   );
 };

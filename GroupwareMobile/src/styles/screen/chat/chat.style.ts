@@ -16,9 +16,11 @@ export const chatStyles = StyleSheet.create({
   inputAndroid: {
     flex: 1,
     paddingVertical: 0,
+    color: 'black',
   },
   inputIos: {
     flex: 1,
+    paddingBottom: 4,
   },
   keyboardAvoidingView: {},
   keyboardAvoidingViewIOS: {

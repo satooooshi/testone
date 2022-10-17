@@ -1,11 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useGetTagsBySearchTarget} from '../../../hooks/tag/useGetTagsBySearchTarget';
-import {Button, Div, Icon, Input, Overlay, Tag} from 'react-native-magnus';
+import {
+  Button,
+  Div,
+  Icon,
+  Input,
+  Overlay,
+  ScrollDiv,
+  Tag,
+} from 'react-native-magnus';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag} from '../../../types';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import TagModal from '../TagModal';
+import tailwind from 'tailwind-rn';
+import {useFocusEffect} from '@react-navigation/native';
 
 export type SearchFormValue = {
   word: string;
@@ -33,7 +43,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   onSubmit,
   defaultSelectedTagIds = [],
 }) => {
-  const {data: tags} = useGetTagsBySearchTarget(searchTarget)();
+  const {data: tags, refetch} = useGetTagsBySearchTarget(searchTarget)();
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const {selectedTags, setSelectedTags} = useSelectedTags(
@@ -64,12 +74,19 @@ const SearchForm: React.FC<SearchFormProps> = ({
     setSelectedTags([]);
     onClear();
   };
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  );
 
   return (
     <Overlay
       px={16}
       py={32}
-      h={240 + Math.floor((selectedTags.length + 2) / 3) * 34}
+      h={240 + selectedTags.length * 8}
+      style={{maxHeight: '80%'}}
       visible={isVisible}>
       <Button
         bg="gray400"
@@ -92,7 +109,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         selectedTagType={selectedTagType}
         defaultSelectedTags={selectedTags}
       />
-      <Div>
+      <Div maxH={'100%'}>
         <Input
           placeholder="検索ワードを入力してください"
           mb={8}
@@ -111,7 +128,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
             ? `${selectedTags.length}個のタグを選択済み`
             : 'タグを選択'}
         </Button>
-        <Div flexDir="row" flexWrap="wrap">
+        <ScrollDiv
+          style={{maxHeight: '80%'}}
+          contentContainerStyle={tailwind('flex-row flex-wrap ')}>
           {selectedTags.map(t => (
             <Tag
               key={t.id}
@@ -125,7 +144,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               {t.name}
             </Tag>
           ))}
-        </Div>
+        </ScrollDiv>
         <Button
           w={'100%'}
           bg="pink600"

@@ -107,8 +107,9 @@ const EditAlbum: React.FC<EditAlbumProps> = ({
     }
     uploadImage(fileArr, {
       onSuccess: (imageURLs) => {
-        const images: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
+        const images: Partial<ChatAlbumImage>[] = imageURLs.map((image, i) => ({
+          imageURL: image,
+          fileName: fileArr[i].name,
         }));
         setValues((v) => ({
           ...v,
@@ -147,7 +148,8 @@ const EditAlbum: React.FC<EditAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);

@@ -47,6 +47,7 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
+
   const boardTopTab: TopTabBehavior[] = [
     {
       tabName: '全て',
@@ -155,6 +156,40 @@ const QAQuestionList = () => {
       isActiveTab:
         type === WikiType.BOARD &&
         board_category === BoardCategory.STUDY_MEETING,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.SELF_IMPROVEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.SELF_IMPROVEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.SELF_IMPROVEMENT,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.PERSONAL_ANNOUNCEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.PERSONAL_ANNOUNCEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.PERSONAL_ANNOUNCEMENT,
     },
     {
       tabName: wikiTypeNameFactory(
@@ -286,6 +321,8 @@ const QAQuestionList = () => {
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
+        : type === WikiType.MAIL_MAGAZINE
+        ? 'メルマガ'
         : 'All',
     tabs,
     rightButtonName: 'Wikiを作成',
@@ -331,13 +368,11 @@ const QAQuestionList = () => {
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
             onClearTag={() => setSelectedTags([])}
-            value={searchWord}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() =>
+            onClickButton={(w) =>
               queryRefresh({
                 page: '1',
                 status,
-                word: searchWord,
+                word: w,
                 type,
               })
             }

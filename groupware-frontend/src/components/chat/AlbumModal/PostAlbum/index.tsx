@@ -18,7 +18,7 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AiOutlineLeft,
   AiFillCloseCircle,
@@ -31,7 +31,7 @@ import { albumSchema } from 'src/utils/validation/schema';
 import dynamic from 'next/dynamic';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import { saveAs } from 'file-saver';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import { socket } from '../../ChatBox/socket';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type PostAlbumProps = {
@@ -58,13 +58,18 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
   };
   const [selectedImage, setSelectedImage] = useState<Partial<ChatAlbumImage>>();
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
+  const focusInputRef = useRef<HTMLInputElement>(null);
   const { values, handleChange, setValues, handleSubmit, errors, touched } =
     useFormik<Partial<ChatAlbum>>({
       initialValues: initialValues,
       validationSchema: albumSchema,
       onSubmit: (submittedValues, { resetForm }) => {
         createAlbum(submittedValues, {
-          onSuccess: () => {
+          onSuccess: (result) => {
+            socket.emit('message', {
+              type: 'send',
+              chatMessage: result.systemMessage,
+            });
             navigateToList();
             toast({
               description: 'アルバムを作成しました',
@@ -77,6 +82,32 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
         });
       },
     });
+
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+      const focusOn = async () => {
+        await new Promise((r) => setTimeout(r, 50));
+        focusInputRef?.current?.focus();
+      };
+      focusOn();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const imagesInNewAlbumViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -112,8 +143,9 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
     }
     uploadImage(fileArr, {
       onSuccess: (imageURLs) => {
-        const images: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
+        const images: Partial<ChatAlbumImage>[] = imageURLs.map((image, i) => ({
+          imageURL: image,
+          fileName: fileArr[i].name,
         }));
         setValues((v) => ({
           ...v,
@@ -142,7 +174,8 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);
@@ -194,7 +227,7 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                     <Button
                       size="sm"
                       flexDir="row"
-                      onClick={() => handleSubmit()}
+                      onClick={() => setWillSubmit(true)}
                       mb="8px"
                       colorScheme="green"
                       alignItems="center">
@@ -212,6 +245,7 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                   value={values.title}
                   name="title"
                   onChange={handleChange}
+                  ref={focusInputRef}
                   placeholder={dateTimeFormatterFromJSDDate({
                     dateTime: new Date(),
                     format: 'yyyy/LL/dd',

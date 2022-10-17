@@ -12,18 +12,30 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
 import { UserTag } from 'src/entities/userTag.entity';
-import { BoardCategory, WikiType } from 'src/entities/wiki.entity';
+import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
 import { DateTime } from 'luxon';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
+import { QAAnswer } from 'src/entities/qaAnswer.entity';
+import { selectUserColumns } from 'src/utils/selectUserColumns';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(UserGoodForBoard)
+    private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
+    @InjectRepository(UserJoiningEvent)
+    private readonly userJoiningEventRepository: Repository<UserJoiningEvent>,
+    @InjectRepository(QAAnswer)
+    private readonly qaAnswerRepository: Repository<QAAnswer>,
+    @InjectRepository(Wiki)
+    private readonly wikiRepository: Repository<Wiki>,
     private storageService: StorageService,
   ) {}
 
@@ -197,6 +209,7 @@ export class UserService {
       word = '',
       tag = '',
       sort,
+      branch,
       role,
       verified,
       duration,
@@ -233,28 +246,10 @@ export class UserService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
+    // const startTime = Date.now();
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
-      .where(
-        word && word.length > 2
-          ? 'MATCH(user.firstName, user.lastName) AGAINST (:word IN NATURAL LANGUAGE MODE)'
-          : '1=1',
-        {
-          word,
-        },
-      )
-      .andWhere(role ? 'user.role = :role' : '1=1', { role })
-      .andWhere(verified ? 'user.verifiedAt is not null' : '1=1')
-      .andWhere(
-        word.length <= 2
-          ? 'CONCAT(user.firstName, user.lastName) LIKE :queryWord'
-          : '1=1',
-        { queryWord: `%${word}%` },
-      )
-      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
-        tagIDs,
-      })
       .addSelect((subQuery) => {
         return subQuery
           .select('COUNT( DISTINCT event.id )', 'eventCount')
@@ -318,19 +313,48 @@ export class UserService {
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
+      .where(
+        word && word.length > 2
+          ? 'MATCH(user.firstName, user.lastName) AGAINST (:word IN NATURAL LANGUAGE MODE)'
+          : '1=1',
+        {
+          word,
+        },
+      )
+      .andWhere(role ? 'user.role = :role' : '1=1', { role })
+      .andWhere(verified ? 'user.verifiedAt is not null' : '1=1')
+      .andWhere(
+        word.length <= 2
+          ? 'CONCAT(user.firstName, user.lastName) LIKE :queryWord'
+          : '1=1',
+        { queryWord: `%${word}%` },
+      )
+      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+        tagIDs,
+      })
+      .andWhere(branch ? 'user.branch = :branch' : '1=1', { branch })
       .skip(offset)
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
+      .addOrderBy(
+        'user.lastNameKana',
+        sortKey === 'user.lastNameKana' ? undefined : 'ASC',
+      )
       .getManyAndCount();
+
+    // const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
       relations: ['tags'],
     });
-    const userObjWithEvent = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
+    const joiningEventCountList = await this.userJoiningEventRepository
+      .createQueryBuilder('userJoiningEvent')
+      .select(['userJoiningEvent.user_id', 'COUNT(*) AS cnt'])
       .leftJoin('userJoiningEvent.event', 'event')
-      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .where(
+        userIDs.length ? 'userJoiningEvent.user_id IN (:...userIDs)' : '1=1',
+        { userIDs },
+      )
       .andWhere('userJoiningEvent.canceledAt IS NULL')
       .andWhere(
         fromDate && toDate
@@ -338,13 +362,16 @@ export class UserService {
           : '1=1',
         { fromDate, toDate },
       )
-      .getMany();
+      .groupBy('userJoiningEvent.user_id')
+      .getRawMany();
 
-    const userObjWithQuestion = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect(
-        'user.wiki',
-        'wiki',
+    const questionCountList = await this.wikiRepository
+      .createQueryBuilder('wiki')
+      .select(['wiki.user_id', 'COUNT(*) AS cnt'])
+      .where(userIDs.length ? 'wiki.user_id IN (:...userIDs)' : '1=1', {
+        userIDs,
+      })
+      .andWhere(
         fromDate
           ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :board AND wiki.boardCategory = :boardCategory'
           : 'wiki.type = :board AND wiki.boardCategory = :boardCategory',
@@ -355,13 +382,16 @@ export class UserService {
           boardCategory: BoardCategory.QA,
         },
       )
-      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
-      .getMany();
-    const userObjWithKnowledge = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect(
-        'user.wiki',
-        'wiki',
+      .groupBy('wiki.user_id')
+      .getRawMany();
+
+    const knowledgeCountList = await this.wikiRepository
+      .createQueryBuilder('wiki')
+      .select(['wiki.user_id', 'COUNT(*) AS cnt'])
+      .where(userIDs.length ? 'wiki.user_id IN (:...userIDs)' : '1=1', {
+        userIDs,
+      })
+      .andWhere(
         fromDate
           ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :board AND wiki.boardCategory = :boardCategory'
           : 'wiki.type = :board AND wiki.boardCategory = :boardCategory',
@@ -372,34 +402,38 @@ export class UserService {
           boardCategory: BoardCategory.KNOWLEDGE,
         },
       )
-      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
-      .getMany();
-    const userObjWithAnswer = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect(
-        'user.qaAnswers',
-        'answer',
-        fromDate
-          ? 'answer.createdAt > :fromDate AND answer.createdAt < :toDate'
+      .groupBy('wiki.user_id')
+      .getRawMany();
+
+    const answerCountList = await this.qaAnswerRepository
+      .createQueryBuilder('qa')
+      .select(['qa.user_id', 'COUNT(*) AS cnt'])
+      .where(userIDs.length ? 'qa.user_id IN (:...userIDs)' : '1=1', {
+        userIDs,
+      })
+      .andWhere(
+        fromDate && toDate
+          ? 'qa.createdAt > :fromDate AND qa.createdAt < :toDate'
           : '1=1',
         { fromDate, toDate },
       )
-      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
-      .getMany();
+      .groupBy('qa.user_id')
+      .getRawMany();
+
     const usersArrWithEachCount = users.map((u) => {
       const tags = userArrWithTags.filter((user) => user.id === u.id)[0]?.tags;
-      const eventCount =
-        userObjWithEvent.filter((user) => user.id === u.id)[0]?.userJoiningEvent
-          .length || 0;
-      const questionCount =
-        userObjWithQuestion.filter((user) => user.id === u.id)[0].wiki.length ||
-        0;
-      const knowledgeCount =
-        userObjWithKnowledge.filter((user) => user.id === u.id)[0].wiki
-          .length || 0;
-      const answerCount =
-        userObjWithAnswer.filter((user) => user.id === u.id)[0].qaAnswers
-          .length || 0;
+      const eventCount = joiningEventCountList.find(
+        (e) => e['user_id'] == u.id,
+      )?.['cnt'];
+      const questionCount = questionCountList.find(
+        (e) => e['user_id'] == u.id,
+      )?.['cnt'];
+      const knowledgeCount = knowledgeCountList.find(
+        (e) => e['user_id'] == u.id,
+      )?.['cnt'];
+      const answerCount = answerCountList.find((e) => e['user_id'] == u.id)?.[
+        'cnt'
+      ];
       return {
         ...u,
         tags,
@@ -409,6 +443,14 @@ export class UserService {
         answerCount,
       };
     });
+    // const endTime2 = Date.now();
+    // console.log(
+    //   'get user list speed check',
+    //   endTime - startTime,
+    //   'end ',
+    //   endTime2 - startTime,
+    // );
+
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
     return { users: usersArrWithEachCount, pageCount };
@@ -423,9 +465,13 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
+    const startTime = Date.now();
     const users = await this.userRepository.find({
+      select: ['id', 'avatarUrl', 'lastName', 'firstName', 'existence', 'role'],
       order: { lastNameKana: 'ASC' },
     });
+    const endTime = Date.now();
+    console.log('spped check get users ==', endTime - startTime);
     return users;
   }
 
@@ -516,7 +562,6 @@ export class UserService {
       if (!u.email && !u.password && !existUser) {
         throw new BadRequestException('メールアドレスとパスワードは必須です');
       }
-      const hashedPassword = await hash(u.password, 10);
       if (existUser) {
         usersArr.push({
           ...existUser,
@@ -524,6 +569,7 @@ export class UserService {
           verifiedAt: new Date(),
         });
       } else {
+        const hashedPassword = await hash(u.password, 10);
         usersArr.push({
           ...u,
           password: hashedPassword,
@@ -541,6 +587,13 @@ export class UserService {
     });
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
+    }
+
+    if (
+      existUser.avatarUrl &&
+      existUser.avatarUrl !== newUserProfile.avatarUrl
+    ) {
+      this.storageService.deleteFile(existUser.avatarUrl);
     }
     const newUserObj = await this.userRepository.save(
       this.userRepository.create({

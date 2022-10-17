@@ -33,7 +33,7 @@ import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { EventType, SubmissionFile, UserRole } from 'src/types';
+import { EventFile, EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
@@ -54,18 +54,21 @@ import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { darkFontColor } from 'src/utils/colors';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
+import { MdCancel } from 'react-icons/md';
+import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type FileIconProps = {
-  href: string;
+  url: string;
+  name: string;
   submitted?: boolean;
 };
 
-const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
+const FileIcon: React.FC<FileIconProps> = ({ url, name, submitted }) => {
   return (
     <Link
-      onClick={() => saveAs(href, fileNameTransformer(href))}
+      onClick={() => saveAs(url, name)}
       display="flex"
       flexDir="column"
       alignItems="center"
@@ -78,7 +81,7 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
       bg={!submitted ? 'white' : 'lightblue'}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
       <Text isTruncated={true} w="100%" textAlign="center">
-        {fileNameTransformer(href)}
+        {name}
       </Text>
     </Link>
   );
@@ -146,22 +149,20 @@ const EventDetail = () => {
       refetch();
     },
   });
+
+  const { mutate: deleteSubmission } = useAPIDeleteSubmission({
+    onSuccess: () => {
+      toast({
+        title: `ファイルを削除しました`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      refetch();
+    },
+  });
   const { mutate: uploadStorage, isLoading: loadingUplaod } =
-    useAPIUploadStorage({
-      onSuccess: (urls) => {
-        const filesNotSubmitted: Partial<SubmissionFile>[] = [];
-        for (const url of urls) {
-          const submitFileObj = {
-            url: url,
-            eventSchedule: data,
-            userSubmitted: user,
-            submitUnFinished: true,
-          };
-          filesNotSubmitted.push(submitFileObj);
-        }
-        setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
-      },
-    });
+    useAPIUploadStorage();
 
   const { mutate: joinEvent } = useAPIJoinEvent({
     onSuccess: () => refetch(),
@@ -346,7 +347,7 @@ const EventDetail = () => {
                 </div>
                 <span className={eventDetailStyles.sub_title}>概要</span>
                 <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify>
+                  <Linkify componentDecorator={componentDecorator}>
                     <span className={eventDetailStyles.description}>
                       {data.description}
                     </span>
@@ -465,7 +466,7 @@ const EventDetail = () => {
               <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                 {data.files.map((f) => (
                   <Box mr="4px" mb="4px" key={f.id}>
-                    <FileIcon href={f.url} />
+                    <FileIcon url={f.url} name={f.name} />
                   </Box>
                 ))}
               </Box>
@@ -610,20 +611,61 @@ const EventDetail = () => {
                         );
                         fileArr.push(renamedFile);
                       }
-                      uploadStorage(fileArr);
+                      uploadStorage(fileArr, {
+                        onSuccess: (urls) => {
+                          const filesNotSubmitted: Partial<SubmissionFile>[] =
+                            urls.map((u, i) => ({
+                              url: u,
+                              name: fileArr[i].name,
+                              eventSchedule: data,
+                              userSubmitted: user,
+                              submitUnFinished: true,
+                            }));
+                          setSubmitFiles((files) => [
+                            ...files,
+                            ...filesNotSubmitted,
+                          ]);
+                        },
+                      });
                     }}
                   />
                 </Box>
                 {submitFiles && submitFiles.length ? (
                   <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-                    {submitFiles.map((f) => (
-                      <Box key={f.url} mb="4px" mr="4px">
-                        <FileIcon
-                          href={f.url || ''}
-                          submitted={f.submitUnFinished}
-                        />
-                      </Box>
-                    ))}
+                    {submitFiles.map((f) =>
+                      f.url && f.name ? (
+                        <>
+                          <Box key={f.url} mb="4px" mr="10px" display="flex">
+                            <FileIcon
+                              url={f.url}
+                              name={f.name}
+                              submitted={f.submitUnFinished}
+                            />
+                            <Box ml="-13px" mt="-2">
+                              <MdCancel
+                                size="25px"
+                                onClick={() => {
+                                  if (f.id) {
+                                    if (
+                                      confirm(
+                                        'ファイルを削除してよろしいですか？',
+                                      )
+                                    ) {
+                                      deleteSubmission({ submissionId: f.id });
+                                    }
+                                  } else {
+                                    const files = submitFiles.filter(
+                                      (file) => file.url !== f.url,
+                                    );
+                                    setSubmitFiles(files);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        </>
+                      ) : null,
+                    )}
                   </Box>
                 ) : (
                   <></>

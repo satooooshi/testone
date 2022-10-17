@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React from 'react';
 import {textContent} from 'domutils';
 import {Element} from 'domhandler';
 import TOCEntry from './TOCEntry';
 import {useEffect} from 'react';
 import {useScroller} from '../../../utils/htmlScroll/scroller';
+import {Div} from 'react-native-magnus';
 
 function useOnEntryChangeEffect(onEntryChange: (entryName: string) => void) {
   const scroller = useScroller();
@@ -22,19 +22,18 @@ function useOnEntryChangeEffect(onEntryChange: (entryName: string) => void) {
 export default function TOC({
   headings,
   onPressEntry,
+  activeEntry = textContent(headings[0]),
+  setActiveEntry,
 }: {
   headings: Element[];
   onPressEntry?: (name: string) => void;
+  activeEntry: string;
+  setActiveEntry: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  const [activeEntry, setActiveEntry] = useState(
-    headings.length ? textContent(headings[0]) : '',
-  );
   useOnEntryChangeEffect(setActiveEntry);
+  const checkIsNotEmptyChar = (char: string) => char !== '';
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollContent}
-      style={styles.scrollView}>
-      <View style={styles.scrollBackground} />
+    <Div>
       {headings.map(header => {
         const headerName = textContent(header);
         const onPress = () => {
@@ -43,7 +42,11 @@ export default function TOC({
         };
         return (
           <TOCEntry
-            active={headerName === activeEntry}
+            active={
+              checkIsNotEmptyChar(activeEntry)
+                ? headerName === activeEntry
+                : headerName === textContent(headings[0])
+            }
             key={headerName}
             onPress={onPress}
             tagName={header.tagName}
@@ -51,27 +54,6 @@ export default function TOC({
           />
         );
       })}
-    </ScrollView>
+    </Div>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
-    opacity: 0.92,
-    paddingRight: 10,
-  },
-  scrollContent: {
-    flex: 1,
-    paddingVertical: 20,
-    position: 'relative',
-  },
-  scrollBackground: {
-    ...StyleSheet.absoluteFillObject,
-    flex: 1,
-    borderRightWidth: 1,
-    marginRight: 10,
-    borderColor: 'rgba(125,125,125,0.3)',
-  },
-});

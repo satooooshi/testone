@@ -6,6 +6,7 @@ export enum EventTab {
   COACH = 'コーチ制度',
   CLUB = '部活動',
   SUBMISSION_ETC = '提出物等',
+  OTHER = 'その他',
 }
 
 export type Tab =
@@ -29,5 +30,6 @@ export enum TabName {
   EVENT = 'event',
   QUESTION = 'question',
   KNOWLEDGE = 'knowledge',
+  GOOD = 'good',
   ANSWER = 'answer', // FIXME: 使用されている箇所がないかもしれないです...
 }

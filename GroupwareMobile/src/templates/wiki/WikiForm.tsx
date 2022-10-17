@@ -1,36 +1,23 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
-import {Alert, useWindowDimensions} from 'react-native';
-import {
-  Button,
-  Div,
-  Dropdown,
-  DropdownProps,
-  Input,
-  Tag as TagButton,
-  Text,
-} from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import React, {useEffect, useRef, useState} from 'react';
+import {useWindowDimensions} from 'react-native';
+import {Button, Div, Input, Tag as TagButton, Text} from 'react-native-magnus';
 import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
-import {
-  BoardCategory,
-  RuleCategory,
-  Tag,
-  TextFormat,
-  Wiki,
-  WikiType,
-} from '../../types';
+import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import ModalSelectingWikiType, {
+  SelectWikiArg,
+} from '../../components/wiki/ModalSelectWikiType';
+import QuillEditor from 'react-native-cn-quill';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -52,11 +39,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: ruleCategory || RuleCategory.NON_RULE,
     boardCategory: boardCategory
       ? boardCategory
@@ -81,403 +70,105 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return;
       }
       saveWiki(w);
+      quillRef.current?.blur();
     },
   });
   const {width: windowWidth} = useWindowDimensions();
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
-  const typeDropdownRef = useRef<any | null>(null);
-  const textFormatDropdownRef = useRef<any | null>(null);
+  const [visibleSelectTypeModal, setVisibleSelectTypeModal] =
+    useState<boolean>(false);
 
-  const handleChangeTextFormat = (format: TextFormat) => {
-    if (newWiki.textFormat === format) {
-      return;
-    }
-    Alert.alert(
-      '入力形式を変更します',
-      '現在の入力状態が失われます\nよろしいですか？',
-      [
-        {
-          text: '変更',
-          onPress: () => {
-            setNewWiki(w => ({
-              ...w,
-              body: '',
-              textFormat: format,
-            }));
-          },
-        },
-        {
-          text: 'キャンセル',
-        },
-      ],
-    );
-  };
-  const isEdit = !!wiki?.id;
   const {user} = useAuthenticate();
 
-  const formatDropdown = (
-    <Dropdown
-      {...defaultDropdownProps}
-      title="入力形式を選択"
-      ref={textFormatDropdownRef}>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() => handleChangeTextFormat('html')}
-        value={'html'}>
-        <Text fontSize={16} color="blue700">
-          デフォルト
-        </Text>
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        value={'markdown'}
-        onPress={() => handleChangeTextFormat('markdown')}>
-        <Div justifyContent="center" alignItems="center">
-          <Text fontSize={16} color="blue700">
-            マークダウン
-          </Text>
-          <Text color="tomato">
-            ※WEB上で編集する際にマークダウン記法で編集できます
-          </Text>
-        </Div>
-      </Dropdown.Option>
-    </Dropdown>
-  );
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
 
-  const typeDropdown = (
-    <Dropdown
-      {...defaultDropdownProps}
-      title="タイプを選択"
-      ref={typeDropdownRef}>
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.RULES,
-              ruleCategory: RuleCategory.RULES,
-            }))
-          }
-          value={RuleCategory.RULES}>
-          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES, true)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.RULES,
-              ruleCategory: RuleCategory.PHILOSOPHY,
-            }))
-          }
-          value={RuleCategory.PHILOSOPHY}>
-          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY, true)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.RULES,
-              ruleCategory: RuleCategory.ABC,
-            }))
-          }
-          value={RuleCategory.ABC}>
-          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC, true)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.RULES,
-              ruleCategory: RuleCategory.BENEFITS,
-            }))
-          }
-          value={RuleCategory.BENEFITS}>
-          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS, true)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.RULES,
-              ruleCategory: RuleCategory.DOCUMENT,
-            }))
-          }
-          value={RuleCategory.DOCUMENT}>
-          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT, true)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({type: WikiType.ALL_POSTAL, userRole: user?.role}) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.ALL_POSTAL,
-              ruleCategory: RuleCategory.NON_RULE,
-            }))
-          }
-          value={WikiType.ALL_POSTAL}>
-          {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.KNOWLEDGE,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.KNOWLEDGE,
-            }))
-          }
-          value={BoardCategory.KNOWLEDGE}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.KNOWLEDGE,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.QA,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.QA,
-            }))
-          }
-          value={BoardCategory.QA}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.QA,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.NEWS,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.NEWS,
-            }))
-          }
-          value={BoardCategory.NEWS}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.NEWS,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-            }))
-          }
-          value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.IMPRESSIVE_UNIVERSITY,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.CLUB,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.CLUB,
-            }))
-          }
-          value={BoardCategory.CLUB}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.CLUB,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.STUDY_MEETING,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.STUDY_MEETING,
-            }))
-          }
-          value={BoardCategory.STUDY_MEETING}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.STUDY_MEETING,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.CELEBRATION,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.CELEBRATION,
-            }))
-          }
-          value={BoardCategory.CELEBRATION}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.CELEBRATION,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
-        boardCategory: BoardCategory.OTHER,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.OTHER,
-            }))
-          }
-          value={BoardCategory.OTHER}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.OTHER,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-    </Dropdown>
-  );
+  //   Fixed the input format so that it cannot be selected at once.
+
+  // const textFormatDropdownRef = useRef<any | null>(null);
+  // const isEdit = !!wiki?.id;
+  // const handleChangeTextFormat = (format: TextFormat) => {
+  //   if (newWiki.textFormat === format) {
+  //     return;
+  //   }
+  //   Alert.alert(
+  //     '入力形式を変更します',
+  //     '現在の入力状態が失われます\nよろしいですか？',
+  //     [
+  //       {
+  //         text: '変更',
+  //         onPress: () => {
+  //           setNewWiki(w => ({
+  //             ...w,
+  //             body: '',
+  //             textFormat: format,
+  //           }));
+  //         },
+  //       },
+  //       {
+  //         text: 'キャンセル',
+  //       },
+  //     ],
+  //   );
+  // };
+
+  // const formatDropdown = (
+  //   <Dropdown
+  //     {...defaultDropdownProps}
+  //     title="入力形式を選択"
+  //     ref={textFormatDropdownRef}>
+  //     <Dropdown.Option
+  //       {...defaultDropdownOptionProps}
+  //       onPress={() => handleChangeTextFormat('html')}
+  //       value={'html'}>
+  //       <Text fontSize={16} color="blue700">
+  //         デフォルト
+  //       </Text>
+  //     </Dropdown.Option>
+  //     <Dropdown.Option
+  //       {...defaultDropdownOptionProps}
+  //       value={'markdown'}
+  //       onPress={() => handleChangeTextFormat('markdown')}>
+  //       <Div justifyContent="center" alignItems="center">
+  //         <Text fontSize={16} color="blue700">
+  //           マークダウン
+  //         </Text>
+  //         <Text color="tomato">
+  //           ※WEB上で編集する際にマークダウン記法で編集できます
+  //         </Text>
+  //       </Div>
+  //     </Dropdown.Option>
+  //   </Dropdown>
+  // );
 
   return (
     <WholeContainer>
       <HeaderWithTextButton
         title={wiki?.id ? 'Wiki編集' : 'Wiki作成'}
         enableBackButton={true}
+      />
+      <ModalSelectingWikiType
+        isVisible={visibleSelectTypeModal}
+        onCloseModal={() => setVisibleSelectTypeModal(false)}
+        onSelectWikiType={(args: SelectWikiArg) => {
+          setNewWiki(w => ({
+            ...w,
+            type: args.type,
+            ruleCategory: args.ruleCategory,
+            boardCategory: args.boardCategory,
+          }));
+          setVisibleSelectTypeModal(false);
+        }}
+        userRole={user?.role}
       />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
@@ -489,8 +180,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         selectedTagType={selectedTagType}
         defaultSelectedTags={newWiki.tags}
       />
-      {formatDropdown}
-      {typeDropdown}
+      {/* {formatDropdown} */}
       <KeyboardAwareScrollView
         ref={scrollRef}
         nestedScrollEnabled={true}
@@ -509,19 +199,24 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onChangeText={text => setNewWiki(w => ({...w, title: text}))}
             mb="sm"
           />
-          <Div mb={8} flexDir="row" justifyContent="space-evenly">
-            <Div>
+          <Div mb={10} flexDir="row">
+            <Div alignItems="center">
               <Text fontSize={16} mb={4}>
                 タイプを選択
               </Text>
+              {errors.type && touched.type ? (
+                <Text fontSize={16} color="tomato">
+                  {errors.type}
+                </Text>
+              ) : null}
               <Button
                 bg="white"
                 borderWidth={1}
                 borderColor={'#ececec'}
                 p="md"
                 color="black"
-                w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
-                onPress={() => typeDropdownRef.current.open()}>
+                w={windowWidth * 0.9}
+                onPress={() => setVisibleSelectTypeModal(true)}>
                 {newWiki.type
                   ? wikiTypeNameFactory(
                       newWiki.type,
@@ -532,7 +227,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   : 'タイプを選択してください'}
               </Button>
             </Div>
-            {!isEdit && (
+            {/* {!isEdit && (
               <Div>
                 <Text fontSize={16} fontWeight="bold" mb={4}>
                   入力形式を選択
@@ -550,7 +245,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     : 'マークダウン'}
                 </Button>
               </Div>
-            )}
+            )} */}
           </Div>
           <Button
             bg="green600"
@@ -582,7 +277,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             mb={16}
             bg="pink600"
             w={'100%'}
-            onPress={() => handleSubmit()}>
+            onPress={() => setWillSubmit(true)}>
             投稿
           </Button>
         </Div>
@@ -597,6 +292,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onUploadImage={onUploadImage}
             initialBody={newWiki.body}
             onChange={text => setNewWiki(w => ({...w, body: text}))}
+            quillRef={quillRef}
           />
         </Div>
       </KeyboardAwareScrollView>

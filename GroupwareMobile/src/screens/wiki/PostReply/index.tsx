@@ -1,9 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import MarkdownIt from 'markdown-it';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Overlay, ScrollDiv, Text, Div} from 'react-native-magnus';
+import {Button, Overlay, Text, Div} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -18,10 +18,17 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {replySchema} from '../../../utils/validation/schema';
 import RenderHtml from 'react-native-render-html';
 import TextEditor from '../../../components/wiki/TextEditor';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import QuillEditor from 'react-native-cn-quill';
 
 const PostReply: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostAnswerRouteProps>();
+  const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const answerId = route.params.id;
   const {data: answerInfo} = useAPIGetAnswerDetail(answerId);
   const mdParser = new MarkdownIt({breaks: true});
@@ -42,7 +49,7 @@ const PostReply: React.FC = () => {
   const isLoading = loadingSaveReply || loadingUploadImage;
   const initialValues: Partial<QAAnswerReply> = {
     body: '',
-    textFormat: answerInfo?.textFormat,
+    textFormat: 'html',
     answer: answerInfo,
   };
   const {
@@ -56,8 +63,15 @@ const PostReply: React.FC = () => {
     validationSchema: replySchema,
     onSubmit: r => {
       saveReply(r);
+      quillRef?.current?.blur();
     },
   });
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const handleUploadImage = async (onSuccess: (imageURL: string[]) => void) => {
     const {formData} = await uploadImageFromGallery();
@@ -69,57 +83,55 @@ const PostReply: React.FC = () => {
     <WholeContainer>
       {answerInfo ? (
         <>
-          <HeaderWithTextButton title="返信する" />
+          <HeaderWithTextButton title="返信する" enableBackButton={true} />
           <Overlay visible={isLoading} p="xl">
             <ActivityIndicator />
           </Overlay>
-          <ScrollDiv
+          <KeyboardAwareScrollView
+            ref={scrollRef}
             nestedScrollEnabled={true}
             scrollEventThrottle={20}
-            keyboardDismissMode={'none'}
-            w={windowWidth * 0.9}
-            h={windowHeight * 0.3}
-            alignSelf="center"
-            pt={10}
-            bg="white"
-            rounded="md"
-            mb={16}>
-            <RenderHtml
-              source={{
-                html:
-                  answerInfo.textFormat === 'html'
-                    ? answerInfo.body
-                    : mdParser.render(answerInfo.body),
-              }}
-            />
-          </ScrollDiv>
-          <ScrollDiv
-            nestedScrollEnabled={true}
-            scrollEventThrottle={20}
-            keyboardDismissMode={'none'}
-            w={windowWidth * 0.9}
-            alignSelf="center"
-            pt={10}>
-            <Button
-              mb={16}
-              bg="pink600"
-              w={'100%'}
-              onPress={() => handleSubmit()}>
-              投稿
-            </Button>
-            {errors.body && touched.body ? (
-              <Text fontSize={16} color="tomato">
-                {errors.body}
-              </Text>
-            ) : null}
-            <Div mb={50}>
-              <TextEditor
-                textFormat={answerInfo.textFormat}
-                onUploadImage={handleUploadImage}
-                onChange={text => setNewReply(r => ({...r, body: text}))}
+            keyboardDismissMode={'none'}>
+            <Div
+              w={windowWidth * 0.9}
+              h={windowHeight * 0.3}
+              alignSelf="center"
+              pt={10}
+              bg="white"
+              rounded="md"
+              mb={16}>
+              <RenderHtml
+                source={{
+                  html:
+                    answerInfo.textFormat === 'html'
+                      ? answerInfo.body
+                      : mdParser.render(answerInfo.body),
+                }}
               />
             </Div>
-          </ScrollDiv>
+            <Div w={windowWidth * 0.9} alignSelf="center" pt={10}>
+              <Button
+                mb={16}
+                bg="pink600"
+                w={'100%'}
+                onPress={() => handleSubmit()}>
+                投稿
+              </Button>
+              {errors.body && touched.body ? (
+                <Text fontSize={16} color="tomato">
+                  {errors.body}
+                </Text>
+              ) : null}
+              <Div mb={50}>
+                <TextEditor
+                  textFormat={answerInfo.textFormat}
+                  onUploadImage={handleUploadImage}
+                  onChange={text => setNewReply(r => ({...r, body: text}))}
+                  quillRef={quillRef}
+                />
+              </Div>
+            </Div>
+          </KeyboardAwareScrollView>
         </>
       ) : null}
     </WholeContainer>

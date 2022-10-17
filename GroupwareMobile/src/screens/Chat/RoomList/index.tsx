@@ -1,59 +1,54 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   FlatList,
+  RefreshControl,
   TouchableHighlight,
   TouchableOpacity,
 } from 'react-native';
-import {Div, Icon, Text} from 'react-native-magnus';
+import {Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
 import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
-import {ChatGroup} from '../../../types';
+import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const [page, setPage] = useState('1');
-  const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
-    ChatGroup[]
-  >([]);
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
-  const {data: users} = useAPIGetUsers('');
-  const {selectedUserRole, filteredUsers} = useUserRole('All', users);
-  const [creationType, setCreationType] = useState<
-    'talk' | 'group' | undefined
-  >();
-
-  const {refetch: refetchAllRooms} = useAPIGetRooms(
-    {
-      page: '1',
-      limit: (20 * Number(page)).toString(),
-    },
-    {
-      refetchInterval: 30000,
-      onSuccess: data => {
-        stateRefreshNeeded(data.rooms);
-      },
-    },
-  );
-
-  const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
-    page,
-    limit: '20',
+  const {data: users, refetch: refetchGetUsers} = useAPIGetUsers('', {
+    enabled: false,
   });
+  const {
+    chatGroups,
+    setChatGroupsState,
+    editChatGroup,
+    isRoomsRefetching,
+    isCompletedRefetchAllRooms,
+    refreshRooms,
+  } = useHandleBadge();
+  const {selectedUserRole, filteredUsers} = useUserRole('All', users);
+  const [creationType, setCreationType] = useState<RoomType>();
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
+  const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
+  const isFocused = useIsFocused();
+
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      if (createdData.updatedAt === createdData.createdAt) {
+        editChatGroup(createdData);
+      }
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},
@@ -64,9 +59,24 @@ const RoomList: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
   const {mutate: savePin} = useAPISavePin({
-    onSuccess: () => {
-      refetchAllRooms();
+    onSuccess: data => {
+      let rooms = chatGroups.filter(r => r.id !== data.id);
+      if (data.isPinned) {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned && r.updatedAt > data.updatedAt,
+        ).length;
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroupsState(rooms);
+      } else {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned || r.updatedAt > data.updatedAt,
+        ).length;
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroupsState(rooms);
+      }
+      // refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
@@ -75,48 +85,34 @@ const RoomList: React.FC = () => {
     },
   });
 
+  useEffect(() => {
+    if (isFocused) {
+      setChatRooms(chatGroups);
+    }
+  }, [chatGroups, isFocused]);
+
+  // useEffect(() => {
+  //   if (isCompletedRefetchAllRooms) {
+  //     console.log('isCompletedRefetchAllRooms', chatGroups.length);
+  //     setChatRooms(chatGroups);
+  //   }
+  // }, [chatGroups, isCompletedRefetchAllRooms]);
+
+  useEffect(() => {
+    if (roomTypeSelector) {
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomTypeSelector]);
+
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
   };
 
-  const onEndReached = () => {
-    if (chatRooms?.rooms?.length) {
-      setPage(p => (Number(p) + 1).toString());
-    }
+  const refreshRoomList = () => {
+    refreshRooms();
   };
-
-  const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    let updateNeeded = false;
-    if (roomsForInfiniteScroll.length !== newData?.length) {
-      updateNeeded = true;
-    }
-    if (roomsForInfiniteScroll.length || newData?.length) {
-      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
-        if (updateNeeded) {
-          break;
-        }
-        if (
-          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
-            new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
-          roomsForInfiniteScroll[i]?.members?.length !==
-            newData?.[i]?.members?.length
-        ) {
-          updateNeeded = true;
-        }
-      }
-    }
-    if (updateNeeded) {
-      setRoomsForInfiniteScroll(newData);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      refetchAllRooms();
-    }, [refetchAllRooms]),
-  );
 
   return (
     <WholeContainer>
@@ -125,6 +121,7 @@ const RoomList: React.FC = () => {
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
       />
+
       {roomTypeSelector ? (
         <Div
           bg="white"
@@ -142,12 +139,11 @@ const RoomList: React.FC = () => {
             }}>
             <Icon color="black" name="close" fontSize={20} />
           </TouchableOpacity>
-
           <TouchableHighlight
             underlayColor="none"
             onPress={() => {
               setVisibleUserModal(true);
-              setCreationType('talk');
+              setCreationType(RoomType.TALK_ROOM);
             }}
             style={tailwind('justify-center w-6/12 items-center')}>
             <>
@@ -165,7 +161,7 @@ const RoomList: React.FC = () => {
             style={tailwind('justify-center w-6/12 items-center')}
             onPress={() => {
               setVisibleUserModal(true);
-              setCreationType('group');
+              setCreationType(RoomType.GROUP);
             }}>
             <>
               <Icon
@@ -184,8 +180,10 @@ const RoomList: React.FC = () => {
             selectedUserRole={selectedUserRole}
             defaultSelectedUsers={[]}
             onCompleteModal={(selectedUsers, reset) => {
-              if (selectedUsers.length === 1 && creationType === 'talk') {
-                createGroup({members: selectedUsers});
+              if (creationType === RoomType.TALK_ROOM) {
+                createGroup({
+                  members: selectedUsers,
+                });
                 setRoomTypeSelector(false);
                 return;
               }
@@ -197,42 +195,68 @@ const RoomList: React.FC = () => {
               reset();
               setRoomTypeSelector(false);
             }}
+            creationType={creationType}
           />
         </Div>
       ) : null}
-      {roomsForInfiniteScroll.length ? (
-        <FlatList
-          {...{onEndReached}}
-          ListFooterComponent={
-            loadingGetChatGroupList ? <ActivityIndicator /> : null
+
+      <Div alignItems="center">
+        <Input
+          w={'90%'}
+          mb={20}
+          placeholder="検索"
+          onChangeText={e => {
+            const filteredRooms = chatRooms.filter(r => {
+              const regex = new RegExp(e);
+              return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
+            });
+            setSearchedRooms(filteredRooms);
+          }}
+          prefix={
+            <Icon
+              name="search"
+              color="gray900"
+              fontFamily="Feather"
+              fontSize={12}
+            />
           }
-          contentContainerStyle={tailwind('self-center mt-4 pb-4')}
-          keyExtractor={item => item.id.toString()}
-          data={roomsForInfiniteScroll}
-          renderItem={({item: room}) => (
-            <Div mb="sm">
-              <RoomCard
-                room={room}
-                onPress={() =>
-                  navigation.navigate('ChatStack', {
-                    screen: 'Chat',
-                    params: {room},
-                  })
-                }
-                onPressPinButton={() => {
-                  savePin({...room, isPinned: !room.isPinned});
-                }}
-              />
-            </Div>
-          )}
+          clearButtonMode="while-editing"
         />
-      ) : loadingGetChatGroupList ? (
-        <ActivityIndicator />
-      ) : (
-        <Text fontSize={16} textAlign="center">
-          ルームを作成するか、招待をお待ちください
-        </Text>
-      )}
+        {/* <Text>ルーム数{chatRooms.length}</Text> */}
+        {chatRooms.length ? (
+          <FlatList
+            style={{height: '80%'}}
+            refreshControl={
+              <RefreshControl
+                refreshing={!isCompletedRefetchAllRooms}
+                onRefresh={refreshRoomList}
+              />
+            }
+            data={searchedRooms ?? chatRooms}
+            windowSize={30}
+            renderItem={({item: room}) => (
+              <Div key={room.id} mb="sm">
+                <RoomCard
+                  room={room}
+                  onPress={() =>
+                    navigation.navigate('ChatStack', {
+                      screen: 'Chat',
+                      params: {room},
+                    })
+                  }
+                  onPressPinButton={() => {
+                    savePin({...room, isPinned: !room.isPinned});
+                  }}
+                />
+              </Div>
+            )}
+          />
+        ) : (
+          <Text fontSize={16} textAlign="center">
+            ルームを作成するか、招待をお待ちください
+          </Text>
+        )}
+      </Div>
     </WholeContainer>
   );
 };

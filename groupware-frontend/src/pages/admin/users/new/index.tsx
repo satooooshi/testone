@@ -10,7 +10,7 @@ import React, {
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
 import Image from 'next/image';
-import { TagType, User, UserRole, UserTag } from 'src/types';
+import { TagType, User, UserRole, UserTag, BranchType } from 'src/types';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -105,7 +105,7 @@ const CreateNewUser = () => {
   } = useFormik({
     initialValues: initialUserValues,
     onSubmit: async (submitted) => {
-      if (croppedImageURL && imageName && completedCrop) {
+      if (croppedImageURL && imageName) {
         const result = await dataURLToFile(croppedImageURL, imageName);
         uploadImage([result]);
         return;
@@ -118,6 +118,20 @@ const CreateNewUser = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter: number = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCropAndImage',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+      ref: img,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const modalReducer = (
@@ -164,10 +178,8 @@ const CreateNewUser = () => {
     },
   );
 
-  const [
-    { crop, completedCrop, croppedImageURL, imageName, imageURL },
-    dispatchCrop,
-  ] = useImageCrop();
+  const [{ crop, croppedImageURL, imageName, imageURL }, dispatchCrop] =
+    useImageCrop();
 
   // const [userInfo, setUserInfo] = useState<Partial<User>>(initialUserValues);
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
@@ -197,6 +209,10 @@ const CreateNewUser = () => {
     [dispatchCrop],
   );
 
+  const onClickDeleteImage = () => {
+    dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+  };
+
   const {
     getRootProps: getEventImageRootProps,
     getInputProps: getEventImageInputProps,
@@ -217,6 +233,7 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         resetForm();
+        dispatchCrop({ type: 'resetImage', value: 'resetImage' });
         setUserInfo(initialUserValues);
       }
     },
@@ -276,23 +293,40 @@ const CreateNewUser = () => {
       <div className={createNewUserStyles.main}>
         <div className={createNewUserStyles.image_wrapper}>
           {imageURL ? (
-            <ReactCrop
-              keepSelection={true}
-              src={imageURL}
-              crop={crop}
-              onChange={(newCrop) =>
-                dispatchCrop({ type: 'setCrop', value: newCrop })
-              }
-              onComplete={(newCrop) =>
-                dispatchCrop({
-                  type: 'setCompletedCrop',
-                  value: newCrop,
-                  ref: imgRef.current,
-                })
-              }
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
+            <>
+              <ReactCrop
+                keepSelection={true}
+                src={imageURL}
+                crop={crop}
+                onChange={(newCrop) => {
+                  if (
+                    newCrop.height !== crop.height ||
+                    newCrop.width !== crop.width ||
+                    newCrop.y !== crop.y ||
+                    newCrop.x !== crop.x
+                  )
+                    dispatchCrop({
+                      type: 'setCropAndImage',
+                      value: newCrop,
+                      ref: imgRef.current,
+                    });
+                }}
+                onImageLoaded={onLoad}
+                circularCrop={true}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '1000px',
+                  minWidth: '100px',
+                }}
+              />
+              <Button
+                mb="15px"
+                colorScheme="blue"
+                marginTop="30px"
+                onClick={() => onClickDeleteImage()}>
+                既存画像を削除
+              </Button>
+            </>
           ) : (
             <div
               {...getEventImageRootProps({
@@ -412,6 +446,20 @@ const CreateNewUser = () => {
               <option value={UserRole.COMMON}>一般社員</option>
             </Select>
           </FormControl>
+          <FormControl mb={4}>
+            <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
+            <Select
+              name="branch"
+              value={values.branch}
+              defaultValue={BranchType.NON_SET}
+              bg="white"
+              height="10"
+              onChange={handleChange}>
+              <option value={BranchType.NON_SET}>未設定</option>
+              <option value={BranchType.TOKYO}>東京</option>
+              <option value={BranchType.OSAKA}>大阪</option>
+            </Select>
+          </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>社員コード</p>
@@ -425,12 +473,12 @@ const CreateNewUser = () => {
               onChange={handleChange}
             />
           </FormControl>
+          <FormControl mb={4}></FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>パスワード</p>
             </FormLabel>
             <Input
-              type="password"
               placeholder="password"
               value={values.password}
               background="white"

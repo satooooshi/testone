@@ -23,6 +23,12 @@ export const isCreatableEvent = (
       );
     case EventType.SUBMISSION_ETC:
       return userRole === UserRole.ADMIN;
+    case EventType.OTHER:
+      return (
+        userRole === UserRole.ADMIN ||
+        userRole === UserRole.INTERNAL_INSTRUCTOR ||
+        userRole === UserRole.COMMON
+      );
   }
 };
 

@@ -2,19 +2,25 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {Div, Icon, Image, Text} from 'react-native-magnus';
 import {replyTargetStyles} from '../../../styles/component/chat/replyTarget.style';
-import {ChatMessage, ChatMessageType} from '../../../types';
+import {ChatMessage, ChatMessageType, User} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
+import {reactionStickers} from '../../../utils/factory/reactionStickers';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import UserAvatar from '../../common/UserAvatar';
 
 type ReplyTargetProps = {
   onPressCloseIcon: () => void;
   replyParentMessage: ChatMessage;
+  senderAvatar?: {
+    member: User;
+    avatar: JSX.Element;
+  };
 };
 
 const ReplyTarget: React.FC<ReplyTargetProps> = ({
   onPressCloseIcon,
   replyParentMessage,
+  senderAvatar,
 }) => {
   const content = (type: ChatMessageType) => {
     switch (type) {
@@ -24,6 +30,8 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
         return '写真';
       case ChatMessageType.VIDEO:
         return '動画';
+      case ChatMessageType.STICKER:
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
@@ -43,11 +51,15 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
         <Icon name="close" fontSize={24} />
       </TouchableOpacity>
       <Div mr="lg">
-        <UserAvatar w={40} h={40} user={replyParentMessage.sender} />
+        <UserAvatar
+          w={40}
+          h={40}
+          user={senderAvatar?.member || replyParentMessage.sender}
+        />
       </Div>
       <Div alignSelf="center" w={'70%'}>
         <Text fontSize={12} fontWeight={'bold'} numberOfLines={1}>
-          {userNameFactory(replyParentMessage?.sender)}
+          {userNameFactory(senderAvatar?.member || replyParentMessage.sender)}
         </Text>
         <Text numberOfLines={1} color={darkFontColor} fontSize={12}>
           {content(replyParentMessage.type)}
@@ -72,6 +84,16 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
             replyParentMessage.thumbnail
               ? {uri: replyParentMessage.thumbnail}
               : require('../../../../assets/no-image.jpg')
+          }
+        />
+      ) : replyParentMessage.type === ChatMessageType.STICKER ? (
+        <Image
+          w={40}
+          h={40}
+          resizeMode="contain"
+          source={
+            reactionStickers.find(s => s.name === replyParentMessage.content)
+              ?.src
           }
         />
       ) : null}

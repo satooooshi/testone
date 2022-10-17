@@ -1,5 +1,6 @@
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -10,7 +11,7 @@ import tailwind from 'tailwind-rn';
 import ChatNoteCard from '../../../../components/chat/Note/ChatNoteCard';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
-import {ChatNote, ChatNoteImage, ImageSource} from '../../../../types';
+import {ChatNote, ChatNoteImage, FIleSource} from '../../../../types';
 import {
   ChatNotesNavigationProps,
   ChatRouteProps,
@@ -19,25 +20,51 @@ import ImageView from 'react-native-image-viewing';
 import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
 import {useAPIDeleteChatNote} from '../../../../hooks/api/chat/note/useAPIDeleteChatNote';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
   const {room} = useRoute<ChatRouteProps>().params;
   const [page, setPage] = useState<string>('1');
-  const {data, refetch: refetchNotes} = useAPIGetChatNotes({
-    roomId: room.id.toString(),
-    page,
-  });
+  const isFocused = useIsFocused();
+  const {refetch: refetchNotes} = useAPIGetChatNotes(
+    {
+      roomId: room.id.toString(),
+      page,
+    },
+    {
+      onSuccess: data => {
+        if (data?.notes?.length) {
+          if (page === '1') {
+            setNotesForInfiniteScroll(data.notes);
+          } else {
+            setNotesForInfiniteScroll(n => {
+              if (
+                n.length &&
+                new Date(n[n.length - 1].createdAt) >
+                  new Date(data.notes[0].createdAt)
+              ) {
+                return [...n, ...data?.notes];
+              }
+              return n;
+            });
+          }
+        }
+      },
+    },
+  );
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatNote[]
   >([]);
   const {mutate: deleteNote} = useAPIDeleteChatNote();
   const [imageModal, setImageModal] = useState(false);
-  const [images, setImages] = useState<ImageSource[]>([]);
+  const [images, setImages] = useState<FIleSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
 
   const onEndReached = () => {
-    setPage(p => (Number(p) + 1).toString());
+    if (notesForInfiniteScroll?.length >= Number(page) * 20) {
+      setPage(p => (Number(p) + 1).toString());
+    }
   };
 
   const handlePressImage = useCallback(
@@ -47,8 +74,9 @@ const ChatNotes: React.FC = () => {
     ) => {
       const isNowUri = (element: Partial<ChatNoteImage>) =>
         element.imageURL === targetImage.imageURL;
-      const imageSources: ImageSource[] = noteImages.map(i => ({
+      const imageSources: FIleSource[] = noteImages.map(i => ({
         uri: i.imageURL || '',
+        fileName: i.fileName || '',
       }));
       setImages(imageSources);
       setNowImageIndex(noteImages.findIndex(isNowUri));
@@ -58,31 +86,18 @@ const ChatNotes: React.FC = () => {
   );
 
   useEffect(() => {
-    if (data?.notes?.length) {
+    if (isFocused) {
       if (page === '1') {
-        setNotesForInfiniteScroll(data.notes);
+        refetchNotes();
       } else {
-        setNotesForInfiniteScroll(n => {
-          if (
-            n.length &&
-            new Date(n[n.length - 1].createdAt) >
-              new Date(data.notes[0].createdAt)
-          ) {
-            return [...n, ...data?.notes];
-          }
-          return n;
-        });
+        setPage('1');
       }
-    }
-  }, [data?.notes, page]);
-
-  useFocusEffect(
-    useCallback(() => {
-      // setNotesForInfiniteScroll([]);
+    } else {
+      setNotesForInfiniteScroll([]);
       setPage('1');
-      refetchNotes();
-    }, [refetchNotes]),
-  );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   return (
     <WholeContainer>
@@ -95,8 +110,9 @@ const ChatNotes: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />
@@ -156,8 +172,12 @@ const ChatNotes: React.FC = () => {
                         },
                         {
                           onSuccess: () => {
-                            setPage('1');
-                            refetchNotes();
+                            setNotesForInfiniteScroll([]);
+                            if (page === '1') {
+                              refetchNotes();
+                            } else {
+                              setPage('1');
+                            }
                           },
                           onError: () => {
                             Alert.alert(
