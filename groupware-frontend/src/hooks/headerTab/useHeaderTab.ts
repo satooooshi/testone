@@ -377,6 +377,20 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
+          name: '全社インタビュー',
+          onClick: () => {
+            {
+              if (queryRefresh)
+                queryRefresh({
+                  page: '1',
+                  type: WikiType.INTERVIEW,
+                  rule_category: undefined,
+                  board_category: undefined,
+                });
+            }
+          },
+        },
+        {
           name: '掲示板',
           onClick: () => {
             {
