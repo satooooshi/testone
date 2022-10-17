@@ -98,6 +98,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
       setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
       setSearchQuery(q => ({
         ...q,
+        word,
         type,
         board_category: boardCategory,
         rule_category: ruleCategory,
@@ -204,6 +205,9 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
   const [word, setWord] = useState('');
   const [tag, setTag] = useState('');
 
+  useEffect(() => {
+    console.log('change word ======================', word);
+  }, [word]);
   useEffect(() => {
     if (routeParams?.tag) {
       setTag(routeParams?.tag);
