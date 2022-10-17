@@ -17,6 +17,7 @@ export const knowledgeColor = '#ecc94b';
 export const qaColor = '#00b5d8';
 export const allPostalColor = '#DD6B20';
 export const mailMagazineColor = '#4a72d3';
+export const interviewColor = '#f56565';
 export const chatColor = '#f6e05e';
 export const accountColor = '#f687b3';
 export const adminColor = '#805ad5';

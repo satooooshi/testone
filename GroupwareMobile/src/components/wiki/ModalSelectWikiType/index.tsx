@@ -150,6 +150,24 @@ const ModalSelectingWikiType: React.FC<ModalSelectingWikiTypeProps> = ({
           <></>
         )}
         {isCreatableWiki({
+          type: WikiType.INTERVIEW,
+          userRole: userRole,
+        }) ? (
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            onPress={() =>
+              onSelectWikiType({
+                type: WikiType.INTERVIEW,
+                ruleCategory: RuleCategory.NON_RULE,
+              })
+            }
+            value={WikiType.INTERVIEW}>
+            {wikiTypeNameFactory(WikiType.INTERVIEW)}
+          </Dropdown.Option>
+        ) : (
+          <></>
+        )}
+        {isCreatableWiki({
           type: WikiType.BOARD,
           boardCategory: BoardCategory.KNOWLEDGE,
           userRole: userRole,
