@@ -178,7 +178,7 @@ const UserList = () => {
               </Select>
             </FormControl>
           </Box>
-          <SimpleGrid minChildWidth="520px" spacing="20px" w="100%" mx="auto">
+          <SimpleGrid minChildWidth="520px" spacing="20px" w="100%">
             {users.users.map((u) => (
               <div key={u.id}>
                 <UserCard
