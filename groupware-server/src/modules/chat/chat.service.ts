@@ -721,7 +721,26 @@ export class ChatService {
     if (!targetGroup) {
       throw new BadRequestException('The chat room has already been deleted.');
     }
+    const manager = getManager();
+    const members: User[] = await manager.query(
+      'select chat_group_id, users.id as id from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [chatGroupID],
+    );
     await this.chatGroupRepository.delete(chatGroupID);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'edit',
+        screen: '',
+        id: targetGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      members.map((u) => u.id),
+      silentNotification,
+    );
   }
 
   public async deleteMessage(message: Partial<ChatMessage>) {
