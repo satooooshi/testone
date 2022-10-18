@@ -841,7 +841,7 @@ export class ChatService {
         .remove(user.id);
 
       const otherMemberIds = await manager.query(
-        'select user_id from user_chat_joining where user_id <> ? AND chat_group_id = ?',
+        'select user_id as id from user_chat_joining where user_id <> ? AND chat_group_id = ?',
         [user.id, chatGroupID],
       );
 
