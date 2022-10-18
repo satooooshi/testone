@@ -18,6 +18,7 @@ const BadgeContext = createContext({
   refreshRooms: () => {},
   isRoomsRefetching: false,
   isCompletedRefetchAllRooms: false,
+  RemovedRoomId: undefined as number | undefined,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -30,6 +31,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const {user, currentChatRoomId} = useAuthenticate();
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
+  const [RemovedRoomId, setRemovedRoomId] = useState<number>();
   const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
@@ -202,21 +204,24 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   }, [refetchGroup, refetchRoom]);
 
+  const removeRoom = (roomId: number) => {
+    setRemovedRoomId(roomId);
+    socket.emit('leaveRoom', roomId.toString());
+    setChatGroups(rooms =>
+      rooms.filter(r => {
+        if (r.id !== roomId) {
+          return true;
+        } else {
+          const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
+          setChatUnreadCount(c => (c - unreadCount >= 0 ? c - unreadCount : 0));
+        }
+      }),
+    );
+  };
+
   const refetchRoomCard = (data: {id: number; type: string}) => {
     if (data.type === 'remove') {
-      socket.emit('leaveRoom', data.id.toString());
-      setChatGroups(rooms =>
-        rooms.filter(r => {
-          if (r.id !== Number(data.id)) {
-            return true;
-          } else {
-            const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
-            setChatUnreadCount(c =>
-              c - unreadCount >= 0 ? c - unreadCount : 0,
-            );
-          }
-        }),
-      );
+      removeRoom(Number(data.id));
     } else {
       setRefetchGroup(data);
     }
@@ -260,19 +265,7 @@ export const BadgeProvider: React.FC = ({children}) => {
             ),
           );
         } else {
-          socket.emit('leaveRoom', editRoom.id.toString());
-          setChatGroups(rooms =>
-            rooms.filter(r => {
-              if (r.id !== editRoom.id) {
-                return true;
-              } else {
-                const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
-                setChatUnreadCount(c =>
-                  c - unreadCount >= 0 ? c - unreadCount : 0,
-                );
-              }
-            }),
-          );
+          removeRoom(editRoom.id);
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {
         const rooms = chatGroups;
@@ -297,6 +290,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         isRoomsRefetching: isLoading && page === 1,
         isCompletedRefetchAllRooms: completeRefetch,
         refreshRooms,
+        RemovedRoomId,
       }}>
       {children}
     </BadgeContext.Provider>

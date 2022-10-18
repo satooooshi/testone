@@ -122,20 +122,24 @@ const Chat: React.FC = () => {
   const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
-  const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
-    Number(room.id),
-    {
-      onError: () => {
-        navigation.navigate('ChatStack', {
-          screen: 'RoomList',
-        });
-        editChatGroup({
-          ...room,
-          members: room.members?.filter(u => u.id !== myself?.id),
-        });
-      },
+  const {
+    data: roomDetail,
+    refetch: refetchRoomDetail,
+    remove,
+  } = useAPIGetRoomDetail(Number(room.id), {
+    onSuccess(data) {
+      console.log('success', data);
     },
-  );
+    onError: () => {
+      navigation.navigate('ChatStack', {
+        screen: 'RoomList',
+      });
+      editChatGroup({
+        ...room,
+        members: room.members?.filter(u => u.id !== myself?.id),
+      });
+    },
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [after, setAfter] = useState<number>();
@@ -169,7 +173,8 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {handleEnterRoom, refetchRoomCard, editChatGroup} = useHandleBadge();
+  const {handleEnterRoom, refetchRoomCard, editChatGroup, RemovedRoomId} =
+    useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
@@ -869,6 +874,15 @@ const Chat: React.FC = () => {
     },
     [room.id, myself?.id, refetchUpdatedMessages],
   );
+
+  useEffect(() => {
+    console.log('----=-=-=-=');
+    if (RemovedRoomId === room.id) {
+      console.log('----=-=-=-=1111');
+      remove();
+      refetchRoomDetail();
+    }
+  }, [RemovedRoomId, refetchRoomDetail, room.id]);
 
   useEffect(() => {
     if (!messages.length) {
