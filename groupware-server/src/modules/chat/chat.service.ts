@@ -732,7 +732,7 @@ export class ChatService {
       body: '',
       custom: {
         silent: 'silent',
-        type: 'edit',
+        type: 'remove',
         screen: '',
         id: targetGroup.id.toString(),
       },
@@ -832,7 +832,8 @@ export class ChatService {
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
-      .of(chatGroupID);
+      .of(chatGroupID)
+      .remove(user.id);
     if (isOwner) {
       await this.chatGroupRepository
         .createQueryBuilder()

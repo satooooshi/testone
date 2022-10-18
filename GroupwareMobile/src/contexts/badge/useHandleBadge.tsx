@@ -203,7 +203,23 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [refetchGroup, refetchRoom]);
 
   const refetchRoomCard = (data: {id: number; type: string}) => {
-    setRefetchGroup(data);
+    if (data.type === 'remove') {
+      socket.emit('leaveRoom', data.id.toString());
+      setChatGroups(rooms =>
+        rooms.filter(r => {
+          if (r.id !== Number(data.id)) {
+            return true;
+          } else {
+            const unreadCount = r?.unreadCount;
+            setChatUnreadCount(c =>
+              c - unreadCount >= 0 ? c - unreadCount : 0,
+            );
+          }
+        }),
+      );
+    } else {
+      setRefetchGroup(data);
+    }
   };
 
   const handleEnterRoom = (roomId: number) => {
@@ -245,7 +261,18 @@ export const BadgeProvider: React.FC = ({children}) => {
           );
         } else {
           socket.emit('leaveRoom', editRoom.id.toString());
-          setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
+          setChatGroups(rooms =>
+            rooms.filter(r => {
+              if (r.id !== editRoom.id) {
+                return true;
+              } else {
+                const unreadCount = r?.unreadCount;
+                setChatUnreadCount(c =>
+                  c - unreadCount >= 0 ? c - unreadCount : 0,
+                );
+              }
+            }),
+          );
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {
         const rooms = chatGroups;
