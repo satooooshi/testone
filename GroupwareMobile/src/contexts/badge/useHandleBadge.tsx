@@ -210,7 +210,7 @@ export const BadgeProvider: React.FC = ({children}) => {
           if (r.id !== Number(data.id)) {
             return true;
           } else {
-            const unreadCount = r?.unreadCount;
+            const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
             setChatUnreadCount(c =>
               c - unreadCount >= 0 ? c - unreadCount : 0,
             );
@@ -266,7 +266,7 @@ export const BadgeProvider: React.FC = ({children}) => {
               if (r.id !== editRoom.id) {
                 return true;
               } else {
-                const unreadCount = r?.unreadCount;
+                const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
                 setChatUnreadCount(c =>
                   c - unreadCount >= 0 ? c - unreadCount : 0,
                 );
