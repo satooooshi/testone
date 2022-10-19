@@ -103,7 +103,7 @@ const UserTagAdmin: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <HeaderWithTextButton
-        title={'タグ管理'}
+        title={'タグ管理(ユーザー)'}
         enableBackButton={true}
         screenForBack={'Menu'}
       />
