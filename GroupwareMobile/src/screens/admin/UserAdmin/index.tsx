@@ -12,7 +12,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {User, UserRole, UserTag} from '../../../types';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
