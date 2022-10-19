@@ -1,9 +1,6 @@
 import {StyleSheet} from 'react-native';
 
 export const profileStyles = StyleSheet.create({
-  scrollView: {
-    alignSelf: 'center',
-  },
   textArea: {
     fontSize: 16,
     height: 100,
