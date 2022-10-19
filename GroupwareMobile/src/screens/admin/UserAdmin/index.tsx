@@ -100,7 +100,7 @@ const UserAdmin: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
-        title="Admin"
+        title="ユーザー管理"
         enableBackButton={true}
         screenForBack={'Menu'}
       />
