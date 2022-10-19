@@ -20,8 +20,17 @@ const Home: React.FC = () => {
   const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
 
   const handleLogout = () => {
-    logout();
-    setUser({});
+    Alert.alert('ログアウトしてよろしいですか？', '', [
+      {text: 'キャンセル', style: 'cancel'},
+      {
+        text: 'ログアウト',
+        style: 'destructive',
+        onPress: () => {
+          logout();
+          setUser({});
+        },
+      },
+    ]);
   };
 
   return (
