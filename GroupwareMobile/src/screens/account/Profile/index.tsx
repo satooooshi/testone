@@ -187,10 +187,7 @@ const Profile: React.FC = () => {
         <KeyboardAwareScrollView
           // eslint-disable-next-line react-native/no-inline-styles
           style={{backgroundColor: 'white'}}
-          extraScrollHeight={50}
-          contentContainerStyle={{
-            ...profileStyles.scrollView,
-          }}>
+          extraScrollHeight={50}>
           <Div px={'5%'} bg="white">
             <Div my="2xl" alignSelf="center">
               <UserAvatar
