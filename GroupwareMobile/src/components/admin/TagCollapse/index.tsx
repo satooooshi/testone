@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {Alert, TouchableHighlight} from 'react-native';
 import {
   Button,
   Collapse,
@@ -16,14 +17,14 @@ type TagCollapseProps = CollapseProps & {
   tags: AllTag[];
   tagType: TagType;
   onPressSaveButton: (t: Partial<AllTag>) => void;
-  onLongPressTag: (t: AllTag) => void;
+  onPressDeleteTag: (t: AllTag) => void;
 };
 
 const TagCollapse: React.FC<TagCollapseProps> = ({
   tags,
   tagType,
   onPressSaveButton,
-  onLongPressTag,
+  onPressDeleteTag,
 }) => {
   const [newTagName, setNewTagName] = useState('');
   const [tagEditted, setTagEditted] = useState<AllTag>();
@@ -120,7 +121,6 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
         )}
         {tags.map(t => (
           <TagButton
-            onLongPress={() => onLongPressTag(t)}
             key={t.id}
             onPress={() => {
               setNewTagName(t.name);
@@ -129,6 +129,16 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
             bg={tagColorFactory(t.type)}
             color="white"
             mr={4}
+            suffix={
+              <TouchableHighlight onPress={() => onPressDeleteTag(t)}>
+                <Icon
+                  name="cross"
+                  fontSize="xl"
+                  color="white"
+                  fontFamily="Entypo"
+                />
+              </TouchableHighlight>
+            }
             mb={4}>
             {t.name}
           </TagButton>
