@@ -90,7 +90,11 @@ const UserList: React.FC = () => {
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <HeaderWithTextButton title="社員名鑑" />
+      <HeaderWithTextButton
+        title="社員名鑑"
+        enableBackButton={true}
+        screenForBack={'Menu'}
+      />
       <TopTab.Navigator
         initialRouteName={topTabNames[0]}
         screenOptions={{tabBarScrollEnabled: true}}>
