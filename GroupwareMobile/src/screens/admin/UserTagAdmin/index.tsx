@@ -102,7 +102,11 @@ const UserTagAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton title={'タグ管理'} />
+      <HeaderWithTextButton
+        title={'タグ管理(ユーザー)'}
+        enableBackButton={true}
+        screenForBack={'Menu'}
+      />
       <ScrollDiv
         alignSelf="center"
         contentContainerStyle={{
