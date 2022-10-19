@@ -113,13 +113,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             )}
           />
         ) : (
-          <Tag
-            fontSize={'md'}
-            h={24}
-            py={0}
-            bg={tagBgColorFactory(TagType.TECH)}
-            color={tagFontColorFactory(TagType.TECH)}
-            mr={4}>
+          <Tag fontSize={'md'} h={24} py={0} bg="white" color="gray" mr={4}>
             未設定
           </Tag>
         )}
@@ -147,13 +141,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             )}
           />
         ) : (
-          <Tag
-            fontSize={'md'}
-            h={24}
-            py={0}
-            bg={tagBgColorFactory(TagType.QUALIFICATION)}
-            color={tagFontColorFactory(TagType.QUALIFICATION)}
-            mr={4}>
+          <Tag fontSize={'md'} h={24} py={0} bg="white" color="gray" mr={4}>
             未設定
           </Tag>
         )}
@@ -181,13 +169,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             )}
           />
         ) : (
-          <Tag
-            fontSize={'md'}
-            h={24}
-            py={0}
-            bg={tagBgColorFactory(TagType.CLUB)}
-            color={tagFontColorFactory(TagType.CLUB)}
-            mr={4}>
+          <Tag fontSize={'md'} h={24} py={0} bg="white" color="gray" mr={4}>
             未設定
           </Tag>
         )}
@@ -215,13 +197,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             )}
           />
         ) : (
-          <Tag
-            fontSize={'md'}
-            h={24}
-            py={0}
-            bg={tagBgColorFactory(TagType.HOBBY)}
-            color={tagFontColorFactory(TagType.HOBBY)}
-            mr={4}>
+          <Tag fontSize={'md'} h={24} py={0} bg="white" color="gray" mr={4}>
             未設定
           </Tag>
         )}
