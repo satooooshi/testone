@@ -99,7 +99,11 @@ const UserAdmin: React.FC = () => {
   ];
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="Admin" />
+      <HeaderWithTextButton
+        title="Admin"
+        enableBackButton={true}
+        screenForBack={'Menu'}
+      />
       <SearchForm
         searchTarget="user"
         defaultValue={{word: '', selectedTags}}
