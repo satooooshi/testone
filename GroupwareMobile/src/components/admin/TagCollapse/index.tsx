@@ -12,7 +12,8 @@ import {
 import {AllTag, TagType} from '../../../types';
 import {layoutBackgroundGrayColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 type TagCollapseProps = CollapseProps & {
   tags: AllTag[];
@@ -129,15 +130,15 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
               setNewTagName(t.name);
               setTagEditted(t);
             }}
-            bg={tagColorFactory(t.type)}
-            color="white"
+            bg={tagBgColorFactory(t.type)}
+            color={tagFontColorFactory(t.type)}
             mr={4}
             suffix={
               <TouchableHighlight onPress={() => onPressDeleteTag(t)}>
                 <Icon
                   name="cross"
                   fontSize="xl"
-                  color="white"
+                  color={tagFontColorFactory(t.type)}
                   fontFamily="Entypo"
                 />
               </TouchableHighlight>
