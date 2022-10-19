@@ -275,12 +275,14 @@ const AccountDetail: React.FC = () => {
       <HeaderWithTextButton
         title={'アカウント情報'}
         activeTabName={'アカウント情報'}
-        enableBackButton={userID !== user?.id}
+        enableBackButton={true}
         // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
         // onPressRightButton={mySelfOfNot ? handleLogout : undefined}
         screenForBack={
           route.params?.previousScreenName
             ? route.params.previousScreenName
+            : userID === user?.id
+            ? 'Menu'
             : undefined
         }
       />
