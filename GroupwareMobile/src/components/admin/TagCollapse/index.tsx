@@ -82,9 +82,9 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
           <Div flexDir="row" mb="lg" justifyContent="space-evenly" w="100%">
             <Button
               w={'45%'}
-              bg={'white'}
-              color="green700"
-              borderColor="green700"
+              bg="blue700"
+              color="white"
+              rounded="lg"
               onPress={() => {
                 onPressSaveButton({
                   ...tagEditted,
@@ -93,16 +93,16 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
                 });
                 setNewTagName('');
                 setTagEditted(undefined);
-              }}
-              borderWidth={1}>
-              保存
+              }}>
+              変更する
             </Button>
             <Button
-              w={'45%'}
-              bg={'white'}
-              color="blue700"
-              borderColor="blue700"
+              w="45%"
+              bg={layoutBackgroundGrayColor}
+              color="gray"
               borderWidth={1}
+              borderColor="gray"
+              rounded="lg"
               onPress={() => {
                 setTagEditted(undefined);
                 setNewTagName('');
@@ -114,14 +114,13 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
           <Button
             w="100%"
             mb="lg"
-            bg={'white'}
-            color="green700"
-            borderColor="green700"
+            bg="blue700"
+            color="white"
+            rounded="lg"
             onPress={() => {
               onPressSaveButton({name: newTagName, type: tagType});
               setNewTagName('');
-            }}
-            borderWidth={1}>
+            }}>
             追加する
           </Button>
         )}
