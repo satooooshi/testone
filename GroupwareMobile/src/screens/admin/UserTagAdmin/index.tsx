@@ -114,14 +114,14 @@ const UserTagAdmin: React.FC = () => {
               tags={techTags || []}
               tagType={TagType.TECH}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
             <TagCollapse
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
           </>
@@ -130,14 +130,14 @@ const UserTagAdmin: React.FC = () => {
           tags={clubTags || []}
           tagType={TagType.CLUB}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         <TagCollapse
           tags={hobbyTags || []}
           tagType={TagType.HOBBY}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         {isAdmin ? (
@@ -145,7 +145,7 @@ const UserTagAdmin: React.FC = () => {
             tags={otherTags || []}
             tagType={TagType.OTHER}
             onPressSaveButton={handleCreate}
-            onLongPressTag={handleDelete}
+            onPressDeleteTag={handleDelete}
             mb={'lg'}
           />
         ) : null}
