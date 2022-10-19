@@ -187,7 +187,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
-                navigation.navigate('IntroStack', {
+                navigation.navigate('EventStack', {
                   screen: 'EventList',
                   params: {
                     type: EventType.SUBMISSION_ETC,
