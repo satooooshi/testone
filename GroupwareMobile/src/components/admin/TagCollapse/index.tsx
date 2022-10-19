@@ -10,6 +10,7 @@ import {
   Tag as TagButton,
 } from 'react-native-magnus';
 import {AllTag, TagType} from '../../../types';
+import {layoutBackgroundGrayColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 
@@ -32,17 +33,19 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
     <Collapse>
       <Collapse.Header
         active
-        color="white"
-        bg={tagColorFactory(tagType)}
+        color="black"
+        bg={layoutBackgroundGrayColor}
         fontSize={18}
         fontWeight={'bold'}
+        borderBottomWidth={0.2}
+        borderBottomColor="gray"
         suffix={
           <Icon
             position="absolute"
             right={8}
             name="down"
             fontSize={20}
-            color="white"
+            color="black"
           />
         }
         activeSuffix={
@@ -51,7 +54,7 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
             right={8}
             name="up"
             fontSize={20}
-            color="white"
+            color="black"
           />
         }
         p="md"
@@ -61,7 +64,7 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
       <Collapse.Body
         pb="xl"
         rounded="md"
-        bg="white"
+        bg={layoutBackgroundGrayColor}
         flexDir="row"
         flexWrap="wrap">
         <Input
