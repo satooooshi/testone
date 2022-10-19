@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Alert, TouchableHighlight} from 'react-native';
+import {TouchableHighlight} from 'react-native';
 import {
   Button,
   Collapse,
