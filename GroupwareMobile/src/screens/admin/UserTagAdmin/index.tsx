@@ -10,7 +10,6 @@ import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
 import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {TagType, UserRole, UserTag} from '../../../types';
 
 const UserTagAdmin: React.FC = () => {
@@ -105,8 +104,8 @@ const UserTagAdmin: React.FC = () => {
       </Overlay>
       <HeaderWithTextButton title={'タグ管理'} />
       <ScrollDiv
+        alignSelf="center"
         contentContainerStyle={{
-          ...tagAdminStyles.scrollView,
           width: windowWidth * 0.9,
         }}>
         {isAdmin ? (
