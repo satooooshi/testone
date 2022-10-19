@@ -10,7 +10,6 @@ import {useAPICreateTag} from '../../../hooks/api/tag/useAPICreateTag';
 import {useAPIDeleteTag} from '../../../hooks/api/tag/useAPIDeleteTag';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {Tag, TagType, UserRole} from '../../../types';
 
 const TagAdmin: React.FC = () => {
@@ -105,15 +104,15 @@ const TagAdmin: React.FC = () => {
       </Overlay>
       <HeaderWithTextButton title={'タグ管理'} />
       <ScrollDiv
+        alignSelf="center"
         contentContainerStyle={{
-          ...tagAdminStyles.scrollView,
           width: windowWidth * 0.9,
         }}>
         <TagCollapse
           tags={techTags || []}
           tagType={TagType.TECH}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         {isAdmin ? (
@@ -122,14 +121,14 @@ const TagAdmin: React.FC = () => {
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
             <TagCollapse
               tags={clubTags || []}
               tagType={TagType.CLUB}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
           </>
@@ -138,7 +137,7 @@ const TagAdmin: React.FC = () => {
           tags={hobbyTags || []}
           tagType={TagType.HOBBY}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         {isAdmin ? (
@@ -146,7 +145,7 @@ const TagAdmin: React.FC = () => {
             tags={otherTags || []}
             tagType={TagType.OTHER}
             onPressSaveButton={handleCreate}
-            onLongPressTag={handleDelete}
+            onPressDeleteTag={handleDelete}
             mb={'lg'}
           />
         ) : null}

@@ -10,7 +10,6 @@ import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
 import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {TagType, UserRole, UserTag} from '../../../types';
 
 const UserTagAdmin: React.FC = () => {
@@ -105,8 +104,8 @@ const UserTagAdmin: React.FC = () => {
       </Overlay>
       <HeaderWithTextButton title={'タグ管理'} />
       <ScrollDiv
+        alignSelf="center"
         contentContainerStyle={{
-          ...tagAdminStyles.scrollView,
           width: windowWidth * 0.9,
         }}>
         {isAdmin ? (
@@ -115,14 +114,14 @@ const UserTagAdmin: React.FC = () => {
               tags={techTags || []}
               tagType={TagType.TECH}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
             <TagCollapse
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
           </>
@@ -131,14 +130,14 @@ const UserTagAdmin: React.FC = () => {
           tags={clubTags || []}
           tagType={TagType.CLUB}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         <TagCollapse
           tags={hobbyTags || []}
           tagType={TagType.HOBBY}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         {isAdmin ? (
@@ -146,7 +145,7 @@ const UserTagAdmin: React.FC = () => {
             tags={otherTags || []}
             tagType={TagType.OTHER}
             onPressSaveButton={handleCreate}
-            onLongPressTag={handleDelete}
+            onPressDeleteTag={handleDelete}
             mb={'lg'}
           />
         ) : null}
