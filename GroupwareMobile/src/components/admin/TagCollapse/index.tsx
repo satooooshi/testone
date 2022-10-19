@@ -73,7 +73,9 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
           value={newTagName}
           onChangeText={t => setNewTagName(t)}
           placeholder="タグ名を入力してください"
+          fontSize="lg"
           w="100%"
+          borderWidth={0}
           mb={'lg'}
         />
         {tagEditted ? (
@@ -120,7 +122,7 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
               setNewTagName('');
             }}
             borderWidth={1}>
-            新規追加
+            追加する
           </Button>
         )}
         {tags.map(t => (
