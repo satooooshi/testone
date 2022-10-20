@@ -15,6 +15,9 @@ import { TopNewsModule } from './modules/top-news/top-news.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_DIRNAME } from './var';
+import { ApplicationBeforeJoining } from './entities/applicationBeforeJoining.entity';
+import { Attendance } from './entities/attendance.entity';
+import { AttendanceReport } from './entities/attendanceReport.entity';
 import { ChatAlbum } from './entities/chatAlbum.entity';
 import { ChatAlbumImage } from './entities/chatAlbumImage.entity';
 import { ChatGroup } from './entities/chatGroup.entity';
@@ -22,6 +25,7 @@ import { ChatMessage } from './entities/chatMessage.entity';
 import { ChatMessageReaction } from './entities/chatMessageReaction.entity';
 import { ChatNote } from './entities/chatNote.entity';
 import { ChatNoteImage } from './entities/chatNoteImage.entity';
+import { DefaultAttendance } from './entities/defaultAttendance.entity';
 import { Department } from './entities/department.entity';
 import { NotificationDevice } from './entities/device.entity';
 import { EventSchedule } from './entities/event.entity';
@@ -36,6 +40,7 @@ import { QAAnswerReply } from './entities/qaAnswerReply.entity';
 import { SubmissionFile } from './entities/submissionFiles.entity';
 import { Tag } from './entities/tag.entity';
 import { TopNews } from './entities/topNews.entity';
+import { TravelCost } from './entities/travelCost.entity';
 import { User } from './entities/user.entity';
 import { UserGoodForBoard } from './entities/userGoodForBord.entity';
 import { UserJoiningEvent } from './entities/userJoiningEvent.entity';
@@ -105,6 +110,11 @@ import { Wiki } from './entities/wiki.entity';
           UserJoiningEvent,
           UserTag,
           Wiki,
+          ApplicationBeforeJoining,
+          Attendance,
+          AttendanceReport,
+          DefaultAttendance,
+          TravelCost,
         ],
         synchronize: false,
         // migrations:
