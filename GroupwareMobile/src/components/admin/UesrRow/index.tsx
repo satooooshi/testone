@@ -35,8 +35,9 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
   });
   const [deleted, setDeleted] = useState(false);
   const {mutate: deleteUser, isLoading: loadingDelete} = useAPIDeleteUser({
-    onSuccess: () => {
+    onSuccess: (_, u: User) => {
       setDeleted(true);
+      Alert.alert(`${userNameFactory(u)}さんを削除しました。`);
     },
     onError: () => {
       Alert.alert(

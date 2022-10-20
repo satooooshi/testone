@@ -57,6 +57,8 @@ export class EventScheduleService {
         return '部活動';
       case EventType.SUBMISSION_ETC:
         return '提出物等';
+      case EventType.OTHER:
+        return 'その他';
     }
   }
 
@@ -154,9 +156,10 @@ export class EventScheduleService {
       { label: 'タグ', value: 'tag' },
       { label: 'タイプ', value: 'type' },
       { label: '開催者', value: 'hostUsers' },
-      { label: '参加者', value: 'users' },
-      { label: '参加者の社員コード', value: 'employeeId' },
-      { label: '参加人数', value: 'participantsCount' },
+      { label: '応募者', value: 'users' },
+      { label: '出席状況', value: 'status' },
+      { label: '応募者の社員コード', value: 'employeeId' },
+      { label: '応募人数', value: 'participantsCount' },
     ];
     const csvEvents: any[] = [];
     const events = await this.eventRepository.find({
@@ -179,6 +182,7 @@ export class EventScheduleService {
             userJoiningEvent.user.lastName +
             ' ' +
             userJoiningEvent.user.firstName;
+          const isCancel = !!userJoiningEvent.canceledAt;
           csvEvents.push({
             ...e,
             startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
@@ -187,6 +191,7 @@ export class EventScheduleService {
             type: this.eventTypeNameFactory(e.type),
             hostUsers: host,
             users: participantName,
+            status: isCancel ? '欠席' : '出席',
             employeeId: userJoiningEvent.user.employeeId,
             participantsCount: e.userJoiningEvent.length,
           });
@@ -201,6 +206,7 @@ export class EventScheduleService {
         type: this.eventTypeNameFactory(e.type),
         hostUsers: host,
         users: '',
+        status: '',
         employeeId: '',
         participantsCount: e.userJoiningEvent.length,
       });
@@ -249,7 +255,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
-        word && word.length !== 1
+        !!word && !!word.match(/[\s]/g)?.length
           ? 'MATCH(events.title, events.description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         { word },
@@ -258,7 +264,7 @@ export class EventScheduleService {
         type,
       })
       .andWhere(
-        word.length === 1
+        !word.match(/[\s]/g)?.length
           ? 'CONCAT(events.title, events.description) LIKE :queryWord'
           : '1=1',
         { queryWord: `%${word}%` },
@@ -370,7 +376,6 @@ export class EventScheduleService {
         .andWhere('userJoiningEvent.event_id IN (:...eventIds)', { eventIds })
         .andWhere('userJoiningEvent.canceledAt IS NULL')
         .getRawMany();
-      console.log('----', userId, joiningEventList);
 
       const joiningEventId = joiningEventList.map((j) => Number(j.eventId));
       events = events.filter((e) => joiningEventId.includes(e.id));

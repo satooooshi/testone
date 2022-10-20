@@ -58,6 +58,11 @@ const EventSearcher: React.FC = () => {
       onPress: () => setPartOfSearchQuery({type: EventType.SUBMISSION_ETC}),
       borderBottomColor: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
+    {
+      name: eventTypeNameFactory(EventType.OTHER),
+      onPress: () => setPartOfSearchQuery({type: EventType.OTHER}),
+      borderBottomColor: eventTypeColorFactory(EventType.OTHER),
+    },
   ];
 
   useEffect(() => {

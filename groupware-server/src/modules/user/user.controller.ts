@@ -10,19 +10,21 @@ import {
   BadRequestException,
   Res,
 } from '@nestjs/common';
-import { User, UserRole } from 'src/entities/user.entity';
+import { BranchType, User, UserRole } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { UserService } from './user.service';
 import UpdatePasswordDto from './dto/updatePasswordDto';
 import { Response } from 'express';
 import { ChatService } from '../chat/chat.service';
+import { ReqUserOrRolesGuard, Roles, RolesGuard } from '../auth/roles.guard';
 
 export interface SearchQueryToGetUsers {
   page?: string;
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: BranchType;
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
@@ -113,7 +115,8 @@ export class UserController {
     return usersExceptRequestUser;
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, ReqUserOrRolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('update-user')
   async updateUser(
     @Req() request: RequestWithUser,
@@ -138,15 +141,11 @@ export class UserController {
     return await this.userService.updatePassword(request, content);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    const rooms = await this.chatService.getRoomsId(user.id);
-    for (const r of rooms) {
-      if (r.id) {
-        await this.chatService.leaveChatRoom(user.id, r.id);
-      }
-    }
+    await this.chatService.leaveAllRooms(user);
     await this.userService.deleteUser(user);
   }
 }

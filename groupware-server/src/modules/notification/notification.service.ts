@@ -2,6 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotificationDevice } from 'src/entities/device.entity';
+import { APP_DIRNAME } from 'src/var';
 import { Repository } from 'typeorm';
 
 export type EmailTemplateContext = {
@@ -69,7 +70,7 @@ export class NotificationService {
       .sendMail({
         to,
         subject,
-        template: __dirname + '/../../templates/index', // The `.pug` or `.hbs` extension is appended automatically.
+        template: APP_DIRNAME + '/templates/index', // The `.pug` or `.hbs` extension is appended automatically.
         context: {
           // Data to be sent to template engine.
           title,

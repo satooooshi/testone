@@ -1,7 +1,7 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text, Textarea, useMediaQuery } from '@chakra-ui/react';
+import { Box, Text, Textarea, useMediaQuery, Image } from '@chakra-ui/react';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { ChatMessage, ChatMessageType } from 'src/types';
+import { ChatMessage, ChatMessageType, User } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
@@ -10,21 +10,31 @@ import Linkify from 'react-linkify';
 import { componentDecorator } from 'src/utils/componentDecorator';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
 import { socket } from '../../ChatBox/socket';
+import { reactionStickers } from '../../../../utils/reactionStickers';
+import NextImage from 'next/image';
+import noImage from '@/public/no-image.jpg';
 
 type TextMessageProps = {
+  focusTextareaRef?: React.RefObject<HTMLTextAreaElement>;
   message: ChatMessage;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
   editMessage: boolean;
   finishEdit: () => void;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
+  focusTextareaRef,
   message,
   confirmedSearchWord,
   searchedResultIds,
   editMessage,
   finishEdit,
+  senderAvatars,
 }) => {
   const [isEdited, setIsEdited] = useState(false);
   const { mutate: updateMessage } = useAPIUpdateChatMessage({
@@ -72,6 +82,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   useEffect(() => {
     const escFunction = (e: any) => {
       if (e.key == 'Escape') {
+        setMessageValue(message.content);
         finishEdit();
       }
     };
@@ -87,6 +98,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
       setIsEdited(true);
     }
   }, [message.createdAt, message.updatedAt]);
+
+  const senderAvatar = senderAvatars?.find(
+    (s) => s.member.id === message.replyParentMessage?.sender?.id,
+  );
 
   return (
     <Box
@@ -109,13 +124,88 @@ const TextMessage: React.FC<TextMessageProps> = ({
               w="32px"
               mr="4px"
               cursor="pointer"
-              user={message.replyParentMessage.sender}
+              user={
+                senderAvatar
+                  ? senderAvatar.member
+                  : message.replyParentMessage.sender
+              }
             />
-            <Box width={'90%'}>
+            <Box width={'50%'}>
               <Text fontWeight="bold">
-                {userNameFactory(message.replyParentMessage?.sender)}
+                {userNameFactory(
+                  senderAvatar
+                    ? senderAvatar.member
+                    : message.replyParentMessage.sender,
+                )}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>
+            </Box>
+            <Box>
+              {message.replyParentMessage.type === ChatMessageType.IMAGE ? (
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
+                    src={message.replyParentMessage.content}
+                    w={'100'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
+                  />
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
+              ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
+                message?.replyParentMessage?.content ? (
+                  <video
+                    style={{
+                      maxHeight: '100px',
+                      width: '100px',
+                      objectFit: 'contain',
+                    }}
+                    controls={false}
+                    muted>
+                    <source
+                      src={message.replyParentMessage.content}
+                      type="video/mp4"
+                    />
+                  </video>
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない動画"
+                  />
+                )
+              ) : message.replyParentMessage.type ===
+                ChatMessageType.STICKER ? (
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
+                    src={
+                      reactionStickers.find(
+                        (s) => s.name === message?.replyParentMessage?.content,
+                      )?.src
+                    }
+                    w={'100%'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
+                  />
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
+              ) : null}
             </Box>
           </Box>
         )}
@@ -126,22 +216,22 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               wordBreak={'break-word'}
-              color={message.isSender ? 'white' : darkFontColor}
-              bg={message.isSender ? 'blue.500' : '#ececec'}>
+              color={message.isSender ? 'white' : 'black'}>
               {highlightSearchedWord(message)}
             </Text>
-            {/* <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">
-              {isEdited ? ' 編集済み' : null}
-            </Text> */}
+            <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">
+              {message.modifiedAt ? ' 編集済み' : null}
+            </Text>
           </>
         ) : (
           <>
             <Textarea
+              ref={focusTextareaRef}
               borderRadius="8px"
               maxW={'40vw'}
               minW={'10vw'}
               value={messageValue}
-              onKeyPress={(e: React.KeyboardEvent) => {
+              onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
                   updateMessage({ ...message, content: messageValue });
                 }

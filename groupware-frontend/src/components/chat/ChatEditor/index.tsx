@@ -63,6 +63,7 @@ export const Entry: React.FC<EntryComponentProps> = ({
 };
 
 type ChatEditorProps = {
+  editorRef?: React.RefObject<Editor>;
   room: ChatGroup;
   onSend: (content: string) => void;
   isLoading: boolean;
@@ -75,14 +76,14 @@ type ChatEditorProps = {
 };
 
 const ChatEditor: React.FC<ChatEditorProps> = memo(
-  ({ room, onSend, isLoading, uploadFiles }) => {
+  ({ room, onSend, isLoading, uploadFiles, editorRef }) => {
     const { user } = useAuthenticate();
     const [content, setContent] = useState('');
     const [editorState, setEditorState] = useState<EditorState>(
       EditorState.createEmpty(),
     );
     // const editorStateRef = useRef(EditorState.createEmpty());
-    const editorRef = useRef<Editor>(null);
+    // const editorRef = useRef<Editor>(null);
     const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>(
       [],
     );
@@ -94,7 +95,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
           ?.filter((u) => u.id !== user?.id)
           .map((u) => ({
             id: u.id,
-            name: userNameFactory(u) + 'さん',
+            name: `@${userNameFactory(u)}さん`,
             avatar: u.avatarUrl,
           })) || [];
       const allTag = { id: 0, name: 'all', avatar: '' };
@@ -160,7 +161,10 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
       if (parsedMessage) {
         for (const m of mentionedUserData) {
           const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-          parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
+          parsedMessage = parsedMessage.replace(
+            regexp,
+            `{@}[${m.name.slice(1)}](${m.id})`,
+          );
         }
         onSend(parsedMessage);
         setEditorState(EditorState.createEmpty());
@@ -175,7 +179,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
           bg="#fefefe"
           h="20%"
           onClick={() => {
-            editorRef.current?.focus();
+            editorRef?.current?.focus();
           }}>
           <Editor
             editorKey={'editor'}
@@ -238,5 +242,4 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
   },
 );
 
-ChatEditor.displayName = 'ChatEditor';
 export default ChatEditor;

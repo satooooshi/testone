@@ -76,6 +76,8 @@ const eventTypeName = (eventType: EventType) => {
       return 'コーチ制度';
     case EventType.SUBMISSION_ETC:
       return '提出物等';
+    case EventType.OTHER:
+      return 'その他';
   }
 };
 
@@ -256,10 +258,7 @@ export class EventScheduleController {
       req.user,
     );
     if (joinedEvent.chatNeeded && joinedEvent.chatGroup) {
-      await this.chatService.joinChatGroup(
-        req.user.id,
-        joinedEvent.chatGroup.id,
-      );
+      await this.chatService.joinChatGroup(req.user, joinedEvent.chatGroup.id);
     }
     return joinedEvent;
   }

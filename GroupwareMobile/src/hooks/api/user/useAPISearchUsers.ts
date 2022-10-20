@@ -9,6 +9,7 @@ export interface SearchQueryToGetUsers {
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: 'tokyo' | 'osaka';
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';

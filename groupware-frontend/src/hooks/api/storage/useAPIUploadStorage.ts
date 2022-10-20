@@ -38,7 +38,7 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
       const base64str = img.data;
       const imgExt = img.ext;
       const resizedFiile = Compress.convertBase64ToFile(base64str, imgExt);
-      return resizedFiile;
+      return file.size < resizedFiile.size ? file : resizedFiile;
     }
     return file;
   };

@@ -12,11 +12,11 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 
 const getRooms = async (query: GetRoomsQuery) => {
-  const {page = 1, limit = '20', updatedAtLatestRoom = ''} = query;
+  const {page = 1, limit = '100', updatedAtLatestRoom = ''} = query;
   const res = await axiosInstance.get<GetRoomsResult>(
     `${getRoomsByPageURL}?page=${page}&limit=${limit}&updatedAtLatestRoom=${updatedAtLatestRoom}`,
   );

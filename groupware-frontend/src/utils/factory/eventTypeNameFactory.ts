@@ -14,6 +14,8 @@ const eventTypeNameFactory = (type: EventType): any => {
       return '部活動';
     case EventType.SUBMISSION_ETC:
       return '提出物等';
+    case EventType.OTHER:
+      return 'その他';
   }
 };
 

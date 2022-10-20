@@ -48,6 +48,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import tailwind from 'tailwind-rn';
+import {ActivityIndicator} from 'react-native-paper';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -90,7 +91,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: type || EventType.CLUB,
+    type: type || undefined,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -143,8 +144,8 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     date: new Date(),
   });
   const {width: windowWidth} = useWindowDimensions();
-  const {mutate: uploadFile} = useAPIUploadStorage();
-  const {mutate: uploadImage} = useAPIUploadStorage({
+  const {mutate: uploadFile, isLoading: isLoadingRF} = useAPIUploadStorage();
+  const {mutate: uploadImage, isLoading: isLoadingTN} = useAPIUploadStorage({
     onSuccess: uploadedURL => {
       setNewEvent(e => ({...e, imageURL: uploadedURL[0]}));
     },
@@ -277,12 +278,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       setNewEvent(event);
     }
   }, [event, setNewEvent]);
-
-  useEffect(() => {
-    if (type && isCreatableEvent(type, user?.role)) {
-      setNewEvent(e => ({...e, type}));
-    }
-  }, [setNewEvent, type, user?.role]);
 
   useEffect(() => {
     event?.tags && setSelectedTags(event.tags);
@@ -578,6 +573,18 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             ) : (
               <></>
             )}
+            {isCreatableEvent(EventType.OTHER, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.OTHER}))
+                }
+                value={EventType.OTHER}>
+                {eventTypeNameFactory(EventType.OTHER)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
           </Dropdown>
           {newEvent.imageURL ? (
             <>
@@ -603,11 +610,17 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               alignItems="flex-start"
               alignSelf="center"
               mb={'lg'}>
-              <Text fontSize={16}>サムネイルを選択</Text>
-              <DropdownOpenerButton
-                name={'タップで画像を選択'}
-                onPress={handlePickImage}
-              />
+              {isLoadingTN ? (
+                <ActivityIndicator />
+              ) : (
+                <>
+                  <Text fontSize={16}>サムネイルを選択</Text>
+                  <DropdownOpenerButton
+                    name={'タップで画像を選択'}
+                    onPress={handlePickImage}
+                  />
+                </>
+              )}
             </Div>
           )}
           <Div
@@ -615,11 +628,17 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignItems="flex-start"
             alignSelf="center"
             mb={'lg'}>
-            <Text fontSize={16}>参考資料を選択</Text>
-            <DropdownOpenerButton
-              name={'タップでファイルを選択'}
-              onPress={() => handlePickDocument()}
-            />
+            {isLoadingRF ? (
+              <ActivityIndicator />
+            ) : (
+              <>
+                <Text fontSize={16}>参考資料を選択</Text>
+                <DropdownOpenerButton
+                  name={'タップでファイルを選択'}
+                  onPress={() => handlePickDocument()}
+                />
+              </>
+            )}
           </Div>
           {newEvent.files?.map(f => (
             <Div

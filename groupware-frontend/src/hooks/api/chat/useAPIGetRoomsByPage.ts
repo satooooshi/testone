@@ -12,7 +12,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 
 const getRooms = async (query: GetRoomsQuery) => {

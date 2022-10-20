@@ -30,6 +30,7 @@ export enum EventType {
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
+  OTHER = 'other',
 }
 
 export enum TagType {
@@ -44,6 +45,7 @@ export enum WikiType {
   RULES = 'rule',
   ALL_POSTAL = 'all-postal',
   BOARD = 'board',
+  MAIL_MAGAZINE = 'mail_magazine',
 }
 
 export enum RuleCategory {
@@ -307,6 +309,7 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
   callTime?: string;
   replyParentMessage?: ChatMessage;
@@ -332,6 +335,8 @@ export interface ChatGroup {
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
+  previousMembers?: User[];
+  memberCount: number;
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
   unreadCount?: number;

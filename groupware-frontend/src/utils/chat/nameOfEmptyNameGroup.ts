@@ -1,9 +1,11 @@
-import { User } from 'src/types';
+import { ChatGroup, User } from 'src/types';
 
-export const nameOfEmptyNameGroup = (members?: User[]): string => {
-  if (!members) {
+export const nameOfEmptyNameGroup = (group: ChatGroup): string => {
+  if (group.name) {
+    return group.name;
+  }
+  if (!group.memberCount) {
     return 'メンバーがいません';
   }
-  const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-  return strMembers;
+  return 'タイトルなしトーク';
 };

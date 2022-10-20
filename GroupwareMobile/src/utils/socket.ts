@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadCh
 import {useAPIGetLastReadChatTime} from '../hooks/api/chat/useAPIGetLastReadChatTime';
 import {getThumbnailOfVideo} from './getThumbnailOfVideo';
 
-export const socket = io('https://www.bbbbbb.ga', {
+export const socket = io('https://www.groupware-develop.tk/', {
   transports: ['websocket'],
   forceNew: true,
   upgrade: false,
@@ -83,7 +83,7 @@ export const useChatSocket = (
         }
       });
       socket.on('msgToClient', async (socketMessage: SocketMessage) => {
-        console.log('msgToClient called', socketMessage);
+        // console.log('msgToClient called', socketMessage);
 
         if (!socketMessage.chatMessage) {
           return;

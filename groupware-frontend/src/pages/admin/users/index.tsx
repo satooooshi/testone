@@ -13,6 +13,8 @@ import {
   Select,
   Text,
   Link as ChakraLink,
+  useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -42,9 +44,11 @@ const UserAdmin: React.FC = () => {
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
   const [searchWord, setSearchWord] = useState(query.word);
+  const [isDeletingUser, setIsDeletingUser] = useState(-1);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
+
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
@@ -55,17 +59,24 @@ const UserAdmin: React.FC = () => {
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
   };
+  const toast = useToast();
   const { mutate: deleteUser } = useAPIDeleteUser({
-    onSuccess: () => {
+    onSuccess: (_, user) => {
+      setIsDeletingUser(-1);
       refetch();
+      toast({
+        description: `${userNameFactory(user)} さんを削除しました。`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const onDeleteClicked = (user: User) => {
-    if (
-      confirm(`${user.lastName} ${user.firstName}さんを削除して宜しいですか？`)
-    ) {
+    if (confirm(`${userNameFactory(user)} さんを削除して宜しいですか？`)) {
+      setIsDeletingUser(user.id);
       deleteUser(user);
     }
   };
@@ -78,6 +89,7 @@ const UserAdmin: React.FC = () => {
       tag: tagQuery,
       word: query.word || '',
       sort: query.sort,
+      branch: query.branch,
       role: query.role,
       duration: query.duration,
     };
@@ -229,11 +241,15 @@ const UserAdmin: React.FC = () => {
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <RiDeleteBin6Line
-                    onClick={() => onDeleteClicked(u)}
-                    className={userAdminStyles.delete_icon}
-                    color="tomato"
-                  />
+                  {isDeletingUser == u.id ? (
+                    <Spinner />
+                  ) : (
+                    <RiDeleteBin6Line
+                      onClick={() => onDeleteClicked(u)}
+                      className={userAdminStyles.delete_icon}
+                      color="tomato"
+                    />
+                  )}
                 </td>
               </tr>
             ))}

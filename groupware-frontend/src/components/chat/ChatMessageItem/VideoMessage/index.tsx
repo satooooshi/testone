@@ -14,13 +14,22 @@ const VideoMessage: React.FC<VideoMessageProps> = ({ message }) => {
     <Box display="flex" maxW="300px" maxH={'300px'}>
       {isSafari ? (
         <video controls muted>
-          <source src={message.content} type="video/mp4" />
+          <source
+            src={message.content}
+            style={{
+              maxHeight: '100px',
+              maxWidth: '100px',
+              objectFit: 'contain',
+            }}
+            type="video/mp4"
+          />
         </video>
       ) : (
         <ReactPlayer
           url={message.content}
-          width={300}
-          height={300}
+          maxW={300}
+          maxH={300}
+          objectFit={'scale-down'}
           config={{
             file: {
               attributes: {

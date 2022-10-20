@@ -14,6 +14,7 @@ type AutoLinkedTextProps = {
   searchedResultIds?: (number | undefined)[];
   style?: StyleProp<TextStyle>;
   linkStyle?: StyleProp<TextStyle>;
+  selectable?: boolean;
 };
 
 const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
@@ -23,6 +24,7 @@ const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
   searchedResultIds,
   style,
   linkStyle,
+  selectable,
 }) => {
   const navigation = useNavigation<any>();
   const [searchedWords, setSearchedWords] = useState<string[]>(['']);
@@ -50,6 +52,7 @@ const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
       url
       linkStyle={linkStyle}
       style={style}
+      selectable={selectable}
       onPress={url => {
         const screenInfo = linkOpen(url);
         if (screenInfo) {

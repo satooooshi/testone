@@ -47,7 +47,7 @@ const PostReply: React.FC = () => {
   const isLoading = loadingSaveReply || loadingUploadImage;
   const initialValues: Partial<QAAnswerReply> = {
     body: '',
-    textFormat: answerInfo?.textFormat,
+    textFormat: 'html',
     answer: answerInfo,
   };
   const {

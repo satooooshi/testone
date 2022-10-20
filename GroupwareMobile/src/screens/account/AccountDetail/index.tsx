@@ -22,6 +22,7 @@ import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
+import {useAPIGetUserGoodList} from '../../../hooks/api/wiki/useAPIGetUserGoodList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {
@@ -203,6 +204,12 @@ const AccountDetail: React.FC = () => {
       },
       {enabled: false},
     );
+  const {data: goodList, refetch: refetchGoodList} = useAPIGetUserGoodList(
+    userID?.toString() || '0',
+    {
+      enabled: false,
+    },
+  );
   const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -304,6 +311,9 @@ const AccountDetail: React.FC = () => {
           return;
         case knowledgeScreenName:
           refetchKnowledgeList();
+          return;
+        case goodScreenName:
+          refetchGoodList();
           return;
       }
     };
@@ -513,12 +523,10 @@ const AccountDetail: React.FC = () => {
                   children={() => (
                     <>
                       <Div alignItems="center" mt="lg">
-                        {profile?.userGoodForBoard?.length ? (
-                          profile?.userGoodForBoard?.map(
-                            w =>
-                              w.wiki && (
-                                <WikiCard key={w.wiki.id} wiki={w.wiki} />
-                              ),
+                        {goodList?.length ? (
+                          goodList?.map(
+                            b =>
+                              b.wiki && <WikiCard key={b.id} wiki={b.wiki} />,
                           )
                         ) : (
                           <Text fontSize={16}>
