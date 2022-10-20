@@ -88,17 +88,10 @@ const AttendanceReportAdmin = () => {
         alignItems="center"
         display="flex"
         flexDir="column"
-        overflowX="auto"
         maxW="1980px"
         mx="auto"
         alignSelf="center">
-        <Table
-          variant="simple"
-          alignSelf="center"
-          w="100%"
-          overflowX="auto"
-          ml="20px"
-          mr="20px">
+        <Table variant="simple" alignSelf="center" w="100%">
           <Thead bg="white">
             <Tr>
               <Th minW={'100px'}>日付</Th>

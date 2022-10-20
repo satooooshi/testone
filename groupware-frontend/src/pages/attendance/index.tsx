@@ -13,7 +13,7 @@ const Attendance = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
       header={{
         title: '勤怠管理',
         tabs,
