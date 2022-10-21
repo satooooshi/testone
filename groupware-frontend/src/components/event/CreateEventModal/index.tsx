@@ -8,6 +8,7 @@ import React, {
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
+import { AiOutlinePlus } from 'react-icons/ai';
 import {
   EventFile,
   EventSchedule,
@@ -43,6 +44,7 @@ import {
   useMediaQuery,
   InputGroup,
   InputRightElement,
+  Flex,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -52,7 +54,6 @@ import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { Crop } from 'react-image-crop';
 import { DateTime } from 'luxon';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
@@ -541,15 +542,20 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             cols={3}
             wrap="hard"
           />
-          <Button
-            mb="8px"
-            onClick={() => setUserModal(true)}
-            size="sm"
-            rounded="full"
-            variant="outline"
-            colorScheme="brand">
-            開催者/講師を編集
-          </Button>
+          <Flex alignItems="center" mb="8px">
+            <Text fontWeight="bold" mr="8px">
+              開催者/講師
+            </Text>
+            <Button
+              onClick={() => setUserModal(true)}
+              size="sm"
+              rounded="full"
+              variant="outline"
+              // leftIcon={<AiOutlinePlus />}
+              colorScheme="brand">
+              編集
+            </Button>
+          </Flex>
           <SelectUserModal
             isOpen={userModal}
             selectedUsers={newEvent.hostUsers || []}
@@ -580,16 +586,26 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             ))}
           </Box>
-          <Button
-            mb="8px"
-            onClick={() => openTagModal()}
-            size="sm"
-            rounded="full"
-            variant="outline"
-            colorScheme="brand">
-            タグを編集
-          </Button>
-          <Box display="flex" flexDir="row" flexWrap="wrap" maxH="200px">
+          <Flex alignItems="center" mb="8px">
+            <Text fontWeight="bold" mr="8px">
+              タグ
+            </Text>
+            <Button
+              onClick={() => openTagModal()}
+              size="sm"
+              rounded="full"
+              variant="outline"
+              // leftIcon={<AiOutlinePlus />}
+              colorScheme="brand">
+              編集
+            </Button>
+          </Flex>
+          <Box
+            display="flex"
+            flexDir="row"
+            flexWrap="wrap"
+            mb="16px"
+            maxH="200px">
             {newEvent.tags?.map((t) => (
               <Box mb="5px" mr="4px" key={t.id}>
                 <ButtonGroup
