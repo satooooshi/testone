@@ -425,7 +425,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         w="100%"
         position={isSmallerThan768 ? 'sticky' : undefined}
         zIndex={50}
-        bg={'#ececec'}
         top={isSmallerThan768 ? '-15px' : undefined}
         pt={isSmallerThan768 ? '15px' : undefined}>
         <Box
