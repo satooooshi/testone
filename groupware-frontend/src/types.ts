@@ -334,6 +334,7 @@ export interface ChatGroup {
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
+  owner: User[];
   previousMembers?: User[];
   memberCount: number;
   lastReadChatTime?: LastReadChatTime[];

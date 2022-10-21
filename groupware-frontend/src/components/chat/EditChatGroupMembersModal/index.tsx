@@ -35,6 +35,7 @@ type EditChatGroupMambersModalProps = {
   onClose: () => void;
   onComplete: (selectedUsers: User[]) => void;
   isTalkRoom?: boolean;
+  category: 'メンバー' | 'オーナー';
 };
 
 const UserRenderer = ({
@@ -78,6 +79,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   onClose: onCancel,
   onComplete,
   isTalkRoom = false,
+  category,
 }) => {
   const {
     data: users,
@@ -90,38 +92,60 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   const {
     toggleUser,
     isSelected,
+    selectOwner,
     selectedUsers: selectedUsersInModal,
     setSelectedUsers,
     clear,
-  } = useSelectedUsers(room?.members || []);
-  const [modalUsers, setModalUsers] = useState(users);
+  } = useSelectedUsers(
+    category === 'メンバー' ? room?.members || [] : room?.owner || [],
+  );
+  const [modalUsers, setModalUsers] = useState(
+    category === 'メンバー' ? users : room?.members,
+  );
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
   const onChangeHandle = (t: string) => {
     const searchWords = t.trim().match(/[^\s]+/g);
     setSearchWords(searchWords);
     return;
   };
+
   const { selectedUserRole, selectUserRole, filteredUsers } = useUserRole(
     'All',
     modalUsers,
   );
-  useEffect(() => {
-    if (!searchWords) {
-      setModalUsers(users);
+
+  const handleToggleUser = (selectedUser: User) => {
+    if (category === 'オーナー') {
+      return selectOwner(selectedUser);
+    }
+    const isMember = room?.members?.filter((u) => u.id === selectedUser.id);
+    if (room?.owner[0].id !== myProfile?.id && isMember?.length) {
       return;
     }
-    const searchedTags = users?.filter((u) => {
+    return toggleUser(selectedUser);
+  };
+
+  useEffect(() => {
+    const userList = category === 'メンバー' ? users : room?.members;
+    if (!searchWords) {
+      setModalUsers(userList);
+      return;
+    }
+    const searchedTags = userList?.filter((u) => {
       const userName = u.firstName + u.lastName;
       return searchWords.every((w) => userName.indexOf(w) !== -1);
     });
     setModalUsers(searchedTags);
-  }, [searchWords, users]);
+  }, [searchWords, users, room?.members, category]);
 
   useEffect(() => {
-    if (room?.members) {
+    if (room?.members && category === 'メンバー') {
       setSelectedUsers(room.members);
     }
-  }, [room?.members, setSelectedUsers]);
+    if (room?.owner && category === 'オーナー') {
+      setSelectedUsers(room.owner);
+    }
+  }, [room?.members, room?.owner, setSelectedUsers, category]);
 
   useEffect(() => {
     if (isOpen) {
@@ -148,7 +172,12 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           justifyContent="space-between"
           display="flex"
           mr="24px">
-          <Text>メンバーを編集</Text>
+          <Text>
+            {category +
+              (room?.owner && room?.owner[0]?.id === myProfile?.id
+                ? 'を編集'
+                : 'を追加')}
+          </Text>
           {(selectedUsersInModal.length !== 0 || !isTalkRoom) && (
             <Button
               size="sm"
@@ -170,7 +199,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         <ModalBody>
           <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
-              <FormLabel htmlFor="search">メンバーを検索</FormLabel>
+              <FormLabel htmlFor="search">ユーザーを検索</FormLabel>
               <Input
                 bg="white"
                 marginBottom={'8px'}
@@ -198,35 +227,41 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 {isLoading ? (
                   <Spinner />
                 ) : (
-                  filteredUsers
-                    ?.filter((u) => u.id !== myProfile?.id)
-                    .map((u) => (
-                      <UserRenderer
-                        user={u}
-                        key={u.id}
-                        onClick={toggleUser}
-                        isSelected={isSelected(u)}
-                      />
-                    ))
+                  (category === 'メンバー'
+                    ? filteredUsers?.filter((u) => u.id !== myProfile?.id)
+                    : filteredUsers
+                  )?.map((u) => (
+                    <UserRenderer
+                      user={u}
+                      key={u.id}
+                      onClick={handleToggleUser}
+                      isSelected={isSelected(u)}
+                    />
+                  ))
                 )}
               </Box>
             </Box>
             <Box overflowY="auto" css={hideScrollbarCss}>
-              <Text mb="8px">選択済みのメンバー</Text>
-              {selectedUsersInModal
-                ?.filter((m) => m.id !== myProfile?.id)
-                .map((u) => (
-                  <Box mr={'4px'} mb={'4px'} key={u.id}>
-                    <ButtonGroup isAttached size="xs" colorScheme="purple">
-                      <Button mr="-px">{userNameFactory(u)}</Button>
+              <Text mb="8px">{`選択済みの${category}`}</Text>
+              {(category === 'メンバー'
+                ? selectedUsersInModal?.filter((m) => m.id !== myProfile?.id)
+                : selectedUsersInModal
+              ).map((u) => (
+                <Box mr={'4px'} mb={'4px'} key={u.id}>
+                  <ButtonGroup isAttached size="xs" colorScheme="purple">
+                    <Button mr="-px">{userNameFactory(u)}</Button>
+                    {((room?.owner && room?.owner[0]?.id === myProfile?.id) ||
+                      room?.members?.filter((m) => m.id === u.id).length ===
+                        0) && (
                       <IconButton
                         onClick={() => toggleUser(u as User)}
                         aria-label="削除"
                         icon={<MdCancel size={18} />}
                       />
-                    </ButtonGroup>
-                  </Box>
-                ))}
+                    )}
+                  </ButtonGroup>
+                </Box>
+              ))}
             </Box>
           </Box>
         </ModalBody>

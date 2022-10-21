@@ -18,36 +18,38 @@ import {
 import tailwind from 'tailwind-rn';
 import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
-import {RoomType, User, UserRole, UserRoleInApp} from '../../../types';
+import {User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import UserAvatar from '../UserAvatar';
+import UserAvatar from '../../common/UserAvatar';
 
 type ModalContainerProps = Omit<ModalProps, 'children'>;
 
-type UserModalProps = ModalContainerProps & {
+type RoomMemberModalProps = ModalContainerProps & {
+  isChatGroupOwner: boolean;
+  isOwnerEdit?: boolean;
   onCloseModal: () => void;
   onCompleteModal: (users: User[], reset: () => void) => void;
   users: User[];
   selectedUserRole: UserRoleInApp;
   defaultSelectedUsers?: Partial<User>[];
-  creationType?: RoomType;
 };
 
-const UserModal: React.FC<UserModalProps> = props => {
+const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
   const {
+    isChatGroupOwner,
     onCloseModal,
+    isOwnerEdit,
     users,
     onCompleteModal,
     selectedUserRole: alreadySelectedUserRole,
     defaultSelectedUsers,
-    creationType,
   } = props;
   const {
     toggleUser,
     isSelected,
+    selectOwner,
     selectedUsers: selectedUsersInModal,
-    setSelectedUsers,
     clear,
   } = useSelectedUsers(defaultSelectedUsers || []);
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
@@ -66,18 +68,22 @@ const UserModal: React.FC<UserModalProps> = props => {
     return;
   };
 
-  useEffect(() => {
-    if (defaultSelectedUsers) {
-      setSelectedUsers(defaultSelectedUsers);
+  const handleToggleUser = (selectedUser: User) => {
+    if (isOwnerEdit) {
+      return selectOwner(selectedUser);
     }
-  }, [defaultSelectedUsers, setSelectedUsers]);
+    const isMember = defaultSelectedUsers?.filter(
+      u => u.id === selectedUser.id,
+    );
+    if (!isOwnerEdit && isMember?.length) {
+      return;
+    }
+    return toggleUser(selectedUser);
+  };
 
   const onCloseUserModal = () => {
     onCloseModal();
     setModalUsers([]);
-    setSearchWords(undefined);
-    selectUserRole('All');
-    clear();
   };
   useEffect(() => {
     if (!searchWords) {
@@ -91,32 +97,25 @@ const UserModal: React.FC<UserModalProps> = props => {
     setModalUsers(searchedTags);
   }, [searchWords, users]);
 
-  const onSubmitPress = () => {
-    onCompleteModal(selectedUsersInModal as User[], clear);
-    setSearchWords(undefined);
-    onCloseModal();
-  };
-
   const dropdownRef = useRef<any | null>(null);
   const {width: windowWidth} = useWindowDimensions();
   return (
     <Modal {...props}>
-      {selectedUsersInModal?.length || creationType !== RoomType.TALK_ROOM ? (
-        <Button
-          bg="purple600"
-          position="absolute"
-          right={10}
-          bottom={10}
-          h={60}
-          zIndex={20}
-          rounded="circle"
-          w={60}
-          onPress={onSubmitPress}>
-          <Icon color="white" fontSize="6xl" name="check" />
-        </Button>
-      ) : (
-        <></>
-      )}
+      <Button
+        bg="purple600"
+        position="absolute"
+        right={10}
+        bottom={10}
+        h={60}
+        zIndex={20}
+        rounded="circle"
+        w={60}
+        onPress={() => {
+          onCompleteModal(selectedUsersInModal as User[], clear);
+          onCloseModal();
+        }}>
+        <Icon color="white" fontSize="6xl" name="check" />
+      </Button>
       <Button
         bg="gray400"
         h={35}
@@ -172,19 +171,21 @@ const UserModal: React.FC<UserModalProps> = props => {
           data={selectedUsersInModal}
           renderItem={({item}) => (
             <Div mr={'md'}>
-              <TouchableOpacity
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{...tailwind('absolute top-0 right-0'), zIndex: 50}}
-                onPress={() => {
-                  toggleUser(item as User);
-                }}>
-                <Icon
-                  color="black"
-                  name="close"
-                  bg="gray300"
-                  rounded="circle"
-                />
-              </TouchableOpacity>
+              {isChatGroupOwner !== false && (
+                <TouchableOpacity
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{...tailwind('absolute top-0 right-0'), zIndex: 50}}
+                  onPress={() => {
+                    toggleUser(item as User);
+                  }}>
+                  <Icon
+                    color="black"
+                    name="close"
+                    bg="gray300"
+                    rounded="circle"
+                  />
+                </TouchableOpacity>
+              )}
               <Div alignItems="center">
                 <UserAvatar user={item} h={64} w={64} />
                 <Text>{userNameFactory(item)}</Text>
@@ -231,7 +232,7 @@ const UserModal: React.FC<UserModalProps> = props => {
       </Dropdown>
       <ScrollDiv contentContainerStyle={{width: '100%'}}>
         {filteredUsers?.map(u => (
-          <TouchableOpacity key={u.id} onPress={() => toggleUser(u)}>
+          <TouchableOpacity key={u.id} onPress={() => handleToggleUser(u)}>
             <Div
               w={windowWidth}
               minH={40}
@@ -249,4 +250,4 @@ const UserModal: React.FC<UserModalProps> = props => {
   );
 };
 
-export default UserModal;
+export default RoomMemberModal;

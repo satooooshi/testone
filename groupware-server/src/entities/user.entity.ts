@@ -312,6 +312,12 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.owner, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  chatGroupOwner?: ChatGroup[];
+
   @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.previousMembers, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
