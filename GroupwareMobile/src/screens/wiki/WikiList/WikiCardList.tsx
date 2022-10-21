@@ -94,10 +94,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
+      console.log(boardCategory, ruleCategory);
       setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
       setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
       setSearchQuery(q => ({
         ...q,
+        word,
         type,
         board_category: boardCategory,
         rule_category: ruleCategory,
@@ -218,11 +220,17 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
           setVisibleSearchFormModal(false);
-          setType(undefined);
+          // setType(undefined);
           setWord(values.word);
           const selectedTagIDs = values.selectedTags.map(t => t.id.toString());
           const tagQuery = selectedTagIDs.join('+');
           setTag(tagQuery);
+        }}
+        onClear={() => {
+          setVisibleSearchFormModal(false);
+          // setType(undefined);
+          setWord('');
+          setTag('');
         }}
         defaultSelectedTagIds={tag.split('+')?.map(t => Number(t))}
       />

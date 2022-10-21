@@ -28,6 +28,7 @@ type SearchFormProps = {
   searchTarget: SearchTarget;
   defaultValue?: SearchFormValue;
   isVisible: boolean;
+  onClear: () => void;
   onCloseModal: () => void;
   onSubmit: (value: SearchFormValue) => void;
   defaultSelectedTagIds?: number[];
@@ -37,6 +38,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   searchTarget,
   defaultValue,
   isVisible,
+  onClear,
   onCloseModal,
   onSubmit,
   defaultSelectedTagIds = [],
@@ -67,6 +69,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
     }
   }, [defaultValue, setSelectedTags]);
 
+  const handleOnClear = () => {
+    setWord('');
+    setSelectedTags([]);
+    onClear();
+  };
   useFocusEffect(
     useCallback(() => {
       refetch();
@@ -141,10 +148,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Button
           w={'100%'}
           bg="pink600"
+          mb={8}
           onPress={() =>
             onSubmit({word, selectedTags: selectedTags as AllTag[]})
           }>
           検索
+        </Button>
+        <Button w={'100%'} bg="gray" onPress={handleOnClear}>
+          クリア
         </Button>
       </Div>
     </Overlay>

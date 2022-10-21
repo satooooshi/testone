@@ -474,6 +474,22 @@ const EventList = () => {
     },
   ];
 
+  const resetSearch = () => {
+    setSearchWord('');
+    setSelectedTags([]);
+    router.push(
+      generateEventSearchQueryString({
+        ...router.query,
+        word: '',
+        tag: '',
+      }),
+      undefined,
+      {
+        shallow: true,
+      },
+    );
+  };
+
   return (
     <LayoutWithTab
       header={initialHeaderValue}
@@ -540,11 +556,12 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
-                onClear={() => setSelectedTags([])}
+                onClearTag={() => setSelectedTags([])}
                 onClickButton={(w) => queryRefresh({ page: '1', word: w })}
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}
+                onClear={() => resetSearch()}
               />
             </div>
             <div className={eventListStyles.event_list_wrapper}>

@@ -22,6 +22,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -293,13 +294,19 @@ const QAQuestionList = () => {
   };
 
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
-    const selectedTagIDs = selectedTags.map((t) => t.id.toString());
-    const tagQuery = selectedTagIDs.join('+');
+    let tagQuery;
+    if (query.tag === '') {
+      tagQuery = '';
+    } else {
+      const selectedTagIDs = selectedTags.map((t) => t.id.toString());
+      tagQuery = selectedTagIDs.join('+');
+    }
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
       tag: tagQuery,
     });
+
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
@@ -334,6 +341,12 @@ const QAQuestionList = () => {
 
   const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '', tag: '' });
+  };
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -354,11 +367,10 @@ const QAQuestionList = () => {
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
-            onClear={() => setSelectedTags([])}
+            onClearTag={() => setSelectedTags([])}
             onClickButton={(w) =>
               queryRefresh({
                 page: '1',
-                tag,
                 status,
                 word: w,
                 type,
@@ -367,6 +379,7 @@ const QAQuestionList = () => {
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
+            onClear={() => resetSearch()}
           />
         </div>
         {!isLoading && !questions?.wiki.length && (

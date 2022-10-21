@@ -63,6 +63,7 @@ type SearchFormProps = {
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
+  onClearTag: () => void;
   onClear: () => void;
 };
 
@@ -73,6 +74,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
   tags = [],
   selectedTags = [],
   toggleTag,
+  onClearTag,
   onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
@@ -84,6 +86,18 @@ const SearchInput: React.FC<SearchFormProps> = ({
     onClickButton(word);
     setSearchedWord(word);
     isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleModalResetButton = () => {
+    onClear();
+    setSearchedWord('');
+    setWord('');
+    isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleOnComplete = () => {
+    setTagModal(false);
+    onClickButton(word);
   };
 
   return (
@@ -119,7 +133,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           }}
         />
         <Button
-          width={isSmallerThan768 ? '100%' : '15vw'}
+          width={isSmallerThan768 ? '100%' : '20vw'}
           className={searchFormStyles.add_tag_button}
           colorScheme="green"
           onClick={() => setTagModal(true)}>
@@ -133,29 +147,26 @@ const SearchInput: React.FC<SearchFormProps> = ({
           selectedTags={selectedTags}
           toggleTag={toggleTag}
           onClear={() => {
-            onClear();
+            onClearTag();
           }}
-          onComplete={() => setTagModal(false)}
+          onComplete={handleOnComplete}
           isSearch={true}
         />
         <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
           <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
+            width={isSmallerThan768 ? '100%' : '12vw'}
             colorScheme="pink"
             onClick={handleModalSearchButton}>
             検索
           </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClear();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
+        </div>
+        <div className={clsx(searchFormStyles.clear_search_button)}>
+          <Button
+            width={isSmallerThan768 ? '100%' : '12vw'}
+            colorScheme="blackAlpha"
+            onClick={handleModalResetButton}>
+            クリア
+          </Button>
         </div>
       </div>
       {selectedTags.length ? (
