@@ -461,16 +461,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             name="title"
             placeholder="タイトルを入力してください"
             value={newEvent.title}
-            background="white"
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, title: e.target.value }))
             }
-            bg="white"
-            textAlign="left"
-            p="8px"
-            fontSize="22px"
-            fontWeight="bold"
-            color={darkFontColor}
+            rounded="xl"
           />
           <Text fontWeight="bold">イベント日時</Text>
           <Box textAlign="center" mb="16px">
@@ -527,7 +521,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           <Textarea
             name="description"
             placeholder="概要を入力してください"
-            p="10px"
             h={isSmallerThan768 ? '1vh' : '280px'}
             w="100%"
             wordBreak="break-all"
@@ -537,8 +530,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, description: e.target.value }))
             }
-            background="white"
-            cols={50}
+            cols={3}
             wrap="hard"
           />
           <Button
@@ -648,8 +640,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             <FormControl>
               <Text fontWeight="bold">タイプ</Text>
               <Select
-                colorScheme="teal"
-                bg="white"
                 onChange={(e) => {
                   const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
