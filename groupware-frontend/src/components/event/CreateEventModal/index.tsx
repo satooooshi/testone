@@ -571,11 +571,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             maxH="200px">
             {newEvent.hostUsers?.map((u) => (
               <Box mb="5px" mr="4px" key={u.id}>
-                <ButtonGroup
-                  isAttached
-                  size="xs"
-                  colorScheme="purple"
-                  variant="outline">
+                <ButtonGroup isAttached size="xs" color="blue.600">
                   <Button mr="-px">{u.lastName + u.firstName}</Button>
                   <IconButton
                     onClick={() => toggleHostUser(u)}
