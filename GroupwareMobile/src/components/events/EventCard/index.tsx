@@ -1,13 +1,13 @@
 import React, {useMemo} from 'react';
 import {EventSchedule, EventType, Tag} from '../../../types';
 import {Div, Text, Tag as TagButton, Icon, Image} from 'react-native-magnus';
-import FastImage from 'react-native-fast-image';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
-import {grayColor, darkFontColor} from '../../../utils/colors';
+import {darkFontColor} from '../../../utils/colors';
 import {eventCardStyles} from '../../../styles/component/eventCard.style';
 import {useNavigation} from '@react-navigation/native';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 type EventCardProps = {
   event: EventSchedule;
@@ -111,8 +111,8 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
                     h={20}
                     py={0}
                     onPress={() => onPressTagButton(t)}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
+                    bg={tagBgColorFactory(t.type)}
+                    color={tagFontColorFactory(t.type)}
                     mr={4}>
                     {t.name}
                   </TagButton>
