@@ -221,11 +221,6 @@ const AccountDetail: React.FC = () => {
 
   const mySelfOfNot = id === user?.id || !id;
 
-  const handleLogout = () => {
-    logout();
-    setUser({});
-  };
-
   const inviteCall = async () => {
     if (user && profile) {
       await sendCallInvitation(user, profile);
