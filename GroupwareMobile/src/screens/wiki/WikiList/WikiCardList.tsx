@@ -94,7 +94,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      console.log(boardCategory, ruleCategory);
       setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
       setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
       setSearchQuery(q => ({

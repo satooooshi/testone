@@ -122,24 +122,20 @@ const Chat: React.FC = () => {
   const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
-  const {
-    data: roomDetail,
-    refetch: refetchRoomDetail,
-    remove,
-  } = useAPIGetRoomDetail(Number(room.id), {
-    onSuccess(data) {
-      console.log('success', data);
+  const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
+    Number(room.id),
+    {
+      onError: () => {
+        navigation.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+        editChatGroup({
+          ...room,
+          members: room.members?.filter(u => u.id !== myself?.id),
+        });
+      },
     },
-    onError: () => {
-      navigation.navigate('ChatStack', {
-        screen: 'RoomList',
-      });
-      editChatGroup({
-        ...room,
-        members: room.members?.filter(u => u.id !== myself?.id),
-      });
-    },
-  });
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [after, setAfter] = useState<number>();
@@ -876,10 +872,7 @@ const Chat: React.FC = () => {
   );
 
   useEffect(() => {
-    console.log('----=-=-=-=');
     if (RemovedRoomId === room.id) {
-      console.log('----=-=-=-=1111');
-      remove();
       refetchRoomDetail();
     }
   }, [RemovedRoomId, refetchRoomDetail, room.id]);
@@ -961,7 +954,6 @@ const Chat: React.FC = () => {
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => {
-          console.log(message.fileName);
           playVideoOnModal({
             uri: message.content,
             fileName: message.fileName,
