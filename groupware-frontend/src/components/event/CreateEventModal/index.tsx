@@ -28,7 +28,6 @@ import {
   Button,
   ButtonGroup,
   FormControl,
-  FormLabel,
   Input,
   Textarea,
   Select,
@@ -541,11 +540,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             wrap="hard"
           />
           <Button
-            alignSelf="flex-end"
             mb="8px"
             onClick={() => setUserModal(true)}
             size="sm"
-            colorScheme="pink">
+            rounded="full"
+            variant="outline"
+            colorScheme="brand">
             開催者/講師を編集
           </Button>
           <SelectUserModal
@@ -560,6 +560,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             flexDir="row"
             justifyContent="flex-start"
             flexWrap="wrap"
+            mb="16px"
             maxH="200px">
             {newEvent.hostUsers?.map((u) => (
               <Box mb="5px" mr="4px" key={u.id}>
@@ -575,11 +576,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             ))}
           </Box>
           <Button
-            alignSelf="flex-end"
             mb="8px"
             onClick={() => openTagModal()}
             size="sm"
-            colorScheme="green">
+            rounded="full"
+            variant="outline"
+            colorScheme="brand">
             タグを編集
           </Button>
           <Box
