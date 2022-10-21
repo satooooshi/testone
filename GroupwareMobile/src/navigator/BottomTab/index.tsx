@@ -179,9 +179,7 @@ const AdminStack = () => {
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
   return (
-    <Stack.Navigator
-      initialRouteName={isAdmin ? 'UserAdmin' : 'TagAdmin'}
-      screenOptions={{animationEnabled: false}}>
+    <Stack.Navigator initialRouteName={isAdmin ? 'UserAdmin' : 'TagAdmin'}>
       {isAdmin && (
         <>
           <Stack.Screen
