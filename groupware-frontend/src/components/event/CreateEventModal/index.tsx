@@ -455,6 +455,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           overflowY="auto"
           mr={isSmallerThan768 ? 0 : '16px'}
           css={hideScrollbarCss}>
+          <Text fontWeight="bold">イベントタイトル</Text>
           <Input
             type="text"
             name="title"
@@ -471,6 +472,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             fontWeight="bold"
             color={darkFontColor}
           />
+          <Text fontWeight="bold">イベント日時</Text>
           <Box textAlign="center" mb="16px">
             <Box
               display="flex"
@@ -521,6 +523,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             </Box>
           </Box>
+          <Text fontWeight="bold">イベント概要</Text>
           <Textarea
             name="description"
             placeholder="概要を入力してください"
@@ -613,9 +616,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <Box mb="16px">
               <FormControl>
-                <FormLabel>
+                <Text fontWeight="bold">
                   チャットルームの作成(作成後に変更することはできません)
-                </FormLabel>
+                </Text>
                 <RadioGroup ml={1} defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
@@ -643,7 +646,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Box mb="16px">
             <FormControl>
-              <FormLabel>タイプ</FormLabel>
+              <Text fontWeight="bold">タイプ</Text>
               <Select
                 colorScheme="teal"
                 bg="white"
@@ -685,7 +688,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Select>
             </FormControl>
           </Box>
-          <Text mb="15px">サムネイル</Text>
+          <Text fontWeight="bold">サムネイル</Text>
 
           {((newEvent.imageURL && !selectThumbnailUrl) ||
             selectThumbnailUrl) && (
@@ -740,7 +743,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             )}
           </Box>
-          <Text mb="16px">参考資料</Text>
+          <Text fontWeight="bold">参考資料</Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <div
               {...getRelatedFileRootProps({
@@ -800,7 +803,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               ))}
             </Box>
           ) : null}
-          <Text mb="16px">関連動画</Text>
+          <Text fontWeight="bold">関連動画</Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <InputGroup>
               <Input
