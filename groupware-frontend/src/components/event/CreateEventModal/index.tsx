@@ -59,6 +59,8 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { darkFontColor } from 'src/utils/colors';
 import { isCreatableEvent } from 'src/utils/factory/isCreatableEvent';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -558,13 +560,16 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           <Box
             display="flex"
             flexDir="row"
-            justifyContent="flex-start"
             flexWrap="wrap"
             mb="16px"
             maxH="200px">
             {newEvent.hostUsers?.map((u) => (
               <Box mb="5px" mr="4px" key={u.id}>
-                <ButtonGroup isAttached size="xs" colorScheme="purple">
+                <ButtonGroup
+                  isAttached
+                  size="xs"
+                  colorScheme="purple"
+                  variant="outline">
                   <Button mr="-px">{u.lastName + u.firstName}</Button>
                   <IconButton
                     onClick={() => toggleHostUser(u)}
@@ -584,22 +589,20 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             colorScheme="brand">
             タグを編集
           </Button>
-          <Box
-            display="flex"
-            flexDir="row"
-            justifyContent="flex-start"
-            flexWrap="wrap"
-            maxH="200px">
+          <Box display="flex" flexDir="row" flexWrap="wrap" maxH="200px">
             {newEvent.tags?.map((t) => (
               <Box mb="5px" mr="4px" key={t.id}>
                 <ButtonGroup
                   isAttached
                   size="xs"
-                  colorScheme={tagColorFactory(t.type)}>
-                  <Button mr="-px">{t.name}</Button>
+                  color={tagFontColorFactory(t.type)}>
+                  <Button mr="-px" bg={tagBgColorFactory(t.type)}>
+                    {t.name}
+                  </Button>
                   <IconButton
                     onClick={() => toggleTag(t)}
                     aria-label="削除"
+                    bg={tagBgColorFactory(t.type)}
                     icon={<MdCancel size={18} />}
                   />
                 </ButtonGroup>
