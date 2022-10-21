@@ -488,6 +488,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
                     label="開始日時"
                     hour24
+                    labelAlignment="left"
                     formatStyle={'medium'}
                   />
                 ) : (
@@ -517,6 +518,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       : '締切日時'
                   }
                   hour24
+                  labelAlignment="left"
                   formatStyle={'medium'}
                 />
               </Box>
