@@ -105,28 +105,30 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
             </Tag>
           ) : null}
           {wiki.tags && wiki.tags.length ? (
-            <FlatList
-              style={wikiCardStyles.tagList}
-              horizontal
-              data={wiki?.tags || []}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() =>
-                    navigation.navigate('WikiStack', {
-                      screen: 'WikiList',
-                      params: {tag: t.id.toString()},
-                    })
-                  }
-                  fontSize={'md'}
-                  h={24}
-                  py={0}
-                  bg={tagBgColorFactory(t.type)}
-                  color={tagFontColorFactory(t.type)}
-                  ml={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
+            <Div>
+              <FlatList
+                style={wikiCardStyles.tagList}
+                horizontal
+                data={wiki?.tags || []}
+                renderItem={({item: t}) => (
+                  <Tag
+                    onPress={() =>
+                      navigation.navigate('WikiStack', {
+                        screen: 'WikiList',
+                        params: {tag: t.id.toString()},
+                      })
+                    }
+                    fontSize={'md'}
+                    h={24}
+                    py={0}
+                    bg={tagBgColorFactory(t.type)}
+                    color={tagFontColorFactory(t.type)}
+                    ml={4}>
+                    {t.name}
+                  </Tag>
+                )}
+              />
+            </Div>
           ) : null}
         </Div>
         <Div flexDir={'row'} w="100%" alignItems="center" mb={10}>
