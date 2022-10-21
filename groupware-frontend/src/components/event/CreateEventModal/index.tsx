@@ -455,7 +455,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           overflowY="auto"
           mr={isSmallerThan768 ? 0 : '16px'}
           css={hideScrollbarCss}>
-          <Text fontWeight="bold">イベントタイトル</Text>
+          <Text fontWeight="bold" mb="8px">
+            イベントタイトル
+          </Text>
           <Input
             type="text"
             name="title"
@@ -466,7 +468,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             }
             rounded="xl"
           />
-          <Text fontWeight="bold">イベント日時</Text>
+          <Text fontWeight="bold" mb="8px">
+            イベント日時
+          </Text>
           <Box textAlign="center" mb="16px">
             <Box
               display="flex"
@@ -517,7 +521,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             </Box>
           </Box>
-          <Text fontWeight="bold">イベント概要</Text>
+          <Text fontWeight="bold" mb="8px">
+            イベント概要
+          </Text>
           <Textarea
             name="description"
             placeholder="概要を入力してください"
@@ -608,7 +614,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <Box mb="16px">
               <FormControl>
-                <Text fontWeight="bold">
+                <Text fontWeight="bold" mb="8px">
                   チャットルームの作成(作成後に変更することはできません)
                 </Text>
                 <RadioGroup ml={1} defaultValue={'unneeded'}>
@@ -638,7 +644,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Box mb="16px">
             <FormControl>
-              <Text fontWeight="bold">タイプ</Text>
+              <Text fontWeight="bold" mb="8px">
+                タイプ
+              </Text>
               <Select
                 onChange={(e) => {
                   const type = e.target.value as EventType;
@@ -678,7 +686,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Select>
             </FormControl>
           </Box>
-          <Text fontWeight="bold">サムネイル</Text>
+          <Text fontWeight="bold" mb="8px">
+            サムネイル
+          </Text>
 
           {((newEvent.imageURL && !selectThumbnailUrl) ||
             selectThumbnailUrl) && (
@@ -733,7 +743,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             )}
           </Box>
-          <Text fontWeight="bold">参考資料</Text>
+          <Text fontWeight="bold" mb="8px">
+            参考資料
+          </Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <div
               {...getRelatedFileRootProps({
@@ -793,7 +805,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               ))}
             </Box>
           ) : null}
-          <Text fontWeight="bold">関連動画</Text>
+          <Text fontWeight="bold" mb="8px">
+            関連動画
+          </Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <InputGroup>
               <Input
