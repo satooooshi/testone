@@ -466,6 +466,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, title: e.target.value }))
             }
+            mb="16px"
             rounded="xl"
           />
           <Text fontWeight="bold" mb="8px">
