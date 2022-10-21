@@ -449,8 +449,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       </Box>
       <Box display="flex" flexDir={isSmallerThan768 ? 'column' : 'row'}>
         <Box
-          display="flex"
-          flexDir="column"
           w={isSmallerThan768 ? '100%' : '48%'}
           overflowY="auto"
           mr={isSmallerThan768 ? 0 : '16px'}
@@ -608,8 +606,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           </Box>
         </Box>
         <Box
-          display="flex"
-          flexDir="column"
           w={isSmallerThan768 ? '100%' : '48%'}
           overflowY="auto"
           css={hideScrollbarCss}>
