@@ -36,8 +36,12 @@ const ChatDetail = () => {
     },
     onError: (err) => {
       setCurrentRoom(undefined);
+
       if (err?.response?.data?.message) {
         alert(err?.response?.data?.message);
+        if (err?.response?.status === 412) {
+          setChatGroupsState(chatGroups.filter((g) => g.id !== Number(id)));
+        }
       }
     },
   });
