@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
@@ -1235,7 +1236,8 @@ export class ChatService {
       .getOne();
 
     if (!existRoom) {
-      throw new InternalServerErrorException('the room is not exist');
+      // throw new InternalServerErrorException('the room is not exist');
+      throw new HttpException('the room is not exist', 412);
     }
 
     const manager = getManager();

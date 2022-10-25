@@ -75,7 +75,7 @@ const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
     const isMember = defaultSelectedUsers?.filter(
       u => u.id === selectedUser.id,
     );
-    if (!isOwnerEdit && isMember?.length) {
+    if (!isChatGroupOwner && !isOwnerEdit && isMember?.length) {
       return;
     }
     return toggleUser(selectedUser);
