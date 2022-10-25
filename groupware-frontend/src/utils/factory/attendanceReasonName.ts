@@ -28,6 +28,8 @@ export const attendanceReasonName = (Reason: AttendanceReason): string => {
       return '遅刻半休';
     case AttendanceReason.EARLY_LEAVING_OFF:
       return '早退半休';
+    case AttendanceReason.HOSPITAL_VISIT:
+      return '通院';
     default:
       return '';
   }
