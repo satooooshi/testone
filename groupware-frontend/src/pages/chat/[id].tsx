@@ -77,6 +77,7 @@ const ChatDetail = () => {
           type: 'editOwnersModalVisible',
           value: true,
         });
+        break;
       case 'editGroup':
         dispatchModal({
           type: 'editChatGroupModalVisible',
