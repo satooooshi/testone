@@ -157,82 +157,45 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
           }))
         }
         value={values.reason}>
-        {(values.category === 'paid_absence' ||
-          values.category === 'late' ||
-          values.category === 'early_leaving' ||
-          values.category === 'late_and_eary_leaving' ||
-          values.category === 'go_out' ||
-          values.category === 'absence') && (
-          <option value={AttendanceReason.PRIVATE}>
-            {attendanceReasonName(AttendanceReason.PRIVATE)}
-          </option>
-        )}
-        {(values.category === 'paid_absence' ||
-          values.category === 'late' ||
-          values.category === 'early_leaving' ||
-          values.category === 'late_and_eary_leaving' ||
-          values.category === 'go_out' ||
-          values.category === 'absence') && (
-          <option value={AttendanceReason.SICK}>
-            {attendanceReasonName(AttendanceReason.SICK)}
-          </option>
-        )}
-        {(values.category === 'paid_absence' ||
-          values.category === 'late' ||
-          values.category === 'early_leaving' ||
-          values.category === 'late_and_eary_leaving' ||
-          values.category === 'go_out' ||
-          values.category === 'absence') && (
-          <option value={AttendanceReason.HOLIDAY}>
-            {attendanceReasonName(AttendanceReason.HOSPITAL_VISIT)}
-          </option>
-        )}
-        {values.category === 'holiday' && (
-          <option value={AttendanceReason.HOLIDAY}>
-            {attendanceReasonName(AttendanceReason.HOLIDAY)}
-          </option>
-        )}
-        {values.category === 'holiday' && (
-          <option value={AttendanceReason.CONDOLENCE}>
-            {attendanceReasonName(AttendanceReason.CONDOLENCE)}
-          </option>
-        )}
-        {(values.category === 'early_leaving' ||
-          values.category === 'holiday_work' ||
-          values.category === 'transfer_holiday' ||
-          values.category === 'shift_work') && (
-          <option value={AttendanceReason.SITE}>
-            {attendanceReasonName(AttendanceReason.SITE)}
-          </option>
-        )}
-        {values.category === 'shift_work' && (
-          <option value={AttendanceReason.MEETING}>
-            {attendanceReasonName(AttendanceReason.MEETING)}
-          </option>
-        )}
-        {/* <option value={AttendanceReason.BIRTHDAY}>
+        <option value={AttendanceReason.PRIVATE}>
+          {attendanceReasonName(AttendanceReason.PRIVATE)}
+        </option>
+        <option value={AttendanceReason.SICK}>
+          {attendanceReasonName(AttendanceReason.SICK)}
+        </option>
+        <option value={AttendanceReason.HOUSEWORK}>
+          {attendanceReasonName(AttendanceReason.HOUSEWORK)}
+        </option>
+        <option value={AttendanceReason.HOLIDAY}>
+          {attendanceReasonName(AttendanceReason.HOLIDAY)}
+        </option>
+        <option value={AttendanceReason.CONDOLENCE}>
+          {attendanceReasonName(AttendanceReason.CONDOLENCE)}
+        </option>
+        <option value={AttendanceReason.SITE}>
+          {attendanceReasonName(AttendanceReason.SITE)}
+        </option>
+        <option value={AttendanceReason.DISASTER}>
+          {attendanceReasonName(AttendanceReason.DISASTER)}
+        </option>
+        <option value={AttendanceReason.MEETING}>
+          {attendanceReasonName(AttendanceReason.MEETING)}
+        </option>
+        <option value={AttendanceReason.BIRTHDAY}>
           {attendanceReasonName(AttendanceReason.BIRTHDAY)}
-        </option> */}
-        {values.category === 'half_holiday' && (
-          <option value={AttendanceReason.MORNING_OFF}>
-            {attendanceReasonName(AttendanceReason.MORNING_OFF)}
-          </option>
-        )}
-        {values.category === 'half_holiday' && (
-          <option value={AttendanceReason.AFTERNOON_OFF}>
-            {attendanceReasonName(AttendanceReason.AFTERNOON_OFF)}
-          </option>
-        )}
-        {values.category === 'half_holiday' && (
-          <option value={AttendanceReason.LATE_OFF}>
-            {attendanceReasonName(AttendanceReason.LATE_OFF)}
-          </option>
-        )}
-        {values.category === 'half_holiday' && (
-          <option value={AttendanceReason.EARLY_LEAVING_OFF}>
-            {attendanceReasonName(AttendanceReason.EARLY_LEAVING_OFF)}
-          </option>
-        )}
+        </option>
+        <option value={AttendanceReason.MORNING_OFF}>
+          {attendanceReasonName(AttendanceReason.MORNING_OFF)}
+        </option>
+        <option value={AttendanceReason.AFTERNOON_OFF}>
+          {attendanceReasonName(AttendanceReason.AFTERNOON_OFF)}
+        </option>
+        <option value={AttendanceReason.LATE_OFF}>
+          {attendanceReasonName(AttendanceReason.LATE_OFF)}
+        </option>
+        <option value={AttendanceReason.EARLY_LEAVING_OFF}>
+          {attendanceReasonName(AttendanceReason.EARLY_LEAVING_OFF)}
+        </option>
       </Select>
       <Text mt={5}>詳細:</Text>
       <Textarea

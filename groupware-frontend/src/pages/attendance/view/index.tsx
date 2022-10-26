@@ -490,6 +490,7 @@ const AttendanceView = () => {
         w={'100%'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
         alignItems="center"
+        display="flex"
         overflowX="auto"
         maxW="1980px"
         mx="auto"

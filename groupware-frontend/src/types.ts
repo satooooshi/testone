@@ -436,17 +436,17 @@ export enum AttendanceCategory {
   EARLY_LEAVING = 'early_leaving',
   // 遅刻かつ早退
   LATE_AND_EARY_LEAVING = 'late_and_eary_leaving',
-  // 休暇
+  // 有給などの休日
   HOLIDAY = 'holiday',
-  // 休出
+  // 休日出勤
   HOLIDAY_WORK = 'holiday_work',
-  // 振休
+  // 振替休日
   TRANSFER_HOLIDAY = 'transfer_holiday',
   // 外出(業務中に自己都合で外出)
   GOOUT = 'go_out',
   // シフト(顧客都合により出社時間を変更する場合)
   SHIFTWORK = 'shift_work',
-  // 欠勤控除
+  // 欠勤
   ABSENCE = 'absence',
   // 半休
   HALF_HOLIDAY = 'half_holiday',
@@ -459,8 +459,6 @@ export enum AttendanceReason {
   PRIVATE = 'private',
   //体調不良
   SICK = 'sick',
-  //通院
-  HOSPITAL_VISIT = 'hospital_visit',
   //家事都合
   HOUSEWORK = 'housework',
   //有給休暇
