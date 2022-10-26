@@ -225,6 +225,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             }}
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
+            <FormLabel>ルーム画像</FormLabel>
             {selectImageUrl ? (
               <Box>
                 <ReactCrop
@@ -252,33 +253,30 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 </Stack>
               </Box>
             ) : (
-              <>
-                <FormLabel>ルーム画像</FormLabel>
-                <Box
-                  m="0 auto"
-                  textAlign="center"
+              <Box
+                m="0 auto"
+                textAlign="center"
+                w="200px"
+                rounded="full"
+                cursor="pointer"
+                {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Avatar
+                  src={newGroup.imageURL}
+                  h="200px"
                   w="200px"
                   rounded="full"
-                  cursor="pointer"
-                  {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <Avatar
-                    src={newGroup.imageURL}
-                    h="200px"
-                    w="200px"
-                    rounded="full"
-                    alt=""
-                  />
-                  <Stack
-                    justifyContent="center"
-                    direction="row"
-                    my="8px"
-                    color="blue.400">
-                    <FiEdit2 />
-                    <Text fontSize="14px">画像を編集する</Text>
-                  </Stack>
-                </Box>
-              </>
+                  alt=""
+                />
+                <Stack
+                  justifyContent="center"
+                  direction="row"
+                  my="8px"
+                  color="blue.400">
+                  <FiEdit2 />
+                  <Text fontSize="14px">画像を編集する</Text>
+                </Stack>
+              </Box>
             )}
             <Box mb="16px">
               <FormLabel>ルーム名</FormLabel>
