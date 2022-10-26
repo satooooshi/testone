@@ -82,12 +82,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   );
 
   return (
-    <Overlay
-      px={16}
-      py={32}
-      h={240 + selectedTags.length * 8}
-      style={{maxHeight: '80%'}}
-      visible={isVisible}>
+    <Overlay px={16} py={32} style={{maxHeight: '80%'}} visible={isVisible}>
       <Button
         bg="gray400"
         h={35}
