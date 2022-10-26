@@ -119,7 +119,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
       return selectOwner(selectedUser);
     }
     const isMember = room?.members?.filter((u) => u.id === selectedUser.id);
-    if (room?.owner[0].id !== myProfile?.id && isMember?.length) {
+    if (room?.owner[0]?.id !== myProfile?.id && isMember?.length) {
       return;
     }
     return toggleUser(selectedUser);
