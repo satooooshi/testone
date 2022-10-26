@@ -212,8 +212,6 @@ const AttendanceReport = () => {
         title: '勤怠報告',
         tabs,
         activeTabName: '勤怠報告',
-        rightButtonName: '新規勤怠報告',
-        onClickRightButton: () => setFormModal(true),
       }}>
       <Head>
         <title>ボールド | 勤怠報告</title>
@@ -227,14 +225,20 @@ const AttendanceReport = () => {
         onSubmit={(report) => handleSaveReport(report)}
       />
 
-      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">
+      <Box
+        display="flex"
+        flexDir="column"
+        justifyContent="flex-start"
+        mb="32px">
         <FormControl
+          w={600}
           display="flex"
           flexDir="column"
           alignItems="center"
           justifyContent="flex-start">
           <FormLabel>対象月</FormLabel>
           <Input
+            w={40}
             type="month"
             bg="white"
             value={month.toFormat('yyyy-LL')}
@@ -253,6 +257,16 @@ const AttendanceReport = () => {
             }}
           />
         </FormControl>
+        <Button
+          mt={6}
+          w={isSmallerThan768 ? 300 : 600}
+          color={'white'}
+          bg="#3182ce"
+          alignSelf={'center'}
+          _hover={{ bg: '#1768b3' }}
+          onClick={() => setFormModal(true)}>
+          新規勤怠報告
+        </Button>
       </Box>
       <Box
         w={'100%'}
