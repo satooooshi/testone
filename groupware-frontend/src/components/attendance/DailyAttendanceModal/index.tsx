@@ -43,7 +43,7 @@ const DailyAttendanceModal: React.FC<DailyAttendanceModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setNow(new Date());
-      let myInterval = setInterval(() => {
+      const myInterval = setInterval(() => {
         setNow(new Date());
       }, 1000);
       return () => {
