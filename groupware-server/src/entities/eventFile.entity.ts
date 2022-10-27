@@ -68,6 +68,7 @@ export class EventFile {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.url = await genSignedURL(this.url);
+    this.url = genStorageURL(this.url);
+    // this.url = await genSignedURL(this.url);
   }
 }

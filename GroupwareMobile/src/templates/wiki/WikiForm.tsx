@@ -356,12 +356,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             justifyContent="space-between"
             rounded="md">
             <Text fontSize={16} color={blueColor} w="80%">
-              {
-                (decodeURI(f.url || '')?.match('.+/(.+?)([?#;].*)?$') || [
-                  '',
-                  f.url,
-                ])[1]
-              }
+              {f.name}
             </Text>
             <TouchableOpacity onPress={() => removeFile(f.url || '')}>
               <Icon name="closecircle" color="gray900" fontSize={24} />

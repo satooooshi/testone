@@ -182,6 +182,7 @@ export interface Wiki {
 
 export interface WikiFile {
   id: number;
+  name: string;
   url: string;
   Wiki?: Wiki;
   createdAt: Date;

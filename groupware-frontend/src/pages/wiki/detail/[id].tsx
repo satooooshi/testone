@@ -37,7 +37,8 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { isEditableWiki } from 'src/utils/factory/isCreatableWiki';
-import FileIcon from '@/components/common/FileIcon';
+import { FileIcon } from 'src/pages/event/[id]';
+// import FileIcon from '@/components/common/FileIcon';
 
 type TOCHead = string[];
 
@@ -304,26 +305,6 @@ const QuestionDetail = () => {
                 ))}
               </Flex>
             ) : null}
-            {wiki.files && wiki.files.length ? (
-              <Flex
-                mb={'8px'}
-                ml="40px"
-                rounded="md"
-                bg="white"
-                flexDir="column"
-                p="40px">
-                <Text fontWeight="bold" mb="16px" alignSelf="center">
-                  添付ファイル
-                </Text>
-                <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-                  {wiki.files.map((f) => (
-                    <Box mr="4px" mb="4px" key={f.id}>
-                      <FileIcon href={f.url} />
-                    </Box>
-                  ))}
-                </Box>
-              </Flex>
-            ) : null}
           </Box>
           <div className={qaDetailStyles.question_wrapper}>
             <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>
@@ -343,6 +324,29 @@ const QuestionDetail = () => {
               />
             </div>
           </div>
+          {wiki.files && wiki.files.length ? (
+            <Flex
+              mb={'40px'}
+              ml="40px"
+              rounded="md"
+              bg="white"
+              flexDir="column"
+              mr="auto"
+              p="40px">
+              <Text fontWeight="bold" mb="16px">
+                添付ファイル
+              </Text>
+              <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
+                {wiki.files.map((f) =>
+                  f.url && f.name ? (
+                    <Box mr="4px" mb="4px" key={f.id}>
+                      <FileIcon url={f.url} name={f.name} />
+                    </Box>
+                  ) : null,
+                )}
+              </Box>
+            </Flex>
+          ) : null}
           {wiki.type === WikiType.BOARD ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>

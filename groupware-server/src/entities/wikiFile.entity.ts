@@ -30,6 +30,15 @@ export class WikiFile {
   })
   url: string;
 
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  name: string;
+
   @ManyToOne(() => Wiki, (wiki) => wiki.files, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
@@ -59,6 +68,6 @@ export class WikiFile {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.url = await genSignedURL(this.url);
+    this.url = genStorageURL(this.url);
   }
 }

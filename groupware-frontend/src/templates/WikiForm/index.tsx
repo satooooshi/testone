@@ -30,6 +30,7 @@ import {
   FormLabel,
   Text,
   Box,
+  Spinner,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { Editor, EditorState } from 'draft-js';
@@ -77,6 +78,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const { type } = router.query as { type: WikiType };
   const { user } = useAuthenticate();
   const [tagModal, setTagModal] = useState(false);
+  const [isLoadingRF, setIsloadingRF] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
@@ -203,17 +205,25 @@ const WikiForm: React.FC<WikiFormProps> = ({
     getInputProps: getRelatedFileInputProps,
   } = useDropzone({
     onDrop: (files: File[]) => {
+      setIsloadingRF(true);
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
-          const newFiles: Partial<WikiFile>[] = urls.map((u) => ({ url: u }));
+          const newFiles: Partial<WikiFile>[] = urls.map((u, i) => ({
+            url: u,
+            name: files[i].name,
+          }));
           setNewQuestion((e) => ({
             ...e,
             files: [...(e.files || []), ...newFiles],
           }));
         },
+        onSettled: () => {
+          setIsloadingRF(false);
+        },
       });
     },
   });
+
   const { mutate: uploadFiles, isLoading } = useAPIUploadStorage();
 
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -609,8 +619,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
             {...getRelatedFileRootProps({
               className: WikiFormStyle.image_dropzone,
             })}>
-            <input {...getRelatedFileInputProps()} />
-            <Text>クリックかドラッグアンドドロップで投稿</Text>
+            {isLoadingRF ? (
+              <Spinner />
+            ) : (
+              <>
+                <input {...getRelatedFileInputProps()} />
+                <Text>クリックかドラッグアンドドロップで投稿</Text>
+              </>
+            )}
           </div>
         </Box>
         {newQuestion.files?.length ? (
@@ -641,7 +657,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   overflowX="auto"
                   w="95%"
                   css={hideScrollbarCss}>
-                  {fileNameTransformer(f.url || '')}
+                  {f.name}
                 </Text>
                 <MdCancel
                   className={WikiFormStyle.url_delete_button}

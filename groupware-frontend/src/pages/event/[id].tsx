@@ -65,7 +65,7 @@ type FileIconProps = {
   submitted?: boolean;
 };
 
-const FileIcon: React.FC<FileIconProps> = ({ url, name, submitted }) => {
+export const FileIcon: React.FC<FileIconProps> = ({ url, name, submitted }) => {
   return (
     <Link
       onClick={() => saveAs(url, name)}
