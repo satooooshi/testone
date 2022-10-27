@@ -49,6 +49,7 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import tailwind from 'tailwind-rn';
 import {handlePickDocument} from '../../../utils/handlePickDocument';
 import {ActivityIndicator} from 'react-native-paper';
+import DocumentPicker from 'react-native-document-picker';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 

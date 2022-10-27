@@ -187,7 +187,7 @@ export interface Wiki {
   writer?: User;
   answers?: QAAnswer[];
   tags?: Tag[];
-  files?: Partial<EventFile>[];
+  files?: Partial<WikiFile>[];
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
@@ -197,9 +197,10 @@ export interface Wiki {
   answersCount?: number;
 }
 
-export interface EventFile {
+export interface WikiFile {
   id: number;
   url: string;
+  name?: string;
   wiki?: Wiki;
   createdAt: Date;
   updatedAt: Date;

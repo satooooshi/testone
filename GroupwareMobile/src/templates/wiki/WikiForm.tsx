@@ -1,9 +1,8 @@
 import {useFormik} from 'formik';
-import {Alert, useWindowDimensions} from 'react-native';
+import {Alert, Platform, useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
-  Dropdown,
   Icon,
   Input,
   Tag as TagButton,
@@ -22,16 +21,15 @@ import {wikiSchema} from '../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import {blueColor} from '../../utils/colors';
-import {handlePickDocument} from '../../utils/handlePickDocument';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import ModalSelectingWikiType, {
   SelectWikiArg,
 } from '../../components/wiki/ModalSelectWikiType';
 import QuillEditor from 'react-native-cn-quill';
+import DocumentPicker from 'react-native-document-picker';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -88,28 +86,58 @@ const WikiForm: React.FC<WikiFormProps> = ({
       quillRef.current?.blur();
     },
   });
-  const {mutate: uploadFile} = useAPIUploadStorage({
-    onSuccess: uploadedURL => {
-      setNewWiki(e => {
-        const newWikiFile = {url: uploadedURL[0]};
-        if (e.files && e.files.length) {
-          return {
-            ...e,
-            files: [...e.files, newWikiFile],
-          };
-        }
-        return {
-          ...e,
-          files: [newWikiFile],
-        };
+  const {mutate: uploadFile} = useAPIUploadStorage();
+
+  const normalizeURL = (url: string) => {
+    const filePrefix = 'file://';
+    if (url.startsWith(filePrefix)) {
+      url = url.substring(filePrefix.length);
+      url = decodeURI(url);
+      return url;
+    }
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const res = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles],
       });
-    },
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
+      const formData = new FormData();
+      formData.append('files', {
+        name: res.name,
+        uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
+        type: res.type,
+      });
+      uploadFile(formData, {
+        onSuccess: uploadedURL => {
+          setNewWiki(e => {
+            const newWikiFile = {url: uploadedURL[0], name: res.name};
+            if (e.files && e.files.length) {
+              return {
+                ...e,
+                files: [...e.files, newWikiFile],
+              };
+            }
+            return {
+              ...e,
+              files: [newWikiFile],
+            };
+          });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
+      });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+      } else {
+        throw err;
+      }
+    }
+  };
+
   const {width: windowWidth} = useWindowDimensions();
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
@@ -339,7 +367,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           <Text fontSize={16}>添付ファイルを選択</Text>
           <DropdownOpenerButton
             name={'タップでファイルを選択'}
-            onPress={() => handlePickDocument(uploadFile)}
+            onPress={() => handlePickDocument()}
           />
         </Div>
         {newWiki.files?.map(f => (

@@ -265,13 +265,12 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         ) : null}
         <Text>{wikiInfo?.files?.length ? '添付ファイル' : null}</Text>
         <Div flexDir="row" flexWrap="wrap">
-          {wikiInfo?.files?.map(
-            f =>
-              f.url && (
-                <Div mr={4} mb={4}>
-                  <FileIcon url={f.url} />
-                </Div>
-              ),
+          {wikiInfo?.files?.map(f =>
+            f.url && f.name ? (
+              <Div mr={4} mb={4}>
+                <FileIcon url={f.url} name={f.name} />
+              </Div>
+            ) : null,
           )}
         </Div>
         {wikiState?.type === WikiType.BOARD && (
