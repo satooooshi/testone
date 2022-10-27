@@ -263,8 +263,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
-        <Text>{wikiInfo?.files?.length ? '添付ファイル' : null}</Text>
-        <Div flexDir="row" flexWrap="wrap">
+        <Text fontWeight="bold" fontSize={16}>
+          {wikiInfo?.files?.length ? '添付ファイル' : null}
+        </Text>
+        <Div flexDir="row" flexWrap="wrap" mt={10} mb={10}>
           {wikiInfo?.files?.map(f =>
             f.url && f.name ? (
               <Div mr={4} mb={4}>
