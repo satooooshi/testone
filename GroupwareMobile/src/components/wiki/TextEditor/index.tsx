@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -10,6 +10,7 @@ type TextEditorProps = {
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
   initialBody?: string;
   onChange: (text: string) => void;
+  quillRef: React.MutableRefObject<QuillEditor | null>;
 };
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -17,11 +18,10 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onUploadImage,
   initialBody,
   onChange,
+  quillRef,
 }) => {
   const [height, setHeight] = useState<number>(200);
   const markdownit = new MarkdownIt();
-  const quillRef = useRef<QuillEditor | null>(null);
-
   const customHandler = (name: string) => {
     if (name === 'image') {
       onUploadImage(async imageURL => {
@@ -31,10 +31,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
     }
   };
 
-  //if this code are deleted, editor height breaks for long text in Android
-  useEffect(() => {
-    quillRef?.current?.focus();
-  }, []);
+  // This code would solve the editor's height collapse, but it causes a crash on Android 10.
+  // https://stackoverflow.com/questions/58519749/android-d0-probable-deadlock-detected-due-to-webview-api-being-called-on-incor
+  // useEffect(() => {
+  //   quillRef?.current?.focus();
+  // }, []);
 
   return (
     <>

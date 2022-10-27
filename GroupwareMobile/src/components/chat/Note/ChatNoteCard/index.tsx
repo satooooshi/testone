@@ -1,5 +1,12 @@
-import React from 'react';
-import {TouchableHighlight} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  TouchableHighlight,
+  TextInput,
+  Platform,
+  Linking,
+  Alert,
+  Text as RNTEXT,
+} from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {ChatNote, ChatNoteImage} from '../../../../types';
@@ -8,6 +15,8 @@ import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterF
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 import AutoLinkedText from '../../../common/AutoLinkedText';
 import UserAvatar from '../../../common/UserAvatar';
+import Hyperlink from 'react-native-hyperlink';
+import Clipboard from '@react-native-community/clipboard';
 
 type ChatNoteCardProps = {
   note: ChatNote;
@@ -25,6 +34,15 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
   onPressDeleteButton,
   onPressImage,
 }) => {
+  const [selectable, setSelectable] = useState(false);
+  useEffect(() => {
+    let timeoutId = setTimeout(() => {
+      setSelectable(true);
+    }, 50);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [note]);
   return (
     <Div
       bg="white"
@@ -35,7 +53,12 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
       <Div flexDir="row" justifyContent="space-between" mb="lg">
         <Div flexDir="row" alignItems="center">
           <Div mr="sm">
-            <UserAvatar h={40} w={40} user={note.editors?.[0]} />
+            <UserAvatar
+              h={40}
+              w={40}
+              user={note.editors?.[0]}
+              GoProfile={true}
+            />
           </Div>
           <Text fontWeight="bold" fontSize={16}>
             {note.editors?.length
@@ -82,11 +105,31 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
         ))}
       </Div>
       <Div mb="lg">
-        <AutoLinkedText
-          text={note.content}
-          style={tailwind('text-base')}
-          linkStyle={tailwind('text-blue-500 text-base text-base')}
-        />
+        {Platform.OS === 'ios' ? (
+          <TextInput
+            multiline={true}
+            editable={false}
+            scrollEnabled={false}
+            value={note.content}
+            style={tailwind(' text-black text-base')}
+            dataDetectorTypes={'link'}
+          />
+        ) : (
+          <Hyperlink
+            linkStyle={tailwind('text-blue-500 text-base text-base')}
+            onPress={t => Linking.openURL(t)}
+            //onLongPress={t => {
+            //  Clipboard.setString(t);
+            //  Alert.alert('クリップボードにコピーしました。');
+            //}}
+          >
+            <Text
+              selectable={selectable}
+              style={tailwind(' text-black text-base')}>
+              {note.content}
+            </Text>
+          </Hyperlink>
+        )}
       </Div>
       <Text fontSize={12} color={darkFontColor}>
         {dateTimeFormatterFromJSDDate({

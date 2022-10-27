@@ -4,8 +4,10 @@ import {
   FlatList,
   useWindowDimensions,
   ActivityIndicator,
+  TouchableOpacity,
   TextInput,
   Alert,
+  Platform,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv, Icon} from 'react-native-magnus';
@@ -49,6 +51,7 @@ import EventParticipants from '../../../components/events/EventParticipants';
 import EventCommentCard from '../EventCommentCard';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {useAPIDeleteSubmission} from '../../../hooks/api/event/useAPIDeleteSubmission';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -93,6 +96,18 @@ const EventDetail: React.FC = () => {
     onError: () => {
       Alert.alert(
         '提出中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
+  });
+  const {mutate: deleteSubmission} = useAPIDeleteSubmission({
+    onSuccess: () => {
+      setUnsavedSubmissions([]);
+      Alert.alert('ファイルを削除しました');
+      refetchEvents();
+    },
+    onError: () => {
+      Alert.alert(
+        '削除中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
@@ -252,6 +267,8 @@ const EventDetail: React.FC = () => {
         return require('../../../../assets/coach_1.jpeg');
       case EventType.CLUB:
         return require('../../../../assets/club_3.png');
+      case EventType.OTHER:
+        return require('../../../../assets/no-image.jpg');
       default:
         return undefined;
     }
@@ -264,15 +281,16 @@ const EventDetail: React.FC = () => {
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
-      uri: normalizeURL(res.uri),
+      uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
       type: res.type,
     });
-    uploadFile(formData);
+
     if (formData) {
       uploadFile(formData, {
         onSuccess: fileURL => {
           const unSavedFiles: Partial<SubmissionFile>[] = fileURL.map(f => ({
             url: f,
+            name: res.name,
             eventSchedule: eventInfo,
             userSubmitted: user,
           }));
@@ -284,6 +302,25 @@ const EventDetail: React.FC = () => {
           );
         },
       });
+    }
+  };
+
+  const handleDelete = (file: Partial<SubmissionFile>) => {
+    if (file.name) {
+      Alert.alert(`${file.name}を削除してよろしいですか？`, undefined, [
+        {
+          text: 'はい',
+          onPress: () => {
+            if (file.id) {
+              deleteSubmission({submissionId: file.id});
+            }
+          },
+        },
+        {
+          text: 'いいえ',
+          onPress: () => {},
+        },
+      ]);
     }
   };
 
@@ -495,9 +532,10 @@ const EventDetail: React.FC = () => {
                 <Div flexDir="row" flexWrap="wrap">
                   {eventInfo?.files?.map(
                     f =>
-                      f.url && (
+                      f.url &&
+                      f.name && (
                         <Div mr={4} mb={4}>
-                          <FileIcon url={f.url} />
+                          <FileIcon name={f.name} url={f.url} />
                         </Div>
                       ),
                   )}
@@ -624,21 +662,54 @@ const EventDetail: React.FC = () => {
                       </Text>
                     </Div>
                     <Div flexDir="row" flexWrap="wrap" mx={16}>
-                      {eventInfo?.submissionFiles?.map(
-                        f =>
-                          f.url && (
-                            <Div mr={4} mb={4}>
-                              <FileIcon url={f.url} />
+                      {eventInfo?.submissionFiles?.map(f =>
+                        f.url && f.name ? (
+                          <Div flexDir="row" mr={4}>
+                            <Div mb={4}>
+                              <FileIcon name={f.name} url={f.url} />
                             </Div>
-                          ),
+                            <Div ml={-12} mt={-5}>
+                              <TouchableOpacity onPress={() => handleDelete(f)}>
+                                <Icon
+                                  name="closecircle"
+                                  color="gray900"
+                                  fontSize={24}
+                                />
+                              </TouchableOpacity>
+                            </Div>
+                          </Div>
+                        ) : null,
                       )}
-                      {unsavedSubmissions?.map(
-                        f =>
-                          f.url && (
-                            <Div mr={4} mb={4}>
-                              <FileIcon url={f.url} color="blue" />
+                      {unsavedSubmissions?.map(f =>
+                        f.url && f.name ? (
+                          <Div flexDir="row" mr={4}>
+                            <Div mb={4}>
+                              <Div mr={4} mb={4}>
+                                <FileIcon
+                                  name={f.name}
+                                  url={f.url}
+                                  color="blue"
+                                />
+                              </Div>
                             </Div>
-                          ),
+                            <Div ml={-12} mt={-5}>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  setUnsavedSubmissions(
+                                    unsavedSubmissions.filter(
+                                      file => file.url !== f.url,
+                                    ),
+                                  )
+                                }>
+                                <Icon
+                                  name="closecircle"
+                                  color="gray900"
+                                  fontSize={24}
+                                />
+                              </TouchableOpacity>
+                            </Div>
+                          </Div>
+                        ) : null,
                       )}
                     </Div>
                   </>

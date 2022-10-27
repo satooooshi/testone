@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { UserRoleInApp, User } from 'src/types';
+import { UserRole } from 'src/types';
 
 export const useUserRole = (
   alreadySelectedUserRole?: UserRoleInApp,
@@ -12,7 +13,7 @@ export const useUserRole = (
   const filteredUsers =
     selectedUserRole !== 'All'
       ? users?.filter((u) => u.role === selectedUserRole)
-      : users;
+      : users?.filter((u) => u.role !== UserRole.EXTERNAL_INSTRUCTOR);
 
   const selectUserRole = (userRole: UserRoleInApp) => {
     setSelectedUserRole(userRole);

@@ -9,50 +9,52 @@ import {Icon, Text} from 'react-native-magnus';
 import {fileIconStyles} from '../../../styles/component/common/fileIcon.style';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
-import {fileNameTransformer} from '../../../utils/factory/fileNameTransformer';
 const {fs, config} = RNFetchBlob;
 
 type FileIconProps = {
+  name: string;
   url: string;
   color?: 'white' | 'blue';
 };
 
-const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
+const FileIcon: React.FC<FileIconProps> = ({name, url, color = 'white'}) => {
   const [loading, setLoading] = useState(false);
   const downloadFile = async () => {
     setLoading(true);
+
     let DownloadDir =
       Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
-    const ext = url.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
+    const ext = name.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
     let options = {
+      path: DownloadDir + '/' + name, // this is the path where your downloaded file will live in
       addAndroidDownloads: {
-        useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+        title: DownloadDir + '/' + name,
+        useDownloadManager: false, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+        // useDownloadManager: true,にするとエラー
         notification: true,
         description: 'ファイルをダウンロードします',
-        path:
-          DownloadDir +
-          '/me_' +
-          decodeURIComponent(
-            (url?.match('.+/(.+?)([?#;].*)?$') || ['', url])[1] || '',
-          ), // this is the path where your downloaded file will live in
+        // path: DownloadDir + '/' + name,
+        // this is the path where your downloaded file will live in
         appendExt: ext,
       },
-      path:
-        DownloadDir +
-        '/me_' +
-        decodeURIComponent(
-          (url?.match('.+/(.+?)([?#;].*)?$') || ['', url])[1] || '',
-        ), // this is the path where your downloaded file will live in
     };
     try {
       const {path} = await config(options).fetch('GET', url);
+
       setLoading(false);
-      FileViewer.open(path()).catch(err => {
-        if (err?.message === 'No app associated with this mime type') {
-          Alert.alert('このファイル形式に対応しているアプリがありません');
-        }
-      });
+      if (path) {
+        FileViewer.open(path()).catch(err => {
+          if (err?.message === 'No app associated with this mime type') {
+            if (Platform.OS === 'ios') {
+              Alert.alert('このファイル形式に対応しているアプリがありません');
+            } else {
+              Alert.alert('ダウンロードが完了しました。');
+            }
+          }
+        });
+      }
     } catch {
+      Alert.alert('ファイルダウンロード時にエラーが発生しました');
       setLoading(false);
     }
   };
@@ -73,7 +75,7 @@ const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
           />
         )}
         <Text color="blue700" numberOfLines={1}>
-          {fileNameTransformer(url)}
+          {name}
         </Text>
       </>
     </TouchableHighlight>

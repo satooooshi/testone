@@ -27,6 +27,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
               h={windowWidth * 0.09}
               w={windowWidth * 0.09}
               user={writer}
+              GoProfile={true}
             />
           </Div>
           <Text fontSize={12} color="gray800">

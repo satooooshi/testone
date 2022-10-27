@@ -6,7 +6,7 @@ import {answerSchema} from '../../../utils/validation/schema';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Div, Overlay, Text} from 'react-native-magnus';
+import {Button, Div, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostAnswerRouteProps,
@@ -20,11 +20,13 @@ import RenderHtml from 'react-native-render-html';
 import MarkdownIt from 'markdown-it';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import QuillEditor from 'react-native-cn-quill';
 
 const PostAnswer: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostAnswerRouteProps>();
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
   const wikiId = route.params.id;
   const {data: wikiInfo} = useAPIGetWikiDetail(wikiId);
   const mdParser = new MarkdownIt({breaks: true});
@@ -46,7 +48,7 @@ const PostAnswer: React.FC = () => {
   const isLoading = loadingSaveAnswer || loadingUploadImage;
   const initialValues: Partial<QAAnswer> = {
     body: '',
-    textFormat: wikiInfo?.textFormat,
+    textFormat: 'html',
     wiki: wikiInfo,
   };
   const {
@@ -60,6 +62,7 @@ const PostAnswer: React.FC = () => {
     validationSchema: answerSchema,
     onSubmit: a => {
       saveAnswer(a);
+      quillRef.current?.blur();
     },
   });
 
@@ -95,7 +98,7 @@ const PostAnswer: React.FC = () => {
             nestedScrollEnabled={true}
             scrollEventThrottle={20}
             keyboardDismissMode={'none'}>
-            <Div
+            <ScrollDiv
               w={windowWidth * 0.9}
               h={windowHeight * 0.3}
               alignSelf="center"
@@ -111,7 +114,7 @@ const PostAnswer: React.FC = () => {
                       : mdParser.render(wikiInfo.body),
                 }}
               />
-            </Div>
+            </ScrollDiv>
             <Div w={windowWidth * 0.9} alignSelf="center" pt={10}>
               <Button
                 mb={16}
@@ -129,6 +132,7 @@ const PostAnswer: React.FC = () => {
                 textFormat={wikiInfo.textFormat}
                 onUploadImage={handleUploadImage}
                 onChange={text => setNewAnswer(a => ({...a, body: text}))}
+                quillRef={quillRef}
               />
             </Div>
           </KeyboardAwareScrollView>

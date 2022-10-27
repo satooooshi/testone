@@ -29,7 +29,7 @@ const ReactionToMessage: React.FC<ReactionToMessageProps> = ({
         p="xs"
         rounded="md">
         <Text fontSize={16}>{reaction.emoji}</Text>
-        <Text fontSize={16} color={reaction.isSender ? 'white' : undefined}>
+        <Text fontSize={16} color={reaction.isSender ? 'white' : 'black'}>
           {numbersOfReaction}
         </Text>
       </Div>

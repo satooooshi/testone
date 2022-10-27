@@ -57,32 +57,47 @@ const SearchProvider: React.FC = ({ children }) => {
 const useSearchForm = () => useContext(SearchFormContext);
 
 type SearchFormProps = {
-  value: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
-  onClickButton: () => void;
+  // value: string;
+  // onChange: ChangeEventHandler<HTMLInputElement>;
+  onClickButton: (word: string) => void;
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
+  onClearTag: () => void;
   onClear: () => void;
 };
 
 const SearchInput: React.FC<SearchFormProps> = ({
-  value,
-  onChange,
+  // value,
+  // onChange,
   onClickButton,
   tags = [],
   selectedTags = [],
   toggleTag,
+  onClearTag,
   onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
-  const [searchedWord, setSearchedWord] = useState(value);
+  const [word, setWord] = useState('');
+  const [searchedWord, setSearchedWord] = useState('');
   const { isSmallerThan768, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
-    onClickButton();
-    setSearchedWord(value);
+    onClickButton(word);
+    setSearchedWord(word);
     isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleModalResetButton = () => {
+    onClear();
+    setSearchedWord('');
+    setWord('');
+    isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleOnComplete = () => {
+    setTagModal(false);
+    onClickButton(word);
   };
 
   return (
@@ -108,11 +123,17 @@ const SearchInput: React.FC<SearchFormProps> = ({
           width={isSmallerThan768 ? '100%' : '60%'}
           placeholder="検索ワードを入力"
           background="white"
-          value={value}
-          onChange={onChange}
+          value={word}
+          onChange={(e) => setWord(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleModalSearchButton();
+            }
+          }}
         />
         <Button
-          width={isSmallerThan768 ? '100%' : '15vw'}
+          width={isSmallerThan768 ? '100%' : '20vw'}
           className={searchFormStyles.add_tag_button}
           colorScheme="green"
           onClick={() => setTagModal(true)}>
@@ -126,29 +147,26 @@ const SearchInput: React.FC<SearchFormProps> = ({
           selectedTags={selectedTags}
           toggleTag={toggleTag}
           onClear={() => {
-            onClear();
+            onClearTag();
           }}
-          onComplete={() => setTagModal(false)}
+          onComplete={handleOnComplete}
           isSearch={true}
         />
         <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
           <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
+            width={isSmallerThan768 ? '100%' : '12vw'}
             colorScheme="pink"
             onClick={handleModalSearchButton}>
             検索
           </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClear();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
+        </div>
+        <div className={clsx(searchFormStyles.clear_search_button)}>
+          <Button
+            width={isSmallerThan768 ? '100%' : '12vw'}
+            colorScheme="blackAlpha"
+            onClick={handleModalResetButton}>
+            クリア
+          </Button>
         </div>
       </div>
       {selectedTags.length ? (

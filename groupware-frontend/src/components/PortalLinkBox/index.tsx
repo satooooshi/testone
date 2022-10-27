@@ -7,12 +7,18 @@ import { BsChatDotsFill } from 'react-icons/bs';
 import { FaUserCog } from 'react-icons/fa';
 import { FcSportsMode } from 'react-icons/fc';
 import { RiAccountCircleFill, RiQuestionnaireFill } from 'react-icons/ri';
-import { MdAssignment, MdDeveloperBoard } from 'react-icons/md';
+import { RiCalendarEventLine } from 'react-icons/ri';
+import {
+  MdAssignment,
+  MdDeveloperBoard,
+  MdPermContactCalendar,
+} from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { BiPaperPlane } from 'react-icons/bi';
 
 export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
@@ -24,12 +30,14 @@ export enum PortalLinkType {
   WIKI = '/wiki',
   RULES = '/wiki/list?type=rule&rule_category=philosophy',
   ALL_POSTAL = '/wiki/list?type=all-postal',
+  MAIL_MAGAZINE = '/wiki/list?type=mail_magazine',
   KNOWLEDGE = '/wiki/list?type=knowledge',
   QA = `/wiki/list?type=qa`,
   BOARD = `/wiki/list?type=board`,
   CHAT = '/chat',
   ADMIN = '/admin/users',
   ACCOUNT = '/account',
+  MYSCHEDULE = 'event/list?page=1&tag=&word=&status=past&from=2022-03-04&to=2022-04-11&personal=true',
 }
 
 type PortarlLinkBoxProps = {
@@ -114,6 +122,13 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
+    case PortalLinkType.MAIL_MAGAZINE:
+      return (
+        <BiPaperPlane
+          className={clsx(portalLinkBoxStyles.icon)}
+          color={'blue'}
+        />
+      );
     case PortalLinkType.RULES:
       return (
         <CgLoadbarDoc
@@ -177,6 +192,15 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
+    case PortalLinkType.MYSCHEDULE:
+      return (
+        <RiCalendarEventLine
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.myschedule_icon,
+          )}
+        />
+      );
     default:
       return <GiBookCover className={portalLinkBoxStyles.icon} />;
   }
@@ -194,13 +218,15 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.CLUB:
       return '部活動';
     case PortalLinkType.SUBMISSION_ETC:
-      return '提出物等';
+      return '〆切一覧';
     case PortalLinkType.WIKI:
       return '社内Wiki';
     case PortalLinkType.RULES:
       return '社内規則';
     case PortalLinkType.ALL_POSTAL:
       return 'オール便';
+    case PortalLinkType.MAIL_MAGAZINE:
+      return 'メルマガ';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:
@@ -213,6 +239,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return 'アカウント';
     case PortalLinkType.BOARD:
       return '掲示板';
+    case PortalLinkType.MYSCHEDULE:
+      return 'Myスケジュール';
     default:
       return '';
   }
@@ -239,6 +267,8 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.ALL_POSTAL:
       return `会社から全社員に向けての重要連絡事項です。今後の提出期限や重要なお知らせを記載しています。
 毎週金曜日に更新しますので必ず確認してください。`;
+    case PortalLinkType.MAIL_MAGAZINE:
+      return `会社から全社員に向けて、イベントのお知らせ事項のほか、部活動の告知、本社メンバーから伝えたいことなどラフなコンテンツをお届けしています。毎週水曜日に更新しますので、必ず確認してください！！`;
     case PortalLinkType.KNOWLEDGE:
       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
     case PortalLinkType.QA:
@@ -251,6 +281,8 @@ const descriptionText = (href: PortalLinkType): string => {
       return '自分のアカウント情報を編集します。';
     case PortalLinkType.BOARD:
       return 'ナレッジやQ&Aなど、社内で情報共有をする掲示板です。';
+    case PortalLinkType.MYSCHEDULE:
+      return '各スケジュールを確認します';
     default:
       return '';
   }

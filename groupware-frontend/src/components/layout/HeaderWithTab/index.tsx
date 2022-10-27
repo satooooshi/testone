@@ -45,6 +45,8 @@ const tabClassNameGetter = (tab: Tab): string => {
       return headerStyles.club_tab;
     case EventTab.SUBMISSION_ETC:
       return headerStyles.submission_etc_tab;
+    case EventTab.OTHER:
+      return headerStyles.other_tab;
     default:
       return '';
   }

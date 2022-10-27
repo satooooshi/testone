@@ -8,7 +8,7 @@ const WikiBodyRenderer = ({dom}: {dom: Document | string | null}) => {
     <>
       {dom ? (
         <RenderHTMLSource
-          contentWidth={windowWidth * 0.9}
+          contentWidth={windowWidth * 0.8}
           source={{
             dom: dom as Document,
           }}

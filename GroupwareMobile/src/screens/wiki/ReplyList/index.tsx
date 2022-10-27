@@ -9,7 +9,7 @@ import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenPro
 import {useNavigation} from '@react-navigation/native';
 import {darkFontColor} from '../../../utils/colors';
 import UserAvatar from '../../../components/common/UserAvatar';
-import { dateTimeFormatterFromJSDDate } from '../../../utils/dateTimeFormatterFromJSDate';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type ReplyListProps = {
   answer: QAAnswer;
@@ -68,7 +68,12 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                                 }
                               }}>
                               <Div>
-                                <UserAvatar w={64} h={64} user={reply.writer} />
+                                <UserAvatar
+                                  w={64}
+                                  h={64}
+                                  user={reply.writer}
+                                  GoProfile={true}
+                                />
                               </Div>
                             </TouchableOpacity>
                             <Text fontSize={18} color={darkFontColor}>

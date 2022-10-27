@@ -1,5 +1,5 @@
 import {AxiosError} from 'axios';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import {UserRole, User} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {userAPIQueryRefresh} from '../../../utils/userAPIQueryRefresh';
@@ -9,6 +9,7 @@ export interface SearchQueryToGetUsers {
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: 'tokyo' | 'osaka';
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
@@ -28,9 +29,13 @@ const searchUsers = async (
   return res.data;
 };
 
-export const useAPISearchUsers = (query: SearchQueryToGetUsers) => {
+export const useAPISearchUsers = (
+  query: SearchQueryToGetUsers,
+  options?: UseQueryOptions<SearchResultToGetUsers, AxiosError>,
+) => {
   return useQuery<SearchResultToGetUsers, AxiosError>(
     ['searchUsers', query],
     () => searchUsers(query),
+    options,
   );
 };

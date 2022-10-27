@@ -1,6 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {Alert} from 'react-native';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
@@ -15,9 +16,11 @@ const NewRoom: React.FC = () => {
   const route = useRoute<NewRoomRouteProps>();
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers('');
+  const {editChatGroup} = useHandleBadge();
   const headerTitle = 'ルーム新規作成';
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      editChatGroup(createdData);
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},

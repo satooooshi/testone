@@ -7,17 +7,20 @@ import { getRoomsByPageURL } from 'src/utils/url/chat.url';
 export interface GetRoomsQuery {
   page?: string;
   limit?: string;
+  updatedAtLatestRoom?: Date;
 }
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 
 const getRooms = async (query: GetRoomsQuery) => {
-  const { page = 1, limit } = query;
+  const { page = 1, limit, updatedAtLatestRoom = '' } = query;
   const res = await axiosInstance.get<GetRoomsResult>(
-    `${getRoomsByPageURL}?page=${page}&limit=${limit || ''}`,
+    `${getRoomsByPageURL}?page=${page}&limit=${
+      limit || ''
+    }&updatedAtLatestRoom=${updatedAtLatestRoom}`,
   );
   return res.data;
 };
@@ -27,7 +30,7 @@ export const useAPIGetRoomsByPage = (
   options?: UseQueryOptions<GetRoomsResult, AxiosError>,
 ) => {
   return useQuery<GetRoomsResult, AxiosError>(
-    ['getMessages', query],
+    [query.updatedAtLatestRoom ? 'getLatestRooms' : 'getRooms', query],
     () => getRooms(query),
     options,
   );

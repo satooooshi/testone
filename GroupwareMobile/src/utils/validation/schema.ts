@@ -12,7 +12,7 @@ const unmatchPasswordConfirmation = '再入力と新しいパスワードが一�
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
-const minRoomUserMessage = 'トークルームには一人以上の社員を招待してください';
+// const minRoomUserMessage = 'トークルームには一人以上の社員を招待してください';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().required(`メールアドレスは${requireMessage}`),
@@ -22,6 +22,7 @@ export const loginSchema = Yup.object().shape({
 export const wikiSchema = Yup.object().shape({
   title: Yup.string().required(requireMessage).max(100, nWordLimitMessage(100)),
   body: Yup.string().required(requireMessage),
+  type: Yup.string().required('タイプを選択してください'),
 });
 export const createCommentSchema = Yup.object().shape({
   body: Yup.string().required('コメントは' + requireMessage),
@@ -73,6 +74,7 @@ export const savingEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+  type: Yup.string().required('タイプを選択してください'),
 });
 
 export const noteSchema = Yup.object().shape({
@@ -89,8 +91,10 @@ export const chatMessageSchema = Yup.object().shape({
 });
 
 export const savingRoomSchema = Yup.object().shape({
-  name: Yup.string().max(50, `ルーム名は${nWordLimitMessage(50)}`),
-  members: Yup.array().min(1, minRoomUserMessage),
+  name: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(50, `ルーム名は${nWordLimitMessage(50)}`),
+  // members: Yup.array().min(1, minRoomUserMessage),
 });
 
 const profileValidation = {
@@ -142,6 +146,11 @@ const profileValidation = {
 
 export const profileSchema = Yup.object().shape({
   ...profileValidation,
+});
+
+export const adminEditUserProfileSchema = Yup.object().shape({
+  ...profileValidation,
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
 });
 
 export const createUserSchema = Yup.object().shape({

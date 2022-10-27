@@ -7,10 +7,18 @@ export enum UserRole {
   COMMON = 'common',
 }
 
+export enum BranchType {
+  TOKYO = 'tokyo',
+  OSAKA = 'osaka',
+  NON_SET = 'non_set',
+}
+
 export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -22,6 +30,7 @@ export enum EventType {
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
+  OTHER = 'other',
 }
 
 export enum TagType {
@@ -36,6 +45,7 @@ export enum WikiType {
   RULES = 'rule',
   ALL_POSTAL = 'all-postal',
   BOARD = 'board',
+  MAIL_MAGAZINE = 'mail_magazine',
 }
 
 export enum RuleCategory {
@@ -65,6 +75,10 @@ export enum BoardCategory {
   CLUB = 'club',
   //勉強会
   STUDY_MEETING = 'study_meeting',
+  //自己研鑽
+  SELF_IMPROVEMENT = 'self_improvement',
+  //個人告知
+  PERSONAL_ANNOUNCEMENT = 'personal_announcement',
   //お祝い事
   CELEBRATION = 'celebration',
   //その他
@@ -85,6 +99,7 @@ export interface User {
   firstName: string;
   lastNameKana: string;
   firstNameKana: string;
+  branch: BranchType;
   introduceTech: string;
   introduceQualification: string;
   introduceHobby: string;
@@ -111,7 +126,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-  userGoodForBoard?: Wiki[];
+  userGoodForBoard?: UserGoodForBoard[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
@@ -137,6 +152,12 @@ export interface UserTag {
   users?: User[];
 }
 
+export type UserGoodForBoard = {
+  id: number;
+  user: User;
+  wiki: Wiki;
+};
+
 export interface Wiki {
   id: number;
   title: string;
@@ -153,8 +174,10 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  userGoodForBoard?: User[];
+  userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
+  goodsCount?: number;
+  answersCount?: number;
 }
 
 export interface WikiFile {
@@ -260,6 +283,7 @@ export interface EventVideo {
 export interface SubmissionFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: Partial<EventSchedule>;
   userSubmitted?: Partial<User>;
   createdAt: Date;
@@ -269,6 +293,7 @@ export interface SubmissionFile {
 export interface EventFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
@@ -284,6 +309,7 @@ export interface Department {
 export interface ChatMessage {
   id: number;
   content: string;
+  fileName: string;
   type: ChatMessageType;
   chatGroup?: ChatGroup;
   chatMessages?: ChatMessage[];
@@ -291,23 +317,45 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
+  callTime?: string;
   replyParentMessage?: ChatMessage;
 }
 
+export interface SocketMessage {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
+}
+
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  roomType: RoomType;
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
+  owner: User[];
+  previousMembers?: User[];
+  memberCount: number;
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
 }
 
 export interface LastReadChatTime {
@@ -328,9 +376,15 @@ export interface ChatNote {
   isEditor?: boolean;
 }
 
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
+}
+
 export interface ChatNoteImage {
   id: number;
   imageURL: string;
+  fileName: string;
   chatNote?: ChatNote;
   createdAt: Date;
   updatedAt: Date;
@@ -347,8 +401,13 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

@@ -11,9 +11,10 @@ import {
   Text,
   Tag as TagButton,
 } from 'react-native-magnus';
-import UserModal from '../../../../components/common/UserModal';
+import RoomMemberModal from '../../../../components/chat/RoomMemberModal';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
+import {useAuthenticate} from '../../../../contexts/useAuthenticate';
 import {useUserRole} from '../../../../hooks/user/useUserRole';
 import {newRoomStyles} from '../../../../styles/screen/chat/newRoom.style';
 import {ChatGroup, User} from '../../../../types';
@@ -41,8 +42,11 @@ const RoomForm: React.FC<RoomFormProps> = ({
   onSubmit,
   onUploadImage,
 }) => {
+  const {user: myProfile} = useAuthenticate();
   const {width: windowWidth} = useWindowDimensions();
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [visibleOwnerModal, setVisibleOwnerModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<ChatGroup> = {
     name: '',
     imageURL: '',
@@ -74,16 +78,49 @@ const RoomForm: React.FC<RoomFormProps> = ({
     }
   }, [initialRoom, setValues]);
 
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   return (
     <WholeContainer>
-      <UserModal
+      <RoomMemberModal
+        isChatGroupOwner={true}
         isVisible={visibleUserModal}
-        users={filteredUsers || []}
+        users={filteredUsers?.filter(u => u.id !== myProfile?.id) || []}
         onCloseModal={() => setVisibleUserModal(false)}
         selectedUserRole={selectedUserRole}
         defaultSelectedUsers={values.members}
         onCompleteModal={selectedUsers =>
           setValues(v => ({...v, members: selectedUsers}))
+        }
+      />
+      <RoomMemberModal
+        isChatGroupOwner={true}
+        isOwnerEdit={true}
+        isVisible={visibleOwnerModal}
+        users={
+          filteredUsers?.filter(u => {
+            const member = values.members?.filter(m => {
+              return m.id === u.id;
+            });
+            if (member?.length) {
+              return member;
+            }
+          }) || []
+        }
+        onCloseModal={() => setVisibleOwnerModal(false)}
+        selectedUserRole={selectedUserRole}
+        defaultSelectedUsers={values.owner}
+        onCompleteModal={selectedUsers =>
+          setValues(v => ({...v, owner: selectedUsers}))
         }
       />
       <HeaderWithTextButton enableBackButton={true} title={headerTitle} />
@@ -97,7 +134,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => handleSubmit()}>
+        onPress={() => setWillSubmit(true)}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       <ScrollDiv
@@ -153,6 +190,26 @@ const RoomForm: React.FC<RoomFormProps> = ({
         ) : null}
         <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
           {values.members?.map(u => (
+            <TagButton key={u.id} mr={4} mb={8} color="white" bg={'purple800'}>
+              {userNameFactory(u)}
+            </TagButton>
+          ))}
+        </Div>
+        {initialRoom?.owner ? (
+          <Div mb="lg">
+            <Button
+              w={'100%'}
+              mb="lg"
+              onPress={() => setVisibleOwnerModal(true)}
+              bg="pink600"
+              fontWeight="bold">
+              オーナーを編集
+            </Button>
+          </Div>
+        ) : null}
+
+        <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
+          {values.owner?.map(u => (
             <TagButton key={u.id} mr={4} mb={8} color="white" bg={'purple800'}>
               {userNameFactory(u)}
             </TagButton>

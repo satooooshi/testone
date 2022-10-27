@@ -24,6 +24,8 @@ export default class CreateInit implements Seeder {
             email: 'valleyin@example.com',
             lastName: '谷内',
             firstName: '健悟',
+            firstNameKana: 'ヤチ',
+            lastNameKana: 'ケンゴ',
             password: hashSync('password', 10),
             role: UserRole.COMMON,
             avatarUrl:
@@ -34,6 +36,8 @@ export default class CreateInit implements Seeder {
             email: 'test@example.com',
             lastName: 'やち',
             firstName: 'けんご',
+            firstNameKana: 'ヤチ',
+            lastNameKana: 'ケンゴ',
             password: hashSync('password', 10),
             role: UserRole.ADMIN,
             avatarUrl:
@@ -44,6 +48,8 @@ export default class CreateInit implements Seeder {
             email: 'takeda@example.com',
             lastName: 'たけだ',
             firstName: 'けんた',
+            firstNameKana: 'タケダ',
+            lastNameKana: 'ケンタ',
             password: hashSync('password', 10),
             role: UserRole.EXTERNAL_INSTRUCTOR,
             avatarUrl:

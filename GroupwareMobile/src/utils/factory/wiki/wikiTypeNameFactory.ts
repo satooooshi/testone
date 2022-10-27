@@ -22,6 +22,10 @@ export const wikiTypeNameFactory = (
             return '部活動・サークル';
           case BoardCategory.STUDY_MEETING:
             return '勉強会';
+          case BoardCategory.SELF_IMPROVEMENT:
+            return '自己研鑽';
+          case BoardCategory.PERSONAL_ANNOUNCEMENT:
+            return '個人告知';
           case BoardCategory.CELEBRATION:
             return 'お祝い事';
           case BoardCategory.OTHER:
@@ -34,6 +38,8 @@ export const wikiTypeNameFactory = (
       }
     case WikiType.ALL_POSTAL:
       return 'オール便';
+    case WikiType.MAIL_MAGAZINE:
+      return 'メルマガ';
     case WikiType.RULES:
       if (nested) {
         switch (ruleCategory) {

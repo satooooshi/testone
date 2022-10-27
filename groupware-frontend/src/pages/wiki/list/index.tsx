@@ -22,6 +22,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -161,6 +162,40 @@ const QAQuestionList = () => {
         WikiType.BOARD,
         undefined,
         true,
+        BoardCategory.SELF_IMPROVEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.SELF_IMPROVEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.SELF_IMPROVEMENT,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.PERSONAL_ANNOUNCEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.PERSONAL_ANNOUNCEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.PERSONAL_ANNOUNCEMENT,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
         BoardCategory.CELEBRATION,
       ),
       onClick: () =>
@@ -259,13 +294,19 @@ const QAQuestionList = () => {
   };
 
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
-    const selectedTagIDs = selectedTags.map((t) => t.id.toString());
-    const tagQuery = selectedTagIDs.join('+');
+    let tagQuery;
+    if (query.tag === '') {
+      tagQuery = '';
+    } else {
+      const selectedTagIDs = selectedTags.map((t) => t.id.toString());
+      tagQuery = selectedTagIDs.join('+');
+    }
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
       tag: tagQuery,
     });
+
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
@@ -280,6 +321,8 @@ const QAQuestionList = () => {
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
+        : type === WikiType.MAIL_MAGAZINE
+        ? 'メルマガ'
         : 'All',
     tabs,
     rightButtonName: 'Wikiを作成',
@@ -297,6 +340,12 @@ const QAQuestionList = () => {
   }, [tag, tags]);
 
   const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
+
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '', tag: '' });
+  };
 
   return (
     <LayoutWithTab
@@ -318,21 +367,19 @@ const QAQuestionList = () => {
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
-            onClear={() => setSelectedTags([])}
-            value={searchWord}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() =>
+            onClearTag={() => setSelectedTags([])}
+            onClickButton={(w) =>
               queryRefresh({
                 page: '1',
-                tag,
                 status,
-                word: searchWord,
+                word: w,
                 type,
               })
             }
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
+            onClear={() => resetSearch()}
           />
         </div>
         {!isLoading && !questions?.wiki.length && (

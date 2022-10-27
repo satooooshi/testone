@@ -30,7 +30,7 @@ const downloadZip = async (query: QueryToGetZipSubmission) => {
   const folder = zip.folder(name.replace(' ', '_'));
   for (let i = 0; i <= submissions.length - 1; i++) {
     const userName = `${submissions[i].userSubmitted?.lastName}_${submissions[i].userSubmitted?.firstName}`;
-    const fileName = userName + '_' + fileNameTransformer(submissions[i].url);
+    const fileName = userName + '_' + submissions[i].name;
     const blobRes = await axios.get<Blob>(signedUrlRes.data[i], {
       responseType: 'blob',
       withCredentials: false,

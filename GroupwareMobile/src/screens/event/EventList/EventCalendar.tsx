@@ -15,9 +15,12 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Text} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
-import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
+import {
+  monthCalendarStyles,
+  calendarStyles,
+} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
 import {
   daysQueryFactoryFromTargetDate,
@@ -25,7 +28,7 @@ import {
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {ActivityIndicator} from 'react-native-paper';
@@ -56,11 +59,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     mode: 'month',
     targetDate: new Date(),
   });
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
-    defaultWeekQuery(),
-  );
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>({
+    personal: personal ? 'true' : '',
+  });
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
+  const isFocused = useIsFocused();
   const {mutate: saveEvent, isSuccess} = useAPICreateEvent({
     onSuccess: () => {
       Alert.alert('イベントを作成しました。');
@@ -76,27 +80,27 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     data: searchResult,
     refetch: refetchEvents,
     isLoading,
-  } = useAPIGetEventList(searchQuery);
+  } = useAPIGetEventList(searchQuery, {enabled: false});
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (isFocused) {
       refetchEvents();
-    }, [refetchEvents]),
-  );
+    }
+  }, [refetchEvents, isFocused, searchQuery]);
 
   const memorizedEvent = useMemo<any[]>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]): any[] => {
       if (ev) {
-        if (personal) {
-          ev = ev.filter(e => {
-            if (
-              e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal) {
+        //   ev = ev.filter(e => {
+        //     if (
+        //       e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const modifiedEvents: any[] = ev.map(e => ({
           ...e,
           start: new Date(e.startAt),
@@ -113,7 +117,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       return [];
     };
     return changeToBigCalendarEvent(searchResult?.events);
-  }, [personal, searchResult?.events, user?.id]);
+  }, [searchResult?.events]);
 
   const dateRange = React.useMemo(() => {
     if (calendarMode.mode === 'day') {
@@ -125,10 +129,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     }
     return getDatesInWeek(new Date(), 0, 'ja');
   }, [calendarMode.mode, calendarMode.targetDate]);
-  const calendarHeight = windowHeight - 120;
+  const calendarHeight = windowHeight - 300;
 
   const headerCellHeight = useMemo(() => MIN_HEIGHT / 24 - 20, []);
-
   const allDayEvents = useMemo(() => {
     return memorizedEvent.filter(event =>
       isAllDayEvent(event.startAt, event.endAt),
@@ -365,65 +368,72 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
         </Div>
       </Div>
-      <ScrollDiv>
-        {!isLoading ? (
-          <Calendar
-            bodyContainerStyle={calendarStyles.container}
-            headerContainerStyle={{
-              ...calendarStyles.container,
-              ...calendarStyles.header,
-            }}
-            onPressDateHeader={onPressDateHeader}
-            scrollOffsetMinutes={1200}
-            renderHeader={
-              calendarMode.mode === 'day'
-                ? () => (
-                    <CalendarHeader
-                      onPressDateHeader={onPressDateHeader}
-                      dateRange={dateRange}
-                      cellHeight={headerCellHeight}
-                      allDayEvents={allDayEvents}
-                      style={calendarStyles.container}
-                      activeDate={calendarMode.targetDate}
-                    />
-                  )
-                : undefined
-            }
-            activeDate={calendarMode.targetDate}
-            date={calendarMode.targetDate}
-            events={memorizedEvent}
-            mode={calendarMode.mode}
-            onPressEvent={event => {
-              navigation.navigate('EventStack', {
-                screen: 'EventDetail',
-                params: {id: event.id},
-              });
-            }}
-            onPressCell={date =>
-              setCalendarMode({mode: 'day', targetDate: date})
-            }
-            height={calendarHeight}
-            eventCellStyle={
-              calendarMode.mode === 'day'
-                ? event => ({
-                    backgroundColor: eventTypeColorFactory(event.type),
-                    borderColor: '#e0e0e0',
-                    borderWidth: 1,
-                    width: `${eventWidth(event)} %`,
-                    minWidth: '33%',
-                    marginLeft: eventPosition(event),
-                  })
-                : event => ({
-                    backgroundColor: eventTypeColorFactory(event.type),
-                    borderColor: '#e0e0e0',
-                    borderWidth: 1,
-                  })
-            }
-          />
-        ) : (
-          <ActivityIndicator />
-        )}
-      </ScrollDiv>
+      {!isLoading ? (
+        <Calendar
+          bodyContainerStyle={calendarStyles.container}
+          headerContainerStyle={
+            calendarMode.mode === 'month'
+              ? {
+                  ...monthCalendarStyles.container,
+                  ...monthCalendarStyles.header,
+                }
+              : {
+                  ...calendarStyles.container,
+                  ...calendarStyles.header,
+                }
+          }
+          onPressDateHeader={onPressDateHeader}
+          scrollOffsetMinutes={1200}
+          swipeEnabled={false}
+          renderHeader={
+            calendarMode.mode === 'day'
+              ? () => (
+                  <CalendarHeader
+                    onPressDateHeader={onPressDateHeader}
+                    dateRange={dateRange}
+                    cellHeight={headerCellHeight}
+                    allDayEvents={allDayEvents}
+                    style={calendarStyles.container}
+                    activeDate={calendarMode.targetDate}
+                  />
+                )
+              : undefined
+          }
+          activeDate={calendarMode.targetDate}
+          date={calendarMode.targetDate}
+          events={memorizedEvent}
+          mode={calendarMode.mode}
+          onPressEvent={event => {
+            navigation.navigate('EventStack', {
+              screen: 'EventDetail',
+              params: {id: event.id},
+            });
+          }}
+          onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
+          height={calendarHeight}
+          maxVisibleEventCount={2}
+          eventCellStyle={
+            calendarMode.mode === 'day'
+              ? event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                  width: `${eventWidth(event)} %`,
+                  minWidth: '33%',
+                  marginLeft: eventPosition(event),
+                })
+              : event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                  padding: 0,
+                  height: calendarMode.mode === 'month' ? 18 : undefined,
+                })
+          }
+        />
+      ) : (
+        <ActivityIndicator />
+      )}
     </>
   );
 };

@@ -24,7 +24,7 @@ export default function TOCEntry({
       <Text
         style={[
           tagName === 'h1' && tailwind('text-xl font-bold'),
-          tagName === 'h2' && tailwind('text-lg'),
+          tagName === 'h2' && tailwind('text-lg ml-5'),
         ]}>
         {headerName}
       </Text>

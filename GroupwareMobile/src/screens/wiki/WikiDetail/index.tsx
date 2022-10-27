@@ -1,6 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Button, Tag, Icon} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Tag,
+  Icon,
+  ScrollDiv,
+  Modal,
+} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
   StyleSheet,
@@ -22,18 +30,13 @@ import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
 import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
-import {
-  DrawerLayout,
-  ScrollView,
-  TouchableHighlight,
-} from 'react-native-gesture-handler';
+import {ScrollView, TouchableHighlight} from 'react-native-gesture-handler';
 import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
 import TOC from '../../../components/wiki/TOC';
 import {FAB} from 'react-native-paper';
 import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
-import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -45,12 +48,12 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import FileIcon from '../../../components/common/FileIcon';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
   const {user: authUser} = useAuthenticate();
   const {id} = route.params;
-  const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
   const {user} = useAuthenticate();
@@ -61,6 +64,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     wikiInfo?.isGoodSender || false,
   );
   const [wikiState, setWikiState] = useState(wikiInfo);
+  const [isVisibleTOCModal, setIsVisibleTOCModal] = useState<boolean>(false);
+  const [activeEntry, setActiveEntry] = useState<string>('');
 
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
@@ -71,10 +76,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       : '';
   const {dom, headings} = useDom(wikiBody);
   const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
   const onPressEntry = useCallback(
     (entry: string) => {
-      closeDrawer();
+      setIsVisibleTOCModal(false);
       scroller.scrollToEntry(entry);
+      setActiveEntry(entry);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scroller],
@@ -82,10 +90,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const renderToc = useCallback(
     function renderToc() {
-      return <TOC headings={headings} onPressEntry={onPressEntry} />;
+      return (
+        <TOC
+          headings={headings}
+          onPressEntry={onPressEntry}
+          activeEntry={activeEntry}
+          setActiveEntry={setActiveEntry}
+        />
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [headings],
+    [headings, activeEntry],
   );
 
   useEffect(() => {
@@ -104,7 +119,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     } else {
       setIsTabBarVisible(true);
     }
-  }, [isFocused, refetchWikiInfo, setIsTabBarVisible]);
+  }, [isFocused, refetchWikiInfo, setIsTabBarVisible, id]);
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
@@ -151,19 +166,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         setWikiState(w => {
           if (w) {
             if (prevHeartStatus) {
-              w.userGoodForBoard = w.userGoodForBoard?.filter(
-                u => u.id !== user?.id,
-              );
+              w.goodsCount = (w.goodsCount || 0) - 1;
             } else {
-              w.userGoodForBoard = [
-                user as User,
-                ...(w.userGoodForBoard || []),
-              ];
+              w.goodsCount = (w.goodsCount || 0) + 1;
             }
             return w;
           }
         });
-
         return !prevHeartStatus;
       });
     },
@@ -224,7 +233,12 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                     }
                   }}>
                   <Div mr={8}>
-                    <UserAvatar h={48} w={48} user={wikiState.writer} />
+                    <UserAvatar
+                      h={48}
+                      w={48}
+                      user={wikiState.writer}
+                      GoProfile={true}
+                    />
                   </Div>
                 </TouchableOpacity>
                 <Text fontSize={18} color={darkFontColor}>
@@ -284,16 +298,21 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               )}
             </TouchableHighlight>
             <Button
-              onPress={() =>
-                setIsVisible(true)
-              }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+              onPress={() => {
+                getGoodsForBoard(wikiState.id);
+                setIsVisible(true);
+              }}>
+              {`${wikiState.goodsCount}件のいいね`}
+            </Button>
           </Div>
         )}
-        <GoodSendersModal
-          goodSenders={wikiState?.userGoodForBoard || []}
-          isVisible={isVisible}
-          onClose={() => setIsVisible(false)}
-        />
+        {goodsForBoard && (
+          <GoodSendersModal
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+            goodsForBoard={goodsForBoard}
+          />
+        )}
         {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
@@ -350,19 +369,30 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         }
       />
       {renderingTOCNeeded ? (
-        <DrawerLayout
-          drawerPosition="right"
-          drawerWidth={300}
-          renderNavigationView={renderToc}
-          ref={drawerRef}>
+        <>
           {article}
           <FAB
             style={styles.fab}
             color="#61dafb"
             icon="format-list-bulleted-square"
-            onPress={openDrawer}
+            onPress={() => setIsVisibleTOCModal(true)}
           />
-        </DrawerLayout>
+          <Modal h={400} isVisible={isVisibleTOCModal}>
+            <ScrollDiv>
+              <Button
+                bg="gray400"
+                h={35}
+                w={35}
+                right={0}
+                alignSelf="flex-end"
+                rounded="circle"
+                onPress={() => setIsVisibleTOCModal(false)}>
+                <Icon color="black" name="close" />
+              </Button>
+              {renderToc()}
+            </ScrollDiv>
+          </Modal>
+        </>
       ) : (
         article
       )}
