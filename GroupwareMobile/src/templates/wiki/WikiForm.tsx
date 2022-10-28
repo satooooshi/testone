@@ -573,12 +573,22 @@ const WikiForm: React.FC<WikiFormProps> = ({
               タイプを選択
             </Text>
             <Button
+              block
               bg="white"
               borderWidth={1}
               borderColor={'#ececec'}
-              p="md"
               color="black"
-              w={windowWidth * 0.9}
+              rounded="xl"
+              suffix={
+                <Icon
+                  position="absolute"
+                  right={8}
+                  name="down"
+                  fontSize={16}
+                  color="gray"
+                  fontFamily="AntDesign"
+                />
+              }
               onPress={() => typeDropdownRef.current.open()}>
               {newWiki.type
                 ? wikiTypeNameFactory(
