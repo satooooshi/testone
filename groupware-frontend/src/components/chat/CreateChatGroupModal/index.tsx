@@ -198,18 +198,24 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     <Modal onClose={onClose} scrollBehavior="inside" isOpen={isOpen}>
       <ModalOverlay />
       <ModalContent h="90vh" bg={'#f9fafb'} textAlign="center">
-        <ModalHeader
-          flexDir="row"
-          justifyContent="space-between"
-          display="flex"
-          mr="24px">
+        <ModalHeader flexDir="row" display="flex" mr="24px">
           <Text>新しいルーム</Text>
+          <Box flex={1} />
+          <Button
+            size="sm"
+            colorScheme="gray"
+            variant="outline"
+            color="gray"
+            fontWeight="bold"
+            onClick={() => closeModal()}>
+            戻る
+          </Button>
           <Button
             size="sm"
             flexDir="row"
+            ml="8px"
             onClick={checkErrors}
-            mb="8px"
-            colorScheme="green"
+            colorScheme="brand"
             alignItems="center">
             {isLoading ? <Spinner /> : <Text display="inline">作成</Text>}
           </Button>
@@ -289,6 +295,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 placeholder="ルーム名を入力して下さい"
               />
             </Box>
+            <FormLabel>メンバー</FormLabel>
             <Box mb="16px" display="flex" flexDir="row" flexWrap="wrap">
               {newGroup.members?.map((u) => (
                 <Box mr={'4px'} mb={'8px'} key={u.id}>
@@ -302,13 +309,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                   </ButtonGroup>
                 </Box>
               ))}
-              <Button
-                colorScheme="pink"
-                fontWeight="bold"
-                w="100%"
-                onClick={() => closeModal()}>
-                メンバーを編集
-              </Button>
             </Box>
           </Box>
         </ModalBody>
