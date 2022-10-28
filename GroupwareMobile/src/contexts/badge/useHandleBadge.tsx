@@ -6,6 +6,7 @@ import {ChatGroup} from '../../types';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
 import {storage} from '../../utils/url';
+import {socket} from '../../utils/socket';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -16,6 +17,8 @@ const BadgeContext = createContext({
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
   refreshRooms: () => {},
   isRoomsRefetching: false,
+  isCompletedRefetchAllRooms: false,
+  RemovedRoomId: undefined as number | undefined,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -28,38 +31,79 @@ export const BadgeProvider: React.FC = ({children}) => {
   const {user, currentChatRoomId} = useAuthenticate();
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
-  // const [completeRefetch, setCompleteRefetch] = useState(false);
+  const [RemovedRoomId, setRemovedRoomId] = useState<number>();
+  const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
   // const [latestRefetchDate, setLatestRefetchDate] = useState<
   //   string | undefined
   // >('');
 
+  const sortRooms = (room: ChatGroup[]) => {
+    if (!room.length) {
+      return [];
+    }
+    const pinnedRooms = room
+      .filter(r => r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    const exceptPinnedRooms = room
+      .filter(r => !r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    return [...pinnedRooms, ...exceptPinnedRooms];
+  };
+
   const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
       page: page.toString(),
-      limit: '20',
+      limit: '100',
     },
     {
       enabled: false,
       onSuccess: data => {
-        console.log('refetchAllRooms called ----', data.rooms.length);
-
         let count = page !== 1 && chatGroups.length ? chatUnreadCount : 0;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
         }
         setChatUnreadCount(count);
-        setChatGroups(r =>
-          page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
-        );
-        if (data.rooms.length >= 20) {
+        setChatGroups(r => {
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (!data.gotAllRooms) {
+            return rooms;
+          }
+          return sortRooms(rooms);
+        });
+        if (!data.gotAllRooms) {
           setPage(p => p + 1);
-          setIsNeedRefetch(true);
         } else {
-          setIsNeedRefetch(false);
           setPage(1);
-          // setCompleteRefetch(true);
+          setCompleteRefetch(true);
         }
       },
       onError: () => {
@@ -76,30 +120,30 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
-      const jsonRoomListInStorage = storage.getString(
-        `chatRoomList${user?.id}`,
-      );
-      if (jsonRoomListInStorage) {
-        const messagesInStorage = JSON.parse(jsonRoomListInStorage);
-        setChatGroups(messagesInStorage);
-        let count = 0;
-        for (const room of messagesInStorage) {
-          count += room.unreadCount ? room.unreadCount : 0;
-        }
-        setChatUnreadCount(count);
-      }
+      // const jsonRoomListInStorage = storage.getString(
+      //   `chatRoomList${user?.id}`,
+      // );
+      // if (jsonRoomListInStorage) {
+      //   const messagesInStorage = JSON.parse(jsonRoomListInStorage);
+      //   setChatGroups(messagesInStorage);
+      //   let count = 0;
+      //   for (const room of messagesInStorage) {
+      //     count += room.unreadCount ? room.unreadCount : 0;
+      //   }
+      //   setChatUnreadCount(count);
+      // }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
-  useEffect(() => {
-    if (user?.id && chatGroups.length) {
-      const jsonMessages = JSON.stringify(chatGroups);
-      storage.set(`chatRoomList${user?.id}`, jsonMessages);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, chatGroups]);
+  // useEffect(() => {
+  //   if (user?.id && chatGroups.length) {
+  //     const jsonMessages = JSON.stringify(chatGroups);
+  //     storage.set(`chatRoomList${user?.id}`, jsonMessages);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [user?.id, chatGroups]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -114,11 +158,10 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [networkConnection]);
 
   useEffect(() => {
-    if (isNeedRefetch) {
-      setIsNeedRefetch(false);
+    if (page > 1) {
       refetchAllRooms();
     }
-  }, [isNeedRefetch, refetchAllRooms]);
+  }, [page, refetchAllRooms]);
 
   const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroup.id, {
     enabled: false,
@@ -149,13 +192,8 @@ export const BadgeProvider: React.FC = ({children}) => {
       if (rooms.length === chatGroups.length && refetchGroup.type === 'badge') {
         setChatUnreadCount(count => count + 1);
       }
-      if (data.isPinned) {
-        setChatGroups([...[data], ...rooms]);
-      } else {
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, data);
-        setChatGroups(rooms);
-      }
+      setChatGroups(sortRooms([data, ...rooms]));
+
       setRefetchGroup({id: 0, type: ''});
     },
   });
@@ -166,8 +204,27 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   }, [refetchGroup, refetchRoom]);
 
+  const removeRoom = (roomId: number) => {
+    setRemovedRoomId(roomId);
+    socket.emit('leaveRoom', roomId.toString());
+    setChatGroups(rooms =>
+      rooms.filter(r => {
+        if (r.id !== roomId) {
+          return true;
+        } else {
+          const unreadCount = r?.unreadCount ? r?.unreadCount : 0;
+          setChatUnreadCount(c => (c - unreadCount >= 0 ? c - unreadCount : 0));
+        }
+      }),
+    );
+  };
+
   const refetchRoomCard = (data: {id: number; type: string}) => {
-    setRefetchGroup(data);
+    if (data.type === 'remove') {
+      removeRoom(Number(data.id));
+    } else {
+      setRefetchGroup(data);
+    }
   };
 
   const handleEnterRoom = (roomId: number) => {
@@ -187,7 +244,8 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const refreshRooms = () => {
-    setIsNeedRefetch(true);
+    setCompleteRefetch(false);
+    refetchAllRooms();
   };
 
   useEffect(() => {
@@ -207,7 +265,7 @@ export const BadgeProvider: React.FC = ({children}) => {
             ),
           );
         } else {
-          setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
+          removeRoom(editRoom.id);
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {
         const rooms = chatGroups;
@@ -229,8 +287,10 @@ export const BadgeProvider: React.FC = ({children}) => {
         handleEnterRoom,
         refetchRoomCard,
         editChatGroup,
-        isRoomsRefetching: isLoading,
+        isRoomsRefetching: isLoading && page === 1,
+        isCompletedRefetchAllRooms: completeRefetch,
         refreshRooms,
+        RemovedRoomId,
       }}>
       {children}
     </BadgeContext.Provider>

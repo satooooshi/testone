@@ -51,6 +51,7 @@ import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible
 import ImageView from 'react-native-image-viewing';
 import DownloadIcon from '../../../components/common/DownLoadIcon';
 import ChatShareIcon from '../../../components/common/ChatShareIcon';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -80,6 +81,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       : '';
   const {dom, headings, imageUrls} = useDom(wikiBody);
   const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
   const onPressEntry = useCallback(
     (entry: string) => {
       setIsVisibleTOCModal(false);
@@ -121,7 +124,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     } else {
       setIsTabBarVisible(true);
     }
-  }, [isFocused, refetchWikiInfo, setIsTabBarVisible]);
+  }, [isFocused, refetchWikiInfo, setIsTabBarVisible, id]);
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
@@ -168,19 +171,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         setWikiState(w => {
           if (w) {
             if (prevHeartStatus) {
-              w.userGoodForBoard = w.userGoodForBoard?.filter(
-                u => u.id !== user?.id,
-              );
+              w.goodsCount = (w.goodsCount || 0) - 1;
             } else {
-              w.userGoodForBoard = [
-                user as User,
-                ...(w.userGoodForBoard || []),
-              ];
+              w.goodsCount = (w.goodsCount || 0) + 1;
             }
             return w;
           }
         });
-
         return !prevHeartStatus;
       });
     },
@@ -334,16 +331,21 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               )}
             </TouchableHighlight>
             <Button
-              onPress={() =>
-                setIsVisible(true)
-              }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+              onPress={() => {
+                getGoodsForBoard(wikiState.id);
+                setIsVisible(true);
+              }}>
+              {`${wikiState.goodsCount}件のいいね`}
+            </Button>
           </Div>
         )}
-        <GoodSendersModal
-          goodSenders={wikiState?.userGoodForBoard || []}
-          isVisible={isVisible}
-          onClose={() => setIsVisible(false)}
-        />
+        {goodsForBoard && (
+          <GoodSendersModal
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+            goodsForBoard={goodsForBoard}
+          />
+        )}
         {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div

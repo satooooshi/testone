@@ -1,0 +1,24 @@
+steps:
+  - name: 'node:14'
+    entrypoint: yarn
+    args:
+      - install
+    dir: groupware-server
+  - name: 'node:14'
+    entrypoint: yarn
+    args:
+      - build
+    dir: groupware-server
+  - name: 'node:14'
+    entrypoint: yarn
+    args:
+      - 'migration:prod'
+    dir: groupware-server
+    env:
+    - 'NODE_ENV=$_NODE_ENV'
+    - 'DB_HOST=$_DB_HOST'
+    - 'DB_DATABASE=$_DB_DATABASE'
+    - 'DB_USERNAME=$_DB_USERNAME'
+    - 'DB_PASSWORD=$_DB_PASSWORD'
+    - 'DB_PORT=$_DB_PORT'
+    # - 'DB_INSTANCE_NAME=$_DB_INSTANCE_NAME'

@@ -221,6 +221,9 @@ const Profile: React.FC = () => {
               メールアドレス
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.email}
               onChangeText={handleChange('email')}
               placeholder="bold@example.com"
@@ -286,6 +289,7 @@ const Profile: React.FC = () => {
               </Div>
             </Div>
           </Div>
+          {/*
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               姓
@@ -365,6 +369,7 @@ const Profile: React.FC = () => {
               {branchTypeNameFactory(BranchType.OSAKA)}
             </Dropdown.Option>
           </Dropdown>
+          */}
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               自己紹介

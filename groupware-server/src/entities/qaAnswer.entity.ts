@@ -99,6 +99,7 @@ export class QAAnswer {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.body = await genSignedURL(this.body);
+    this.body = genStorageURL(this.body);
+    // this.body = await genSignedURL(this.body);
   }
 }

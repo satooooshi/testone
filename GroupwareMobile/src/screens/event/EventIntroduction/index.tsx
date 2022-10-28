@@ -1,5 +1,5 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useMemo} from 'react';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
+import React, {useEffect, useMemo} from 'react';
 import FastImage, {Source} from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Div, Text} from 'react-native-magnus';
@@ -18,7 +18,12 @@ import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 
 const EventIntroduction: React.FC = () => {
   const {type} = useRoute<EventIntroductionRouteProps>().params;
-  const {data: recommendedEvents, isLoading} = useAPIGetLatestEvent({
+  const isFocused = useIsFocused();
+  const {
+    data: recommendedEvents,
+    isLoading,
+    refetch: refetchLatestEvent,
+  } = useAPIGetLatestEvent({
     type,
   });
   const {data: eventIntroduction, refetch} = useAPIGetEventIntroduction(type);
@@ -45,6 +50,12 @@ const EventIntroduction: React.FC = () => {
         return {};
     }
   }, [type]);
+
+  useEffect(() => {
+    if (isFocused) {
+      refetchLatestEvent();
+    }
+  }, [isFocused, refetchLatestEvent]);
 
   const bottomSources: Source[] = useMemo(() => {
     switch (type) {

@@ -27,12 +27,13 @@ import noImage from '@/public/no-image.jpg';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
 import ReactCrop from 'react-image-crop';
+import { Crop } from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
-import { profileSchema } from 'src/utils/validation/schema';
+import { adminEditUserProfileSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
@@ -128,7 +129,6 @@ const Profile = () => {
   const [
     {
       crop,
-      completedCrop,
       croppedImageURL,
       imageName: selectImageName,
       imageURL: selectImageUrl,
@@ -177,7 +177,7 @@ const Profile = () => {
   } = useFormik<Partial<User>>({
     initialValues: profile ? profile : initialUserValues,
     enableReinitialize: true,
-    validationSchema: profileSchema,
+    validationSchema: adminEditUserProfileSchema,
     onSubmit: () => {
       handleUpdateUser();
     },
@@ -192,16 +192,22 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        dispatchCrop({ type: 'setImageFile', value: undefined });
+        dispatchCrop({
+          type: 'resetImage',
+          value: 'resetImage',
+        });
         router.back();
       }
+    },
+    onError: () => {
+      alert('プロフィールの更新中にエラーが発生しました');
     },
   });
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const handleUpdateUser = async () => {
-    if (!croppedImageURL || !completedCrop || !selectImageName) {
+    if (!croppedImageURL || !selectImageName) {
       updateUser(userInfo);
       return;
     }
@@ -212,6 +218,20 @@ const Profile = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCropAndImage',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+      ref: img,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleSelectedTag = (t: UserTag) => {
@@ -220,6 +240,28 @@ const Profile = () => {
       ...i,
       tags: toggledTag,
     }));
+  };
+
+  const resetImageUrl = () => {
+    dispatchCrop({
+      type: 'resetImage',
+      value: 'resetImage',
+    });
+    setUserInfo((e) => ({ ...e, avatarUrl: '' }));
+  };
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({
+        type: 'setCropAndImage',
+        value: newCrop,
+        ref: imgRef.current,
+      });
   };
 
   const isLoading = loadigUpdateUser || loadingUplaod;
@@ -250,20 +292,8 @@ const Profile = () => {
       )}
       <div className={profileStyles.main}>
         <div className={profileStyles.image_wrapper}>
-          {userInfo.avatarUrl && !selectImageUrl ? (
-            <div
-              {...getEventImageRootProps({
-                className: profileStyles.image_dropzone,
-              })}>
-              <input {...getEventImageInputProps()} />
-              <img
-                className={profileStyles.avatar}
-                src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
-                alt="アバター画像"
-              />
-            </div>
-          ) : null}
           {!userInfo.avatarUrl && !selectImageUrl ? (
+            // 画像なしバージョン
             <div
               {...getEventImageRootProps({
                 className: profileStyles.image_dropzone,
@@ -277,26 +307,51 @@ const Profile = () => {
                 />
               </div>
             </div>
-          ) : null}
-          {selectImageUrl ? (
-            <ReactCrop
-              keepSelection={true}
-              src={selectImageUrl}
-              crop={crop}
-              onChange={(newCrop) => {
-                dispatchCrop({ type: 'setCrop', value: newCrop });
-              }}
-              onComplete={(c) => {
-                dispatchCrop({
-                  type: 'setCompletedCrop',
-                  value: c,
-                  ref: imgRef.current,
-                });
-              }}
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
-          ) : null}
+          ) : selectImageUrl ? (
+            <>
+              <ReactCrop
+                keepSelection={true}
+                src={selectImageUrl}
+                crop={crop}
+                onChange={(newCrop) => {
+                  onChange(newCrop);
+                }}
+                onImageLoaded={onLoad}
+                circularCrop={true}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '1000px',
+                  minWidth: '300px',
+                }}
+              />
+              <Button
+                mt="15px"
+                colorScheme="blue"
+                onClick={() => resetImageUrl()}>
+                既存画像を削除
+              </Button>
+            </>
+          ) : (
+            <>
+              <div
+                {...getEventImageRootProps({
+                  className: profileStyles.image_dropzone,
+                })}>
+                <input {...getEventImageInputProps()} />
+                <img
+                  className={profileStyles.avatar}
+                  src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
+                  alt="アバター画像"
+                />
+              </div>
+              <Button
+                mt="15px"
+                colorScheme="blue"
+                onClick={() => resetImageUrl()}>
+                既存画像を削除
+              </Button>
+            </>
+          )}
         </div>
         <div className={profileStyles.form_wrapper}>
           <FormControl className={profileStyles.input_wrapper}>
@@ -422,6 +477,17 @@ const Profile = () => {
               <option value={BranchType.TOKYO}>東京</option>
               <option value={BranchType.OSAKA}>大阪</option>
             </Select>
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>社員コード</FormLabel>
+            <Input
+              type="text"
+              name="employeeId"
+              placeholder="社員コード"
+              value={userInfo.employeeId || ''}
+              background="white"
+              onChange={handleChange}
+            />
           </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>

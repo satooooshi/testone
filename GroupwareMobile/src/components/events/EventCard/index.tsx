@@ -44,6 +44,8 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         return require('../../../../assets/coach_1.jpeg');
       case EventType.CLUB:
         return require('../../../../assets/club_3.png');
+      case EventType.OTHER:
+        return require('../../../../assets/no-image.jpg');
       default:
         return undefined;
     }

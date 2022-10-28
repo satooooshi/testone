@@ -1,11 +1,11 @@
 import {AxiosError} from 'axios';
 import {useMutation, UseQueryOptions} from 'react-query';
-import {ChatAlbum} from '../../../../types';
+import {ChatAlbum, SaveAlbumResult} from '../../../../types';
 import {axiosInstance} from '../../../../utils/url';
 import {albumURL} from '../../../../utils/url/chat.url';
 
 const createAlbum = async (query: Partial<ChatAlbum>) => {
-  const res = await axiosInstance.post<ChatAlbum>(
+  const res = await axiosInstance.post<SaveAlbumResult>(
     albumURL(query.chatGroup?.id.toString() || '0'),
     query,
   );
@@ -13,9 +13,9 @@ const createAlbum = async (query: Partial<ChatAlbum>) => {
 };
 
 export const useAPICreateChatAlbum = (
-  options?: UseQueryOptions<ChatAlbum, AxiosError>,
+  options?: UseQueryOptions<SaveAlbumResult, AxiosError>,
 ) => {
-  return useMutation<ChatAlbum, AxiosError, Partial<ChatAlbum>, unknown>(
+  return useMutation<SaveAlbumResult, AxiosError, Partial<ChatAlbum>, unknown>(
     createAlbum,
     options,
   );

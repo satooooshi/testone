@@ -1,16 +1,21 @@
 import React from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Div} from 'react-native-magnus';
-import {ChatMessage} from '../../../../types';
+import {Div, Text} from 'react-native-magnus';
+import {ChatMessage, User} from '../../../../types';
 import ReplyParent from '../ReplyParent';
 import tailwind from 'tailwind-rn';
 import AutoLinkedText from '../../../common/AutoLinkedText';
+import {darkFontColor} from '../../../../utils/colors';
 
 export type TextMessageProps = {
   message: ChatMessage;
   inputtedSearchWord?: string;
   searchedResultIds?: (number | undefined)[];
   onLongPress: () => void;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
@@ -18,6 +23,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   inputtedSearchWord,
   searchedResultIds,
   onLongPress,
+  senderAvatars,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
@@ -25,12 +31,19 @@ const TextMessage: React.FC<TextMessageProps> = ({
       <Div
         rounded="xl"
         maxW={windowWidth * 0.6}
-        minW={windowWidth * 0.4}
-        bg={message.isSender ? 'blue600' : 'gray500'}
-        p={8}
+        minW={windowWidth * 0.06}
+        bg={message.isSender ? 'blue900' : 'white'}
+        py={8}
+        px={15}
         justifyContent="center">
         {message.replyParentMessage && (
-          <ReplyParent parentMessage={message.replyParentMessage} />
+          <ReplyParent
+            senderAvatar={senderAvatars?.find(
+              s => s.member.id === message.replyParentMessage?.sender?.id,
+            )}
+            parentMessage={message.replyParentMessage}
+            isSender={message.isSender}
+          />
         )}
         <AutoLinkedText
           message={message}
@@ -41,8 +54,15 @@ const TextMessage: React.FC<TextMessageProps> = ({
               ? 'font-bold text-pink-300 text-base'
               : 'font-bold text-blue-600 text-base',
           )}
-          style={tailwind('text-white')}
+          style={
+            message.isSender ? tailwind('text-white') : tailwind('text-black')
+          }
         />
+        {message.modifiedAt ? (
+          <Text fontSize={10} mt={3} color={darkFontColor} textAlign="right">
+            編集済み
+          </Text>
+        ) : null}
       </Div>
     </TouchableHighlight>
   );

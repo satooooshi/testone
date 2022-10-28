@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Delete,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -61,5 +63,14 @@ export class StorageController {
       signedURLs.push(parsedURL);
     }
     return signedURLs;
+  }
+
+  @Delete('delete')
+  @UseGuards(JwtAuthenticationGuard)
+  async delete(
+    @Body()
+    url: string,
+  ) {
+    await this.storageService.deleteFile(url);
   }
 }

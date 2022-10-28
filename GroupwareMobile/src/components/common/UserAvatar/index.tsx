@@ -73,4 +73,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   );
 };
 
-export default UserAvatar;
+export default React.memo(UserAvatar, (prevProps, nextProps) => {
+  return (
+    prevProps.user?.id === nextProps.user?.id &&
+    prevProps.user?.avatarUrl === nextProps.user?.avatarUrl
+  );
+});

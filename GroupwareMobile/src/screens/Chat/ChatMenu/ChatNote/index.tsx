@@ -1,5 +1,6 @@
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -25,10 +26,33 @@ const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
   const {room} = useRoute<ChatRouteProps>().params;
   const [page, setPage] = useState<string>('1');
-  const {data, refetch: refetchNotes} = useAPIGetChatNotes({
-    roomId: room.id.toString(),
-    page,
-  });
+  const isFocused = useIsFocused();
+  const {refetch: refetchNotes} = useAPIGetChatNotes(
+    {
+      roomId: room.id.toString(),
+      page,
+    },
+    {
+      onSuccess: data => {
+        if (data?.notes?.length) {
+          if (page === '1') {
+            setNotesForInfiniteScroll(data.notes);
+          } else {
+            setNotesForInfiniteScroll(n => {
+              if (
+                n.length &&
+                new Date(n[n.length - 1].createdAt) >
+                  new Date(data.notes[0].createdAt)
+              ) {
+                return [...n, ...data?.notes];
+              }
+              return n;
+            });
+          }
+        }
+      },
+    },
+  );
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatNote[]
   >([]);
@@ -38,7 +62,9 @@ const ChatNotes: React.FC = () => {
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
 
   const onEndReached = () => {
-    setPage(p => (Number(p) + 1).toString());
+    if (notesForInfiniteScroll?.length >= Number(page) * 20) {
+      setPage(p => (Number(p) + 1).toString());
+    }
   };
 
   const handlePressImage = useCallback(
@@ -60,31 +86,18 @@ const ChatNotes: React.FC = () => {
   );
 
   useEffect(() => {
-    if (data?.notes?.length) {
+    if (isFocused) {
       if (page === '1') {
-        setNotesForInfiniteScroll(data.notes);
+        refetchNotes();
       } else {
-        setNotesForInfiniteScroll(n => {
-          if (
-            n.length &&
-            new Date(n[n.length - 1].createdAt) >
-              new Date(data.notes[0].createdAt)
-          ) {
-            return [...n, ...data?.notes];
-          }
-          return n;
-        });
+        setPage('1');
       }
-    }
-  }, [data?.notes, page]);
-
-  useFocusEffect(
-    useCallback(() => {
-      // setNotesForInfiniteScroll([]);
+    } else {
+      setNotesForInfiniteScroll([]);
       setPage('1');
-      refetchNotes();
-    }, [refetchNotes]),
-  );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   return (
     <WholeContainer>
@@ -159,8 +172,12 @@ const ChatNotes: React.FC = () => {
                         },
                         {
                           onSuccess: () => {
-                            setPage('1');
-                            refetchNotes();
+                            setNotesForInfiniteScroll([]);
+                            if (page === '1') {
+                              refetchNotes();
+                            } else {
+                              setPage('1');
+                            }
                           },
                           onError: () => {
                             Alert.alert(

@@ -29,7 +29,6 @@ export const cancelCallInvitation = async (
   localInvitation: LocalInvitation,
 ) => {
   await rtmEngine.createInstance(Config.AGORA_APP_ID);
-  console.log('cancel', localInvitation);
   try {
     await rtmEngine?.cancelLocalInvitationV2(localInvitation);
   } catch (e) {

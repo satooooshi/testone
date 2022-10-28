@@ -59,6 +59,7 @@ export class EventVideo {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.url = await genSignedURL(this.url);
+    // this.url = await genSignedURL(this.url);
+    this.url = genStorageURL(this.url);
   }
 }

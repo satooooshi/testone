@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 
@@ -28,7 +29,29 @@ export class ChatAlbumService {
     @InjectRepository(ChatAlbumImage)
     private readonly albumImageRepository: Repository<ChatAlbumImage>,
     private readonly storageService: StorageService,
+    @InjectRepository(ChatGroup)
+    private readonly chatGroupRepository: Repository<ChatGroup>,
   ) {}
+
+  private async checkUserBelongToGroup(
+    userID: number,
+    groupID: number,
+  ): Promise<boolean> {
+    const isUserBelongToGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin(
+        'chat_groups.members',
+        'm',
+        'm.id = :userId AND chat_groups.id = :chatGroupId',
+        {
+          userId: userID,
+          chatGroupId: groupID,
+        },
+      )
+      .getOne();
+    return !!isUserBelongToGroup;
+  }
+
   public async saveChatAlbums(dto: Partial<ChatAlbum>): Promise<ChatAlbum> {
     const savedAlbum = await this.albumRepository.save(
       dto.id
@@ -67,9 +90,19 @@ export class ChatAlbumService {
   }
 
   public async getChatAlbumImages(
+    userID: number,
+    roomID: number,
     albumID: number,
     // page: string,
   ): Promise<GetChatAlbumImagesResult> {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      roomID,
+    );
+    if (!isUserBelongToGroup) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     // const limit = 20;
     // const offset = limit * (Number(page) - 1);
     const albumImages = await this.albumImageRepository
@@ -90,6 +123,15 @@ export class ChatAlbumService {
     userID: number,
   ): Promise<GetChatAlbumsResult> {
     const { page, group } = query;
+
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      group,
+    );
+    if (!isUserBelongToGroup) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const limit = 20;
     const offset = limit * (Number(page) - 1);
     //@TODO limit images

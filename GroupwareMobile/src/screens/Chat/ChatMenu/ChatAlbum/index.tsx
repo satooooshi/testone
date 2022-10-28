@@ -1,5 +1,6 @@
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -23,42 +24,54 @@ const ChatAlbums: React.FC = () => {
   const {room} = useRoute<ChatAlbumsRouteProps>().params;
   const [albumsForScroll, setAlbumsForScroll] = useState<ChatAlbum[]>([]);
   const [page, setPage] = useState<string>('1');
-  const {data, refetch: refetchAlbums} = useAPIGetChatAlbums({
-    roomId: room.id.toString(),
-    page: page,
-  });
+  const isFocused = useIsFocused();
+  const {refetch: refetchAlbums} = useAPIGetChatAlbums(
+    {
+      roomId: room.id.toString(),
+      page: page,
+    },
+    {
+      onSuccess: data => {
+        if (data?.albums?.length) {
+          if (page === '1') {
+            setAlbumsForScroll(data.albums);
+          } else {
+            setAlbumsForScroll(a => {
+              if (
+                a.length &&
+                new Date(a[a.length - 1].createdAt) >
+                  new Date(data.albums[0].createdAt)
+              ) {
+                return [...a, ...data?.albums];
+              }
+              return a;
+            });
+          }
+        }
+      },
+    },
+  );
   const {mutate: deleteAlbum} = useAPIDeleteChatAlbum();
 
   const onEndReached = () => {
-    setPage(p => (Number(p) + 1).toString());
+    if (albumsForScroll?.length >= Number(page) * 20) {
+      setPage(p => (Number(p) + 1).toString());
+    }
   };
 
   useEffect(() => {
-    if (data?.albums?.length) {
+    if (isFocused) {
       if (page === '1') {
-        setAlbumsForScroll(data.albums);
+        refetchAlbums();
       } else {
-        setAlbumsForScroll(a => {
-          if (
-            a.length &&
-            new Date(a[a.length - 1].createdAt) >
-              new Date(data.albums[0].createdAt)
-          ) {
-            return [...a, ...data?.albums];
-          }
-          return a;
-        });
+        setPage('1');
       }
-    }
-  }, [data?.albums, page]);
-
-  useFocusEffect(
-    useCallback(() => {
-      // setAlbumsForScroll([]);
+    } else {
+      setAlbumsForScroll([]);
       setPage('1');
-      refetchAlbums();
-    }, [refetchAlbums]),
-  );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   return (
     <WholeContainer>
@@ -118,8 +131,12 @@ const ChatAlbums: React.FC = () => {
                         },
                         {
                           onSuccess: () => {
-                            setPage('1');
-                            refetchAlbums();
+                            setAlbumsForScroll([]);
+                            if (page === '1') {
+                              refetchAlbums();
+                            } else {
+                              setPage('1');
+                            }
                           },
                           onError: () => {
                             Alert.alert(

@@ -5,7 +5,7 @@ import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import EventCard from '@/components/common/EventCard';
 import WikiCard from '@/components/common/WikiCard';
 import { axiosInstance } from 'src/utils/url';
@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import { useAPIGetUserGoodList } from '@/hooks/api/wiki/useAPIGetWikiGoodList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import {
   Text,
@@ -116,17 +117,32 @@ const MyAccountInfo = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
-  const { data: events } = useAPIGetEventList({ participant_id: id });
-  const { data: questionList } = useAPIGetWikiList({
-    writer: id,
-    type: WikiType.BOARD,
-    board_category: BoardCategory.QA,
-  });
-  const { data: knowledgeList } = useAPIGetWikiList({
-    writer: id,
-    type: WikiType.BOARD,
-    board_category: BoardCategory.KNOWLEDGE,
-  });
+  const { data: events, refetch: refetchEvent } = useAPIGetEventList(
+    { participant_id: id },
+    { enabled: false },
+  );
+  const { data: questionList, refetch: refetchQuestionList } =
+    useAPIGetWikiList(
+      {
+        writer: id,
+        type: WikiType.BOARD,
+        board_category: BoardCategory.QA,
+      },
+      { enabled: false },
+    );
+
+  const { data: knowledgeList, refetch: refetchKnowledgeList } =
+    useAPIGetWikiList(
+      {
+        writer: id,
+        type: WikiType.BOARD,
+        board_category: BoardCategory.KNOWLEDGE,
+      },
+      { enabled: false },
+    );
+  const { data: goodList, refetch: refetchGoodList } =
+    useAPIGetUserGoodList(id);
+
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -190,6 +206,29 @@ const MyAccountInfo = () => {
       });
     },
   });
+
+  useEffect(() => {
+    const refetchActiveTabData = (activeTab: TabName) => {
+      switch (activeTab) {
+        case TabName.EVENT:
+          refetchEvent();
+          return;
+        case TabName.QUESTION:
+          refetchQuestionList();
+          return;
+        case TabName.KNOWLEDGE:
+          refetchKnowledgeList();
+          return;
+        case TabName.GOOD:
+          refetchGoodList();
+          return;
+      }
+    };
+    if (activeTab) {
+      refetchActiveTabData(activeTab);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   return (
     <LayoutWithTab
@@ -467,14 +506,18 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD &&
-            profile.userGoodForBoard &&
-            profile.userGoodForBoard.length ? (
-              <Box>
-                {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.GOOD ? (
+              goodList && goodList.length ? (
+                <Box>
+                  {goodList.map((b) => (
+                    <WikiCard wiki={b.wiki} key={b.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  いいねした掲示板が見つかりませんでした
+                </Text>
+              )
             ) : null}
           </Box>
         )}

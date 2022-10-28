@@ -56,6 +56,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
       <a className={userCardStyles.wrapper}>
         <div className={userCardStyles.top}>
           <Avatar
+            priority={true}
             size="xl"
             src={user.avatarUrl}
             className={userCardStyles.avatar}

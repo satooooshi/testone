@@ -11,7 +11,7 @@ import {
 import { Button, Progress, Spinner, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import { DatePicker } from 'react-rainbow-components';
+import DatePicker from 'node_modules/react-rainbow-components/components/DatePicker';
 import { Tab } from 'src/types/header/tab/types';
 import exportCsvStyles from '@/styles/layouts/admin/ExportCsv.module.scss';
 import clsx from 'clsx';

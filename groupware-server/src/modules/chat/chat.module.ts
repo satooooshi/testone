@@ -21,7 +21,7 @@ import { ChatNoteService } from './chatNote.service';
 @Module({
   imports: [
     StorageModule,
-    UserModule,
+    // UserModule,
     NotificationModule,
     ConfigModule,
     TypeOrmModule.forFeature([

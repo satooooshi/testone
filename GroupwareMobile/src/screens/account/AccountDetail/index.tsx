@@ -22,6 +22,7 @@ import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
+import {useAPIGetUserGoodList} from '../../../hooks/api/wiki/useAPIGetUserGoodList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {
@@ -180,20 +181,35 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
-    participant_id: userID?.toString(),
-  });
-  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.QA,
-  });
-  const {data: knowledgeList, refetch: refetchKnowledgeList} =
-    useAPIGetWikiList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList(
+    {
+      participant_id: userID?.toString(),
+    },
+    {enabled: false},
+  );
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList(
+    {
       writer: userID?.toString() || '0',
       type: WikiType.BOARD,
-      board_category: BoardCategory.KNOWLEDGE,
-    });
+      board_category: BoardCategory.QA,
+    },
+    {enabled: false},
+  );
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList(
+      {
+        writer: userID?.toString() || '0',
+        type: WikiType.BOARD,
+        board_category: BoardCategory.KNOWLEDGE,
+      },
+      {enabled: false},
+    );
+  const {data: goodList, refetch: refetchGoodList} = useAPIGetUserGoodList(
+    userID?.toString() || '0',
+    {
+      enabled: false,
+    },
+  );
   const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -279,19 +295,33 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
-      refetchEventList();
-      refetchQuestionList();
-      refetchKnowledgeList();
+
       setIsTabBarVisible(true);
     }
-  }, [
-    isFocused,
-    refetch,
-    refetchEventList,
-    refetchQuestionList,
-    refetchKnowledgeList,
-    setIsTabBarVisible,
-  ]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
+
+  useEffect(() => {
+    const refetchActiveTabData = (activeTab: string) => {
+      switch (activeTab) {
+        case eventScreenName:
+          refetchEventList();
+          return;
+        case questionScreenName:
+          refetchQuestionList();
+          return;
+        case knowledgeScreenName:
+          refetchKnowledgeList();
+          return;
+        case goodScreenName:
+          refetchGoodList();
+          return;
+      }
+    };
+    if (activeScreen) {
+      refetchActiveTabData(activeScreen);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeScreen]);
 
   return (
     <WholeContainer>
@@ -493,10 +523,11 @@ const AccountDetail: React.FC = () => {
                   children={() => (
                     <>
                       <Div alignItems="center" mt="lg">
-                        {profile?.userGoodForBoard?.length ? (
-                          profile?.userGoodForBoard?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
-                          ))
+                        {goodList?.length ? (
+                          goodList?.map(
+                            b =>
+                              b.wiki && <WikiCard key={b.id} wiki={b.wiki} />,
+                          )
                         ) : (
                           <Text fontSize={16}>
                             いいねした掲示板が見つかりませんでした

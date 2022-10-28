@@ -8,6 +8,7 @@ import {
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
 import {Alert} from 'react-native';
+import {socket} from '../../../../../utils/socket';
 
 const PostChatAlbum: React.FC = () => {
   const {mutate: createChatAlbum} = useAPICreateChatAlbum();
@@ -20,11 +21,16 @@ const PostChatAlbum: React.FC = () => {
       room={room}
       onSubmit={submittedValues =>
         createChatAlbum(submittedValues, {
-          onSuccess: () =>
+          onSuccess: result => {
+            socket.emit('message', {
+              type: 'send',
+              chatMessage: result.systemMessage,
+            });
             navigation.navigate('ChatStack', {
               screen: 'ChatAlbums',
               params: {room},
-            }),
+            });
+          },
           onError: () => {
             Alert.alert(
               'アルバム作成中にエラーが発生しました。\n時間をおいて再実行してください。',

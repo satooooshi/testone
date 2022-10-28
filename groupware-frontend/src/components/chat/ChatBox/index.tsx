@@ -4,35 +4,17 @@ import {
   useMediaQuery,
   Text,
   Link,
-  Image,
-  Spinner,
   Input,
   InputGroup,
   InputRightElement,
-  Portal,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  SimpleGrid,
-  Popover,
-  PopoverTrigger,
+  Image,
 } from '@chakra-ui/react';
-import { MentionData } from '@draft-js-plugins/mention';
-import { blueColor, darkFontColor } from 'src/utils/colors';
+import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
-import Editor from '@draft-js-plugins/editor';
-import {
-  convertToRaw,
-  EditorState,
-  getDefaultKeyBinding,
-  RichUtils,
-} from 'draft-js';
 import {
   AiFillCloseCircle,
   AiOutlineDown,
-  AiOutlinePaperClip,
   AiOutlinePicture,
   AiOutlineSearch,
   AiOutlineUp,
@@ -54,92 +36,35 @@ import React, {
   useCallback,
 } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
-import { IoCloseSharp, IoSend } from 'react-icons/io5';
+import Sticker from '../Sticker';
+import { IoCloseSharp } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
 import { useDropzone } from 'react-dropzone';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { draftToMarkdown } from 'markdown-draft-js';
-import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
-import { useFormik } from 'formik';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from 'src/utils/indecateChatMessageType';
 import { mentionTransform } from 'src/utils/mentionTransform';
-import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import UserAvatar from '@/components/common/UserAvatar';
-import io from 'socket.io-client';
-import { baseURL } from 'src/utils/url';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import AlbumModal from '../AlbumModal';
 import NoteModal from '../NoteModal';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
-import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
-import suggestionStyles from '@/styles/components/Suggestion.module.scss';
-import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
-import { reactionStickers } from 'src/utils/reactionStickers';
-import { BiSmile } from 'react-icons/bi';
-import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
-
-export const Entry: React.FC<EntryComponentProps> = ({
-  mention,
-  isFocused,
-  id,
-  onMouseUp,
-  onMouseDown,
-  onMouseEnter,
-}) => {
-  const entryRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (isFocused) {
-      if ('scrollIntoViewIfNeeded' in document.body) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        entryRef.current?.scrollIntoViewIfNeeded(false);
-      } else {
-        entryRef.current?.scrollIntoView(false);
-      }
-    }
-  }, [isFocused]);
-
-  return (
-    <div
-      ref={entryRef}
-      style={
-        isFocused
-          ? {
-              padding: '5px',
-              backgroundColor: 'cornsilk',
-            }
-          : {
-              padding: '5px',
-            }
-      }
-      role="option"
-      aria-selected={isFocused ? 'true' : 'false'}
-      id={id}
-      onMouseUp={onMouseUp}
-      onMouseEnter={onMouseEnter}
-      onMouseDown={onMouseDown}>
-      {mention.name}
-    </div>
-  );
-};
-
-// const socket = io(baseURL, {
-//   transports: ['websocket'],
-// });
+import { useChatSocket } from './socket';
+import ChatEditor from '../ChatEditor';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import boldMascot from '@/public/bold-mascot.png';
+import Editor from '@draft-js-plugins/editor';
+import { reactionStickers } from '../../../utils/reactionStickers';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -147,7 +72,7 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
-  const { user, setCurrentChatRoomId } = useAuthenticate();
+  const { user } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -157,25 +82,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [before, setBefore] = useState<number>();
   const [minBefore, setMinBefore] = useState<number>();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
     Partial<ChatMessage>[]
   >([]);
   const [include, setInclude] = useState(false);
-
-  const {
-    values: newChatMessage,
-    setValues: setNewChatMessage,
-    handleSubmit,
-  } = useFormik<Partial<ChatMessage>>({
-    initialValues: {
-      content: '',
-      type: ChatMessageType.TEXT,
-      chatGroup: room,
-    },
-    enableReinitialize: true,
-    onSubmit: () => onSend(),
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
+    content: '',
+    type: ChatMessageType.TEXT,
+    replyParentMessage: undefined,
+    chatGroup: room,
   });
+  const socket = useChatSocket(room, setMessages);
+
   const imagesForViewing: ImageDecorator[] = useMemo(() => {
     return messages
       .filter((m) => m.type === ChatMessageType.IMAGE)
@@ -185,32 +104,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       }))
       .reverse();
   }, [messages]);
-  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
+
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
-    useAPIGetLastReadChatTime(room.id, {
-      onSuccess: () => {
-        // refetchRoom();
-      },
-    });
-  const userDataForMention: MentionData[] = useMemo(() => {
-    const users =
-      room?.members
-        ?.filter((u) => u.id !== user?.id)
-        .map((u) => ({
-          id: u.id,
-          name: userNameFactory(u) + 'さん',
-          avatar: u.avatarUrl,
-        })) || [];
-    const allTag = { id: 0, name: 'all', avatar: '' };
-    users.unshift(allTag);
-    return users;
-  }, [room?.members, user?.id]);
-  const [suggestions, setSuggestions] =
-    useState<MentionData[]>(userDataForMention);
-  const [mentionOpened, setMentionOpened] = useState(false);
-  const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
-  const { data: fetchedPastMessages } = useAPIGetMessages({
+  const { data: fetchedPastMessages, remove } = useAPIGetMessages({
     group: room.id,
     after,
     before,
@@ -218,37 +114,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     limit: '20',
   });
 
-  const { refetch: refetchLatest } = useAPIGetMessages(
-    {
-      group: room.id,
-      limit: '10',
-    },
-    {
-      refetchInterval: 1000,
-      onSuccess: (latestData) => {
-        refetchLastReadChatTime();
-        if (latestData?.length) {
-          const msgToAppend: ChatMessage[] = [];
-          for (const latest of latestData) {
-            if (!messages?.length || isRecent(latest, messages?.[0])) {
-              msgToAppend.push(latest);
-            }
-          }
-          if (msgToAppend.length) {
-            saveLastReadChatTime(room.id, {
-              onSuccess: () => {
-                // socket.emit('readReport', {
-                //   room: room.id.toString(),
-                //   senderId: user?.id,
-                // });
-              },
-            });
-            setMessages((m) => [...msgToAppend, ...m]);
-          }
-        }
-      },
-    },
-  );
+  const editorRef = useRef<Editor>(null);
 
   const { refetch: searchMessages } = useAPISearchMessages(
     {
@@ -271,13 +137,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        // socket.emit('message', { ...data, isSender: false });
+        socket.send({ chatMessage: data, type: 'send' });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
           replyParentMessage: undefined,
         }));
-        setEditorState(EditorState.createEmpty());
+        // editorStateRef.current = EditorState.createEmpty();
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
       },
@@ -289,7 +155,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
-      onSuccess: (fileURLs, requestFileURLs) => {
+      onSuccess: async (fileURLs, requestFileURLs) => {
         for (let i = 0; i < fileURLs.length; i++) {
           const type = isImage(requestFileURLs[i].name)
             ? ChatMessageType.IMAGE
@@ -302,6 +168,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             chatGroup: newChatMessage.chatGroup,
             type,
           });
+          await new Promise((r) => setTimeout(r, 100));
         }
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
@@ -309,44 +176,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
   );
 
-  const onSend = () => {
-    let parsedMessage = newChatMessage?.content?.trimEnd();
-    if (parsedMessage) {
-      for (const m of mentionedUserData) {
-        const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
-      }
-
-      sendChatMessage({
-        ...newChatMessage,
-        content: parsedMessage,
-      });
-    }
+  const onSend = (content: string) => {
+    sendChatMessage({
+      ...newChatMessage,
+      content: content,
+    });
   };
 
-  const onSuggestionOpenChange = (_open: boolean) => {
-    setMentionOpened(_open);
-  };
-
-  const onSuggestionSearchChange = ({ value }: { value: string }) => {
-    setSuggestions(
-      userDataForMention.filter((m) => {
-        return m.name.toLowerCase().includes(value.toLowerCase());
-      }),
-    );
-  };
-
-  useEffect(() => {
-    setSuggestions(userDataForMention);
-  }, [userDataForMention]);
-
-  const onAddMention = (newMention: MentionData) => {
-    setMentionedUserData((m) => [...m, newMention]);
-  };
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<Editor>(null);
-  const { handleEnterRoom } = useHandleBadge();
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const countOfSearchWord = useMemo(() => {
     if (searchedResults && focusedMessageID) {
@@ -364,48 +202,24 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     noClick: true,
     onDrop: (f) => uploadFiles(f),
   });
-  const { getRootProps: getRootProps, getInputProps } = useDropzone({
-    onDrop: (f) => uploadFiles(f),
-  });
 
-  const onEditorChange = (newState: EditorState) => {
-    setEditorState(newState);
-    const content = newState.getCurrentContent();
-    const rawObject = convertToRaw(content);
-    const markdownString = draftToMarkdown(rawObject);
-    setNewChatMessage((v) => ({ ...v, content: markdownString }));
-  };
+  const handleStickerSelected = useCallback(
+    (sticker?: string) => {
+      sendChatMessage({
+        content: sticker,
+        chatGroup: newChatMessage.chatGroup,
+        type: ChatMessageType.STICKER,
+      });
+    },
+    [sendChatMessage, newChatMessage.chatGroup],
+  );
 
-  const handleStickerSelected = (sticker?: string) => {
-    sendChatMessage({
-      content: sticker,
-      chatGroup: newChatMessage.chatGroup,
-      type: ChatMessageType.STICKER,
-    });
-  };
-
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members?.length) {
-      return 'メンバーがいません';
-    }
-
-    if (room.roomType === RoomType.PERSONAL) {
-      const chatPartner = members.filter((m) => m.id !== user?.id);
-      const partnerName = chatPartner
-        .map((p) => p.lastName + ' ' + p.firstName)
-        .join();
-      return partnerName;
-    }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-    return strMembers.toString();
-  };
-
-  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
-    if (new Date(created.createdAt) > new Date(target.createdAt)) {
-      return true;
-    }
-    return false;
-  };
+  // const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
+  //   if (new Date(created.createdAt) > new Date(target.createdAt)) {
+  //     return true;
+  //   }
+  //   return false;
+  // };
 
   const { MentionSuggestions, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin();
@@ -418,37 +232,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
-    console.log('onScrollTopOnChat');
-
     if (
       e.target.clientHeight - e.target.scrollTop >=
       (e.target.scrollHeight * 2) / 3
     ) {
-      console.log(
-        'onScrollTopOnChat fetchedPastMessages',
-        fetchedPastMessages?.length,
-      );
       if (fetchedPastMessages?.length) {
         const target = messages[messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
-        console.log('onScrollTopOnChat set');
         setMinBefore(target);
         setBefore(target);
       }
     }
   };
 
-  // useEffect(() => {
-  //   setMessages([]);
-  //   setBefore(undefined);
-  //   setAfter(undefined);
-  //   refetchLatest();
-  // }, [refetchLatest, room]);
-
   useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      setMessages(refreshedMessage);
+    if (fetchedPastMessages?.length && room.members?.length) {
+      setMessages((m) => {
+        const refreshedMessage = refreshMessage(fetchedPastMessages, m);
+        return refreshedMessage;
+      });
 
       if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -469,85 +271,29 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    setCurrentChatRoomId(room.id);
-    saveLastReadChatTime(room.id);
-    handleEnterRoom(room.id);
+    if (room.members?.length) {
+      socket.joinRoom();
+    }
+    setNewChatMessage({
+      content: '',
+      type: ChatMessageType.TEXT,
+      replyParentMessage: undefined,
+      chatGroup: room,
+    });
     if (messageWrapperDivRef.current) {
       messageWrapperDivRef.current.scrollTo({ top: 0 });
-      console.log('77777');
     }
-    // socket.connect();
-    // socket.emit('joinRoom', room.id.toString());
-    // // socket.on('readMessageClient', async (senderId: string) => {
-    // //   if (user?.id && senderId && senderId != `${user?.id}`) {
-    // //     refetchLastReadChatTime();
-    // //   }
-    // // });
-    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-    //   if (sentMsgByOtherUsers.content) {
-    //     if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-    //       saveLastReadChatTime(room.id, {
-    //         onSuccess: () => {
-    //           socket.emit('readReport', {
-    //             room: room.id.toString(),
-    //             senderId: user?.id,
-    //           });
-    //         },
-    //       });
-    //       refetchLastReadChatTime();
-    //     }
-    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-    //     if (sentMsgByOtherUsers.sender?.id === user?.id) {
-    //       sentMsgByOtherUsers.isSender = true;
-    //     }
-    //     setMessages((msgs) => {
-    //       if (
-    //         msgs.length &&
-    //         msgs[0].id !== sentMsgByOtherUsers.id &&
-    //         sentMsgByOtherUsers.chatGroup?.id === room.id
-    //       ) {
-    //         return [sentMsgByOtherUsers, ...msgs];
-    //       } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-    //         return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-    //       }
-
-    //       return msgs;
-    //     });
-    //   }
-    // });
-
     return () => {
-      // socket.emit('leaveRoom', room.id);
-      // socket.disconnect();
+      remove();
+      socket.leaveRoom();
       setMessages([]);
       setBefore(undefined);
       setAfter(undefined);
       setMinBefore(undefined);
       setInclude(false);
-      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
-
-  // useEffect(() => {
-  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [messages, room.id]);
-
-  // useEffect(() => {
-  //   saveLastReadChatTime(room.id, {
-  //     onSuccess: () => {
-  //       socket.emit('readReport', {
-  //         room: room.id.toString(),
-  //         senderId: user?.id,
-  //       });
-  //       handleEnterRoom(room.id);
-  //     },
-  //   });
-  //   return () => saveLastReadChatTime(room.id);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [room.id, saveLastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -605,19 +351,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+  const refreshMessage = (
+    targetMessages: ChatMessage[],
+    messagesState: ChatMessage[],
+  ): ChatMessage[] => {
+    const filterCurrentGroup = (messages: ChatMessage[]) => {
+      return messages.filter((m) => {
+        return room.id === m.chatGroup?.id;
+      });
+    };
+
+    const arrayIncludesDuplicate = [...messagesState, ...targetMessages];
     return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
       })
       .sort((a, b) => b.id - a.id);
-  };
-
-  const filterCurrentGroup = (messages: ChatMessage[]) => {
-    return messages.filter((m) => {
-      return room.id === m.chatGroup?.id;
-    });
   };
 
   const scrollToTarget = useCallback((topOffset: number) => {
@@ -626,7 +375,53 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   }, []);
 
+  const onClickReply = useCallback(
+    (m: ChatMessage) => {
+      editorRef.current?.focus();
+      setNewChatMessage((pre) => ({
+        ...pre,
+        replyParentMessage: m,
+      }));
+    },
+    [setNewChatMessage],
+  );
+
+  const onClickImage = useCallback((m: ChatMessage) => {
+    if (m.type === ChatMessageType.IMAGE) {
+      setSelectedImageURL(m.content);
+    }
+  }, []);
+
+  const searchedResultIds = useMemo(() => {
+    return searchedResults?.map((s) => s.id);
+  }, [searchedResults]);
+
   const isPersonal = room.roomType === RoomType.PERSONAL;
+
+  const allMembers = useMemo(
+    () => [...(room?.members || []), ...(room?.previousMembers || [])],
+    [room.members, room.previousMembers],
+  );
+
+  const replyParentMessageSender = useMemo(() => {
+    return allMembers?.find(
+      (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+    );
+  }, [newChatMessage, allMembers]);
+
+  const senderAvatars = useMemo(() => {
+    return allMembers.map((m) => ({
+      member: m,
+      avatar: (
+        <Avatar
+          h="40px"
+          w="40px"
+          cursor="pointer"
+          src={!m?.existence ? boldMascot.src : m.avatarUrl}
+        />
+      ),
+    }));
+  }, [allMembers]);
 
   return (
     <Box
@@ -698,7 +493,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
+              {nameOfEmptyNameGroup(room)}
             </Text>
             <Text
               fontWeight="bold"
@@ -719,21 +514,37 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          {!isPersonal && (
-            <Menu
-              direction="left"
-              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-              menuButton={
-                <MenuButton>
-                  <HiOutlineDotsCircleHorizontal size={24} />
-                </MenuButton>
-              }
-              transition>
-              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-            </Menu>
-          )}
+          <Menu
+            direction="left"
+            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+            menuButton={
+              <MenuButton>
+                <HiOutlineDotsCircleHorizontal size={24} />
+              </MenuButton>
+            }
+            transition>
+            {!isPersonal && (
+              <>
+                <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+                <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+                {(room?.id && room?.owner?.length === 0) ||
+                (user?.id &&
+                  room.owner.filter((u) => {
+                    return u.id === user?.id;
+                  }).length) ? (
+                  <MenuItem value={'editOwners'}>オーナーを編集</MenuItem>
+                ) : null}
+                {user?.id &&
+                room.owner &&
+                room.owner.filter((u) => {
+                  return u.id === user?.id;
+                }).length ? (
+                  <MenuItem value={'deleteRoom'}>ルームを解散</MenuItem>
+                ) : null}
+              </>
+            )}
+            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+          </Menu>
         </Box>
       </Box>
       {visibleSearchForm && (
@@ -797,26 +608,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                senderAvatars={senderAvatars}
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
                 key={m.id}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
-                searchedResultIds={searchedResults?.map((s) => s.id)}
-                lastReadChatTime={lastReadChatTime}
+                searchedResultIds={searchedResultIds}
+                lastReadChatTime={socket.lastReadChatTime}
                 // readUsers={readUsers[i] ? readUsers[i] : []}
-                onClickReply={() =>
-                  setNewChatMessage((pre) => ({
-                    ...pre,
-                    replyParentMessage: m,
-                  }))
-                }
-                onClickImage={() => {
-                  if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImageURL(m.content);
-                  }
-                }}
+                onClickReply={onClickReply}
+                onClickImage={onClickImage}
               />
             ))}
           </>
@@ -841,7 +644,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           display="flex"
           flexDir="row"
           alignItems="center"
-          h="13%"
+          h="110"
           borderBottomWidth={1}
           px="8px"
           position="relative"
@@ -863,138 +666,81 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Link>
           <UserAvatar
             mr="8px"
-            src={newChatMessage.replyParentMessage.sender?.avatarUrl}
+            src={
+              replyParentMessageSender
+                ? replyParentMessageSender.avatarUrl
+                : newChatMessage.replyParentMessage.sender?.avatarUrl
+            }
             size="md"
-            user={newChatMessage.replyParentMessage.sender}
+            user={
+              replyParentMessageSender ||
+              newChatMessage.replyParentMessage.sender
+            }
           />
-          <Box display="flex" justifyContent="center" flexDir="column" w="100%">
+          <Box display="flex" justifyContent="center" flexDir="column" w="80%">
             <Text fontWeight="bold">
-              {userNameFactory(newChatMessage.replyParentMessage.sender)}
+              {userNameFactory(
+                replyParentMessageSender ||
+                  newChatMessage.replyParentMessage.sender,
+              )}
             </Text>
             <Text isTruncated w="90%" noOfLines={1}>
               {replyTargetContent(newChatMessage.replyParentMessage)}
             </Text>
           </Box>
+          <Box w="20%">
+            {newChatMessage.replyParentMessage.type ===
+            ChatMessageType.IMAGE ? (
+              <Image
+                loading="lazy"
+                src={newChatMessage.replyParentMessage.content}
+                w={'100'}
+                h={'100'}
+                objectFit={'contain'}
+                alt="送信された画像"
+              />
+            ) : newChatMessage.replyParentMessage.type ===
+              ChatMessageType.VIDEO ? (
+              <video
+                style={{
+                  maxHeight: '100px',
+                  maxWidth: '100px',
+                  objectFit: 'contain',
+                }}
+                controls={false}
+                muted>
+                <source
+                  src={newChatMessage.replyParentMessage.content}
+                  type="video/mp4"
+                />
+              </video>
+            ) : newChatMessage.replyParentMessage.type ===
+              ChatMessageType.STICKER ? (
+              <Image
+                loading="lazy"
+                src={
+                  reactionStickers.find(
+                    (s) =>
+                      s.name === newChatMessage?.replyParentMessage?.content,
+                  )?.src
+                }
+                w={'100'}
+                h={'100'}
+                objectFit={'contain'}
+                alt="送信された画像"
+              />
+            ) : null}
+          </Box>
         </Box>
       )}
-      <Box
-        boxSizing="border-box"
-        cursor="text"
-        p="16px"
-        bg="#fefefe"
-        h="20%"
-        onClick={() => {
-          editorRef.current?.focus();
-        }}>
-        <Editor
-          editorKey={'editor'}
-          placeholder="メッセージを入力"
-          editorState={editorState}
-          onChange={onEditorChange}
-          plugins={plugins}
-          ref={editorRef}
-          keyBindingFn={(e) => {
-            if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
-              onSend();
-              return 'handled';
-            }
-            if (e.key === 'Enter') {
-              setEditorState(RichUtils.insertSoftNewline(editorState));
-              return 'handled';
-            }
-            return getDefaultKeyBinding(e);
-          }}
-        />
-        <div className={suggestionStyles.suggestion_wrapper}>
-          <MentionSuggestions
-            open={mentionOpened}
-            onOpenChange={onSuggestionOpenChange}
-            suggestions={suggestions}
-            onSearchChange={onSuggestionSearchChange}
-            onAddMention={onAddMention}
-            entryComponent={Entry}
-          />
-        </div>
-      </Box>
-      <Popover closeOnBlur={false} placement="top-start">
-        {({ onClose }) => (
-          <>
-            <PopoverTrigger>
-              <Link
-                color={darkFontColor}
-                position="absolute"
-                zIndex={1}
-                bottom={'8px'}
-                cursor="pointer"
-                right="90px">
-                <BiSmile size={20} color={darkFontColor} />
-              </Link>
-            </PopoverTrigger>
-            <Portal>
-              <PopoverContent>
-                <PopoverHeader border="0">
-                  <PopoverCloseButton />
-                </PopoverHeader>
-
-                <PopoverBody>
-                  <SimpleGrid columns={3}>
-                    {reactionStickers.map((e) => (
-                      <Fragment key={e.name}>
-                        <a
-                          onClick={() => {
-                            handleStickerSelected(e.name);
-                            onClose();
-                          }}>
-                          <Box display="flex" maxW="300px" maxH={'300px'}>
-                            <Image
-                              src={e.src}
-                              w={100}
-                              h={100}
-                              padding={2}
-                              alt="送信された画像"
-                            />
-                          </Box>
-                        </a>
-                      </Fragment>
-                    ))}
-                  </SimpleGrid>
-                </PopoverBody>
-              </PopoverContent>
-            </Portal>
-          </>
-        )}
-      </Popover>
-      <Link
-        {...getRootProps()}
-        color={darkFontColor}
-        position="absolute"
-        zIndex={1}
-        bottom={'8px'}
-        cursor="pointer"
-        right="50px">
-        <input {...getInputProps()} onClick={getInputProps().onDrag} />
-        <AiOutlinePaperClip size={20} color={darkFontColor} />
-      </Link>
-
-      <Link
-        color={darkFontColor}
-        position="absolute"
-        zIndex={1}
-        bottom={'8px'}
-        cursor="pointer"
-        right="8px">
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <IoSend
-            size={20}
-            onClick={() => handleSubmit()}
-            color={
-              newChatMessage.content?.trimEnd() ? blueColor : darkFontColor
-            }
-          />
-        )}
-      </Link>
+      <ChatEditor
+        room={room}
+        onSend={onSend}
+        isLoading={isLoading}
+        uploadFiles={uploadFiles}
+        editorRef={editorRef}
+      />
+      <Sticker handleStickerSelected={handleStickerSelected} />
     </Box>
   );
 };

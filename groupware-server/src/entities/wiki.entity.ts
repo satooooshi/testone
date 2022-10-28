@@ -22,12 +22,14 @@ import {
 import { QAAnswer } from './qaAnswer.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
+import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum WikiType {
   RULES = 'rule',
   ALL_POSTAL = 'all-postal',
   //掲示板
   BOARD = 'board',
+  MAIL_MAGAZINE = 'mail_magazine',
 }
 
 export enum RuleCategory {
@@ -171,22 +173,18 @@ export class Wiki {
   })
   tags?: Tag[];
 
-  @ManyToMany(() => User, (user) => user.userGoodForBoard, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({
-    name: 'user_good_for_board',
-    joinColumn: {
-      name: 'wiki_id',
-      referencedColumnName: 'id',
+  @ManyToMany(
+    () => UserGoodForBoard,
+    (userGoodForBoard) => userGoodForBoard.wiki,
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGoodForBoard?: User[];
+  )
+  userGoodForBoard?: UserGoodForBoard[];
+
+  goodsCount?: number;
+  answersCount?: number;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -198,7 +196,8 @@ export class Wiki {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.body = await genSignedURL(this.body);
+    // this.body = await genSignedURL(this.body);
+    this.body = genStorageURL(this.body);
   }
 
   isGoodSender?: boolean;

@@ -19,6 +19,7 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import Linkify from 'react-linkify';
 import { blueColor } from 'src/utils/colors';
 import { componentDecorator } from 'src/utils/componentDecorator';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type NoteBoxProps = {
   note: ChatNote;
@@ -33,6 +34,7 @@ const NoteBox: React.FC<NoteBoxProps> = ({
   onClickDelete,
   onClickImage,
 }) => {
+  const { user } = useAuthenticate();
   return (
     <>
       <Box
@@ -70,18 +72,20 @@ const NoteBox: React.FC<NoteBoxProps> = ({
               </Text>
             </Box>
           </Box>
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label="Options"
-              icon={<FiMenu />}
-              variant="outline"
-            />
-            <MenuList>
-              <MenuItem onClick={() => onClickEdit(n)}>編集</MenuItem>
-              <MenuItem onClick={() => onClickDelete(n)}>削除</MenuItem>
-            </MenuList>
-          </Menu>
+          {n?.isEditor ? (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<FiMenu />}
+                variant="outline"
+              />
+              <MenuList>
+                <MenuItem onClick={() => onClickEdit(n)}>編集</MenuItem>
+                <MenuItem onClick={() => onClickDelete(n)}>削除</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : null}
         </Box>
         <SimpleGrid spacing="4px" columns={3} w="100%">
           {n.images?.map((i) => (

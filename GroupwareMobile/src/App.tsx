@@ -34,22 +34,42 @@ const App = () => {
 
   useEffect(() => {
     const checkVersion = async () => {
-      const needOrNot = await VersionCheck.needUpdate({
-        provider: Platform.OS === 'android' ? 'playStore' : 'appStore',
-        //@ts-ignore
-        country: 'jp',
-      });
-      if (needOrNot?.isNeeded) {
-        Alert.alert('アプリを更新してください', '', [
-          {
-            text: 'ストアを開く',
-            onPress: () => {
-              Linking.openURL(needOrNot.storeUrl);
+      if (Platform.OS === 'android') {
+        const needOrNot = await VersionCheck.needUpdate({
+          provider: 'playStore',
+          //@ts-ignore
+          country: 'jp',
+        });
+        if (needOrNot?.isNeeded) {
+          Alert.alert('アプリを更新してください', '', [
+            {
+              text: 'ストアを開く',
+              onPress: () => {
+                Linking.openURL(needOrNot.storeUrl);
+              },
             },
-          },
-        ]);
+          ]);
+        }
+      } else {
+        const res = await fetch(
+          'https://send-latest-ios-version-sgzkfl3uyq-an.a.run.app',
+        );
+        const latestVersion = Number(await res.json());
+        const currentVersion = Number(VersionCheck.getCurrentVersion());
+        const isUpdateNeeded = currentVersion < latestVersion;
+        // if (isUpdateNeeded) {
+        //   Alert.alert('アプリを更新してください', '', [
+        //     {
+        //       text: 'TestFlightを開く',
+        //       onPress: () => {
+        //         Linking.openURL('itms-beta://testflight.apple.com');
+        //       },
+        //     },
+        //   ]);
+        // }
       }
     };
+
     checkVersion();
   }, []);
 

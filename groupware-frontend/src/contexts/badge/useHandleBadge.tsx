@@ -13,6 +13,8 @@ import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import router from 'next/router';
+import { useAPISendNotifiForRefetchRoom } from '@/hooks/api/chat/useAPISendNotifiForRefetchRoom';
+import { sortRooms } from 'src/utils/chat/sortRooms';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -38,7 +40,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
   const { refetch: refetchAllRooms, isLoading } = useAPIGetRoomsByPage(
     {
       page: page.toString(),
-      limit: '20',
+      limit: '100',
     },
     {
       enabled: false,
@@ -48,10 +50,15 @@ export const BadgeProvider: React.FC = ({ children }) => {
           count += room.unreadCount ? room.unreadCount : 0;
         }
         setChatUnreadCount(count);
-        setChatGroups((r) =>
-          page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
-        );
-        if (data.rooms.length >= 20) {
+        setChatGroups((r) => {
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (!data.gotAllRooms) {
+            return rooms;
+          }
+          return sortRooms(rooms);
+        });
+        if (!data.gotAllRooms) {
           setPage((p) => p + 1);
           setIsNeedRefetch(true);
         } else {
@@ -86,12 +93,19 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
   });
 
+  const { mutate: sendNotifiForRefetch } = useAPISendNotifiForRefetchRoom();
+
   useEffect(() => {
     if (user?.id) {
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // useEffect(() => {
+  //   console.log('-----', chatGroups.length);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [chatGroups]);
 
   useEffect(() => {
     if (isNeedRefetch) {
@@ -115,26 +129,24 @@ export const BadgeProvider: React.FC = ({ children }) => {
   // }, [user]);
 
   useEffect(() => {
-    if (editRoom) {
+    if (editRoom?.members?.filter((m) => m.id === user?.id).length) {
       if (editRoom.updatedAt > editRoom.createdAt) {
-        if (editRoom.members?.filter((m) => m.id === user?.id).length) {
-          setChatGroups((room) =>
-            room.map((r) =>
-              r.id === editRoom.id
-                ? { ...r, name: editRoom.name, members: editRoom.members }
-                : r,
-            ),
-          );
-        } else {
-          setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
-        }
-      } else if (editRoom.members?.filter((m) => m.id === user?.id).length) {
+        setChatGroups((room) =>
+          room.map((r) =>
+            r.id === editRoom.id
+              ? { ...r, name: editRoom.name, members: editRoom.members }
+              : r,
+          ),
+        );
+      } else if (!chatGroups?.filter((g) => g.id === editRoom.id).length) {
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
         setChatGroups(rooms);
         setEditRoom(undefined);
       }
+    } else if (editRoom) {
+      setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editRoom]);
@@ -155,6 +167,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
     const targetRoom = chatGroups.filter((g) => g.id === roomId);
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
+      sendNotifiForRefetch(roomId);
       setChatUnreadCount((c) => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups((group) =>
         group.map((g) => (g.id === roomId ? { ...g, unreadCount: 0 } : g)),

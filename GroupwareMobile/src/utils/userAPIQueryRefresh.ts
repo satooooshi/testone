@@ -9,6 +9,7 @@ export const userAPIQueryRefresh = (
     word: newWord = '',
     tag: newTag = '',
     sort,
+    branch,
     role,
     verified,
     duration,
@@ -17,6 +18,9 @@ export const userAPIQueryRefresh = (
   let refreshURL = `${searchUsersURL}?page=${newPage}&word=${newWord}&tag=${newTag}`;
   if (sort) {
     refreshURL = `${refreshURL}&sort=${sort}`;
+  }
+  if (branch) {
+    refreshURL = `${refreshURL}&branch=${branch}`;
   }
   if (role) {
     refreshURL = `${refreshURL}&role=${role}`;
@@ -38,6 +42,7 @@ export const searchUserQueryParamFactory = (
     word: newWord = '',
     tag: newTag = '',
     sort,
+    branch,
     role,
     verified,
     duration,
@@ -46,6 +51,9 @@ export const searchUserQueryParamFactory = (
   let refreshURL = `?page=${newPage}&word=${parsedWord}&tag=${newTag}`;
   if (sort) {
     refreshURL = `${refreshURL}&sort=${sort}`;
+  }
+  if (branch) {
+    refreshURL = `${refreshURL}&branch=${branch}`;
   }
   if (role) {
     refreshURL = `${refreshURL}&role=${role}`;

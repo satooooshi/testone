@@ -61,6 +61,14 @@ export class ChatGroup {
   })
   roomType: RoomType;
 
+  @Column({
+    type: 'int',
+    name: 'member_count',
+    nullable: false,
+    default: 0,
+  })
+  memberCount: number;
+
   @OneToOne(() => EventSchedule, (eventSchedule) => eventSchedule.chatGroup, {
     onUpdate: 'CASCADE',
   })
@@ -109,6 +117,36 @@ export class ChatGroup {
   })
   members?: User[];
 
+  @ManyToMany(() => User, (user) => user.chatGroupOwner, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chatGroupOwner_joining',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  owner?: User[];
+
+  @ManyToMany(() => User, (user) => user.leftChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chat_leaving',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  previousMembers?: User[];
+
   @ManyToMany(() => User, (user) => user.muteChatGroups, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
@@ -137,6 +175,7 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+  isMute?: boolean;
   hasBeenRead?: boolean;
   unreadCount?: number;
 
@@ -163,10 +202,10 @@ export class ChatGroup {
     this.imageURL = genStorageURL(this.imageURL);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.imageURL = await genSignedURL(this.imageURL);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.imageURL = await genSignedURL(this.imageURL);
+  // }
 }

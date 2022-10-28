@@ -15,10 +15,15 @@ define(User, (): User => {
   user.email = faker.internet.email();
   user.lastName = faker.name.lastName();
   user.firstName = faker.name.firstName();
+  user.lastNameKana = 'ン';
+  user.firstNameKana = 'ン';
   (user.password = hashSync('password', 10)),
     (user.role =
       userRoleArray[Math.floor(Math.random() * userRoleArray.length)]);
-  user.avatarUrl = faker.image.avatar();
+  user.verifiedAt = new Date();
+  user.avatarUrl =
+    'https://storage.googleapis.com/groupware-bucket-development/1659514315874/';
+  user.existence = true;
 
   return user;
 });

@@ -5,6 +5,8 @@ import {Icon} from 'react-native-magnus';
 import ChatMenuRow from '../../../components/chat/ChatMenuRow';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
+import {useAPIDeleteChatRoom} from '../../../hooks/api/chat/useAPIDeleteChatRoom';
+import AddUsersForm from '../../../templates/chat/room/AddUsersForm';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPILeaveChatRoom} from '../../../hooks/api/chat/useAPILeaveChatRoomURL';
@@ -17,24 +19,26 @@ import {
 } from '../../../types/navigator/drawerScreenProps';
 
 const ChatMenu: React.FC = () => {
+  const {user: myProfile} = useAuthenticate();
   const route = useRoute<ChatMenuRouteProps>();
   const navigation = useNavigation<ChatMenuNavigationProps>();
   const {room, removeCache} = route.params;
   const {user} = useAuthenticate();
+  const [visibleUserModal, setVisibleUserModal] = useState(false);
   const [isMute, setIsMute] = useState(false);
   const {editChatGroup} = useHandleBadge();
 
-  const {mutate: updateGroup} = useAPIUpdateChatGroup({
-    onSuccess: updateRoom => {
-      editChatGroup(updateRoom);
-      setIsMute(!isMute);
-    },
-    onError: () => {
-      Alert.alert(
-        'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
+  // const {mutate: updateGroup} = useAPIUpdateChatGroup({
+  //   onSuccess: data => {
+  //     editChatGroup(data.room);
+  //     setIsMute(!isMute);
+  //   },
+  //   onError: () => {
+  //     Alert.alert(
+  //       'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+  //     );
+  //   },
+  // });
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
       editChatGroup({
@@ -48,6 +52,18 @@ const ChatMenu: React.FC = () => {
     onError: () => {
       Alert.alert(
         '退室中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
+  });
+  const {mutate: deleteChatGroup} = useAPIDeleteChatRoom({
+    onSuccess: () => {
+      navigation.navigate('ChatStack', {
+        screen: 'RoomList',
+      });
+    },
+    onError: () => {
+      Alert.alert(
+        '削除中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
@@ -66,6 +82,11 @@ const ChatMenu: React.FC = () => {
 
   return (
     <WholeContainer>
+      <AddUsersForm
+        visibleUserModal={visibleUserModal}
+        closeUserModal={() => setVisibleUserModal(false)}
+        room={room}
+      />
       <HeaderWithTextButton enableBackButton={true} title="メニュー" />
       {/* <ChatMenuRow
         name={isMute ? '通知をオン' : '通知をオフ'}
@@ -105,18 +126,26 @@ const ChatMenu: React.FC = () => {
           }
         }}
       /> */}
-      {!isPersonal && (
-        <ChatMenuRow
-          name="ルームを編集"
-          icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
-          onPress={() =>
-            navigation.navigate('ChatStack', {
-              screen: 'EditRoom',
-              params: {room},
-            })
-          }
-        />
-      )}
+      {!isPersonal &&
+        ((myProfile?.id && room?.owner[0]?.id === myProfile?.id) ||
+        !room?.owner?.length ? (
+          <ChatMenuRow
+            name="ルームを編集"
+            icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'EditRoom',
+                params: {room},
+              })
+            }
+          />
+        ) : (
+          <ChatMenuRow
+            name="メンバーを追加"
+            icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+            onPress={() => setVisibleUserModal(true)}
+          />
+        ))}
       <ChatMenuRow
         name="ノート"
         icon={<Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />}
@@ -166,36 +195,55 @@ const ChatMenu: React.FC = () => {
           ])
         }
       />
+      <ChatMenuRow
+        name="退室"
+        icon={
+          <Icon
+            name="ios-arrow-undo-outline"
+            fontSize={20}
+            fontFamily="Ionicons"
+            mr={'lg'}
+            color="black"
+          />
+        }
+        onPress={() =>
+          Alert.alert('退室してよろしいですか？', undefined, [
+            {
+              text: 'キャンセル',
+              style: 'cancel',
+            },
+            {
+              text: '退室する',
+              style: 'destructive',
+              onPress: () => {
+                leaveChatGroup(room);
+              },
+            },
+          ])
+        }
+      />
 
-      {!isPersonal && (
+      {!isPersonal && myProfile?.id && room?.owner[0]?.id === myProfile?.id ? (
         <ChatMenuRow
-          name="退室"
-          icon={
-            <Icon
-              name="ios-arrow-undo-outline"
-              fontSize={20}
-              fontFamily="Ionicons"
-              mr={'lg'}
-              color="black"
-            />
-          }
+          name="解散"
+          icon={<Icon name="delete" fontSize={20} mr={'lg'} color="black" />}
           onPress={() =>
-            Alert.alert('退室してよろしいですか？', undefined, [
+            Alert.alert('ルームを解散してよろしいですか？', undefined, [
               {
                 text: 'キャンセル',
                 style: 'cancel',
               },
               {
-                text: '退室する',
+                text: '解散する',
                 style: 'destructive',
                 onPress: () => {
-                  leaveChatGroup(room);
+                  deleteChatGroup(room);
                 },
               },
             ])
           }
         />
-      )}
+      ) : null}
     </WholeContainer>
   );
 };
