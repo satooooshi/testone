@@ -322,12 +322,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 bg="white"
                 onChange={onTypeSelectionChange}
                 defaultValue={newQuestion.type}>
+                <option label={'指定なし'}></option>
                 {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
                   <>
-                    <option label={'指定なし'}></option>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
                         WikiType.RULES,
