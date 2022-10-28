@@ -169,14 +169,14 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             flexDir="row"
             onClick={() => onFinish()}
             mb="8px"
-            colorScheme="green"
+            colorScheme="brand"
             alignItems="center">
             {isLoading ? <Spinner /> : <Text display="inline">更新</Text>}
           </Button>
         </ModalHeader>
         <ModalCloseButton onClick={() => onClickClose()} />
         <ModalBody>
-          <FormLabel>ルーム画像</FormLabel>
+          <FormLabel fontWeight="bold">ルーム画像</FormLabel>
           {selectImageUrl ? (
             <Box textAlign="center">
               <ReactCrop
@@ -236,7 +236,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             </Box>
           ) : null}
           <FormLabel>
-            <p>ルーム名</p>
+            <FormLabel fontWeight="bold">ルーム名</FormLabel>
             {errors.name && touched.name ? (
               <Text color="tomato">{errors.name}</Text>
             ) : null}
