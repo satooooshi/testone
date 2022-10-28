@@ -5,6 +5,7 @@ import {
   Button,
   Div,
   Dropdown,
+  Icon,
   Input,
   Tag as TagButton,
   Text,
@@ -595,13 +596,26 @@ const WikiForm: React.FC<WikiFormProps> = ({
               タグを選択
             </Text>
             <Button
-              bg="green600"
-              w={'100%'}
-              mb={8}
-              onPress={() => setVisibleTagModal(true)}>
-              {newWiki.tags?.length
-                ? `${newWiki.tags?.length}個のタグ`
-                : 'タグを選択'}
+              bg="white"
+              rounded="circle"
+              color="blue700"
+              fontSize={14}
+              fontWeight="bold"
+              borderWidth={1}
+              borderColor="blue700"
+              py="md"
+              px="lg"
+              mb="sm"
+              onPress={() => setVisibleTagModal(true)}
+              prefix={
+                <Icon
+                  name="add"
+                  fontSize={14}
+                  color="blue700"
+                  fontFamily="MaterialIcons"
+                />
+              }>
+              タグを追加
             </Button>
             <Div
               flexDir="row"
@@ -613,6 +627,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   key={t.id}
                   mr={4}
                   mb={8}
+                  fontSize="md"
                   color={tagFontColorFactory(t.type)}
                   bg={tagBgColorFactory(t.type)}>
                   {t.name}
