@@ -82,6 +82,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
   const flatListRef = useRef<FlatList | null>(null);
   const isFocused = useIsFocused();
+  const [noRefetch, setNoRefetch] = useState(false);
 
   const onEndReached = () => {
     if (wikiForInfiniteScroll.length >= 20 * Number(searchQuery.page)) {
@@ -94,18 +95,22 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
-      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
-      setSearchQuery(q => ({
-        ...q,
-        word,
-        type,
-        board_category: boardCategory,
-        rule_category: ruleCategory,
-        page: '1',
-      }));
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      if (!noRefetch) {
+        setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
+        setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
+        setSearchQuery(q => ({
+          ...q,
+          type,
+          board_category: boardCategory,
+          rule_category: ruleCategory,
+          page: '1', //seachQuery.page,
+        }));
+        flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      } else {
+        setNoRefetch(false);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isFocused,
     refetch,
@@ -119,6 +124,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   ]);
 
   useEffect(() => {
+    // Do not refetch when go back from wiki detail screen
     if (isFocused) {
       refetch();
     }
@@ -180,7 +186,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
               onEndReachedThreshold={0.5}
               data={wikiForInfiniteScroll || []}
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => <WikiCard wiki={item} />}
+              renderItem={({item}) => (
+                <WikiCard goBackFromDetail={setNoRefetch} wiki={item} />
+              )}
             />
           </Div>
         ) : !wikiForInfiniteScroll.length ? (
