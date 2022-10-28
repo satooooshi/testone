@@ -14,6 +14,7 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {userNameFactory} from '../../../utils/factory/userNameFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -72,13 +73,16 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, goBackFromDetail}) => {
         py={4}
         bg="#eceeec"
         borderColor="#b0b0b0">
+        {wiki.type !== WikiType.RULES && (
+          <Div w={'40%'} mb={5} flexDir="row" alignItems="center">
+            <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
+            <Text ml={8} fontSize={18}>
+              {userNameFactory(wiki.writer)}
+            </Text>
+          </Div>
+        )}
         <Div w={'100%'} px={8} flexDir="row" alignItems="center">
-          {wiki.type !== WikiType.RULES && (
-            <Div mr={8}>
-              <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
-            </Div>
-          )}
-          <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
+          <Text numberOfLines={2} fontWeight="bold" fontSize={22}>
             {wiki.title}
           </Text>
         </Div>
