@@ -158,7 +158,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 setSearchWords(undefined);
               }}
               mb="8px"
-              colorScheme="green"
+              colorScheme="brand"
               alignItems="center">
               <Text display="inline">
                 {room ? '更新' : isTalkRoom ? '作成' : '次へ'}
