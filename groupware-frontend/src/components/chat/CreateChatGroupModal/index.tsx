@@ -231,7 +231,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             }}
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
-            <FormLabel>ルーム画像</FormLabel>
+            <FormLabel fontWeight="bold">ルーム画像</FormLabel>
             {selectImageUrl ? (
               <Box>
                 <ReactCrop
@@ -285,7 +285,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               </Box>
             )}
             <Box mb="16px">
-              <FormLabel>ルーム名</FormLabel>
+              <FormLabel fontWeight="bold">ルーム名</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -295,7 +295,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 placeholder="ルーム名を入力して下さい"
               />
             </Box>
-            <FormLabel>メンバー</FormLabel>
+            <FormLabel fontWeight="bold">メンバー</FormLabel>
             <Box mb="16px" display="flex" flexDir="row" flexWrap="wrap">
               {newGroup.members?.map((u) => (
                 <Box mr={'4px'} mb={'8px'} key={u.id}>
