@@ -130,7 +130,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <Tag
               key={t.id}
               fontSize={'lg'}
-              h={28}
               py={0}
               bg={tagColorFactory((t as AllTag).type)}
               color="white"
