@@ -1,3 +1,4 @@
+import {interviewColor} from './../../colors/index';
 import {WikiType, RuleCategory} from '../../../types';
 import {
   allPostalColor,
@@ -42,6 +43,8 @@ export const wikiTypeColorFactory = (
       return allPostalColor;
     case WikiType.MAIL_MAGAZINE:
       return mailMagazineColor;
+    case WikiType.INTERVIEW:
+      return interviewColor;
     case WikiType.RULES:
       // NOTE: 以下はWebでは分けられてなかったので、のちに併せて実装してください。
       switch (ruleCategory) {
