@@ -544,6 +544,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
         ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         keyboardDismissMode={'none'}>
         <Div p="5%" alignItems="center" alignSelf="center" bg="white">
           <Text fontSize={16}>タイトル</Text>
