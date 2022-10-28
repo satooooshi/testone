@@ -1,6 +1,5 @@
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -546,7 +545,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         nestedScrollEnabled={true}
         scrollEventThrottle={20}
         keyboardDismissMode={'none'}>
-        <Div w="90%" alignItems="center" alignSelf="center">
+        <Div p="5%" alignItems="center" alignSelf="center" bg="white">
           <Text fontSize={16}>タイトル</Text>
           {errors.title && touched.title ? (
             <Text fontSize={16} color="tomato">
