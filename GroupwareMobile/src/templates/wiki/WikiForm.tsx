@@ -583,25 +583,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   : 'タイプを選択してください'}
               </Button>
             </Div>
-            {/* {!isEdit && (
-              <Div>
-                <Text fontSize={16} fontWeight="bold" mb={4}>
-                  入力形式を選択
-                </Text>
-                <Button
-                  bg="white"
-                  borderWidth={1}
-                  borderColor={'#ececec'}
-                  p="md"
-                  color="black"
-                  w={windowWidth * 0.4}
-                  onPress={() => textFormatDropdownRef.current.open()}>
-                  {newWiki.textFormat === 'html'
-                    ? 'デフォルト'
-                    : 'マークダウン'}
-                </Button>
-              </Div>
-            )} */}
           </Div>
           <Button
             bg="green600"
