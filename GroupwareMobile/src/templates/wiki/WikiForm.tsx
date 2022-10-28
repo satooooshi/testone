@@ -1,6 +1,5 @@
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
@@ -82,7 +81,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       saveWiki(w);
     },
   });
-  const {width: windowWidth} = useWindowDimensions();
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
