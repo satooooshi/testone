@@ -15,6 +15,7 @@ import {
   Box,
   Avatar,
   Spinner,
+  Stack,
 } from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
@@ -27,6 +28,8 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { socket } from '../ChatBox/socket';
+import { AiOutlineDelete } from 'react-icons/ai';
+import { FiEdit2 } from 'react-icons/fi';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
@@ -166,85 +169,91 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             flexDir="row"
             onClick={() => onFinish()}
             mb="8px"
-            colorScheme="green"
+            colorScheme="brand"
             alignItems="center">
             {isLoading ? <Spinner /> : <Text display="inline">更新</Text>}
           </Button>
         </ModalHeader>
         <ModalCloseButton onClick={() => onClickClose()} />
         <ModalBody>
-          <Box>
-            <Box>
-              {selectImageUrl ? (
-                <Box textAlign="center">
-                  <ReactCrop
-                    src={selectImageUrl}
-                    crop={crop}
-                    onChange={(newCrop) => onChange(newCrop)}
-                    onImageLoaded={onLoad}
-                    circularCrop={true}
-                    keepSelection={true}
-                    imageStyle={{
-                      minHeight: '100px',
-                      maxHeight: '300px',
-                      minWidth: '100px',
-                    }}
-                  />
-                </Box>
-              ) : (
-                <Box
-                  m="0 auto"
-                  textAlign="center"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  border="3px dashed #eeeeee"
-                  w="300px"
-                  h="300px"
-                  rounded="full"
-                  cursor="pointer"
-                  {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <Avatar
-                    src={isDeleted ? undefined : newGroupInfo.imageURL}
-                    h="100%"
-                    w="100%"
-                    rounded="full"
-                    alt=""
-                  />
-                </Box>
-              )}
-              {selectImageUrl || newGroupInfo.imageURL ? (
-                <Box textAlign="center">
-                  <Button
-                    my="10px"
-                    onClick={() => onClickDeleteImage()}
-                    colorScheme="brand">
-                    既存の画像を削除
-                  </Button>
-                </Box>
-              ) : null}
-              <FormLabel>
-                <p>ルーム名</p>
-                {errors.name && touched.name ? (
-                  <Text color="tomato">{errors.name}</Text>
-                ) : null}
-              </FormLabel>
-              <Input
-                type="text"
-                name="name"
-                className={editChatGroupModalStyles.modal_input_name}
-                mb="16px"
-                px="8px"
-                h="40px"
-                rounded="md"
-                border="1px"
-                value={newGroupInfo.name}
-                onChange={handleChange}
-                placeholder="ルーム名を入力して下さい"
+          <FormLabel fontWeight="bold">ルーム画像</FormLabel>
+          {selectImageUrl ? (
+            <Box textAlign="center">
+              <ReactCrop
+                src={selectImageUrl}
+                crop={crop}
+                onChange={(newCrop) => onChange(newCrop)}
+                onImageLoaded={onLoad}
+                circularCrop={true}
+                keepSelection={true}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '300px',
+                  minWidth: '100px',
+                }}
               />
             </Box>
-          </Box>
+          ) : (
+            <Box
+              m="0 auto"
+              textAlign="center"
+              alignItems="center"
+              justifyContent="center"
+              w="200px"
+              rounded="full"
+              cursor="pointer"
+              {...getRootProps()}>
+              <input {...getInputProps()} />
+              <Avatar
+                src={isDeleted ? undefined : newGroupInfo.imageURL}
+                h="100%"
+                w="100%"
+                rounded="full"
+                alt=""
+              />
+              <Stack
+                justifyContent="center"
+                direction="row"
+                my="8px"
+                color="blue.400">
+                <FiEdit2 />
+                <Text fontSize="14px">画像を編集する</Text>
+              </Stack>
+            </Box>
+          )}
+          {!isDeleted && (selectImageUrl || newGroupInfo.imageURL) ? (
+            <Box textAlign="center">
+              <Stack
+                justifyContent="center"
+                direction="row"
+                my="8px"
+                cursor="pointer"
+                color="red"
+                onClick={() => onClickDeleteImage()}>
+                <AiOutlineDelete />
+                <Text fontSize="14px">画像を削除する</Text>
+              </Stack>
+            </Box>
+          ) : null}
+          <FormLabel>
+            <FormLabel fontWeight="bold">ルーム名</FormLabel>
+            {errors.name && touched.name ? (
+              <Text color="tomato">{errors.name}</Text>
+            ) : null}
+          </FormLabel>
+          <Input
+            type="text"
+            name="name"
+            className={editChatGroupModalStyles.modal_input_name}
+            mb="16px"
+            px="8px"
+            h="40px"
+            rounded="md"
+            border="1px"
+            value={newGroupInfo.name}
+            onChange={handleChange}
+            placeholder="ルーム名を入力して下さい"
+          />
         </ModalBody>
       </ModalContent>
     </Modal>

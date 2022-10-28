@@ -158,7 +158,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 setSearchWords(undefined);
               }}
               mb="8px"
-              colorScheme="green"
+              colorScheme="brand"
               alignItems="center">
               <Text display="inline">
                 {room ? '更新' : isTalkRoom ? '作成' : '次へ'}
@@ -170,7 +170,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         <ModalBody>
           <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
-              <FormLabel htmlFor="search">メンバーを検索</FormLabel>
+              <FormLabel fontWeight="bold" htmlFor="search">
+                メンバーを検索
+              </FormLabel>
               <Input
                 bg="white"
                 marginBottom={'8px'}
@@ -178,7 +180,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 id="search"
               />
               <FormControl mb="16px">
-                <FormLabel>タイプ</FormLabel>
+                <FormLabel fontWeight="bold">タイプ</FormLabel>
                 <Select
                   bg="white"
                   onChange={(e) =>
@@ -212,7 +214,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
               </Box>
             </Box>
             <Box overflowY="auto" css={hideScrollbarCss}>
-              <Text mb="8px">選択済みのメンバー</Text>
+              <Text fontWeight="bold" mb="8px">
+                選択済みのメンバー
+              </Text>
               {selectedUsersInModal
                 ?.filter((m) => m.id !== myProfile?.id)
                 .map((u) => (
