@@ -3,7 +3,7 @@ import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style'
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import QuillEditor, {QuillToolbar} from 'react-native-cn-quill';
-import {blueColor} from '../../../utils/colors';
+import {blueColor, grayColor} from '../../../utils/colors';
 
 type TextEditorProps = {
   textFormat?: TextFormat;
@@ -53,7 +53,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
             ? initialBody
             : undefined
         }
-        style={{...textEditorStyles.quillEditor, minHeight: height}}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          ...textEditorStyles.quillEditor,
+          minHeight: height,
+          borderColor: grayColor,
+          borderWidth: 1,
+          borderRadius: 10,
+        }}
         quill={{
           // not required just for to show how to pass this props
           placeholder: '本文を入力',
