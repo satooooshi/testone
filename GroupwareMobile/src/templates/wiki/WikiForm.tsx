@@ -15,7 +15,6 @@ import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
 import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
-import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
 import {
@@ -26,6 +25,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import {tagFontColorFactory} from '../../utils/factory/tagFontColorFactory';
+import {tagBgColorFactory} from '../../utils/factory/tagBgColorFactory';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -612,8 +613,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   key={t.id}
                   mr={4}
                   mb={8}
-                  color="white"
-                  bg={tagColorFactory(t.type)}>
+                  color={tagFontColorFactory(t.type)}
+                  bg={tagBgColorFactory(t.type)}>
                   {t.name}
                 </TagButton>
               ))}
