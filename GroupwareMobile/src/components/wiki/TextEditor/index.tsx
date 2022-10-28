@@ -90,6 +90,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             provider: provided => ({
               ...provided,
               borderTopWidth: 0,
+              overflow: 'hidden',
             }),
             root: provided => ({
               ...provided,
