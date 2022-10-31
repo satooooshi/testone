@@ -289,11 +289,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 <Box mr={'4px'} mb={'8px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    <IconButton
-                      onClick={() => removeFromSelectedMember(u as User)}
-                      aria-label="削除"
-                      icon={<MdCancel size={18} />}
-                    />
                   </ButtonGroup>
                 </Box>
               ))}
