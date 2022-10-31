@@ -584,7 +584,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               </Box>
             )}
 
-            <Link onClick={() => setInputtedSearchWord('')}>
+            <Link
+              onClick={() => {
+                setInputtedSearchWord('');
+                setSearchedResults([]);
+              }}>
               <AiFillCloseCircle style={{ marginRight: 5 }} size={20} />
             </Link>
           </InputRightElement>
