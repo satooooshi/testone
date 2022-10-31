@@ -1,11 +1,10 @@
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
   Dropdown,
+  Icon,
   Input,
   Tag as TagButton,
   Text,
@@ -16,7 +15,6 @@ import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
 import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
-import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
 import {
@@ -27,6 +25,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import {tagFontColorFactory} from '../../utils/factory/tagFontColorFactory';
+import {tagBgColorFactory} from '../../utils/factory/tagBgColorFactory';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -81,7 +81,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       saveWiki(w);
     },
   });
-  const {width: windowWidth} = useWindowDimensions();
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
@@ -545,102 +544,124 @@ const WikiForm: React.FC<WikiFormProps> = ({
         ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         keyboardDismissMode={'none'}>
-        <Div w="90%" alignItems="center" alignSelf="center">
-          <Text fontSize={16}>タイトル</Text>
-          {errors.title && touched.title ? (
-            <Text fontSize={16} color="tomato">
-              {errors.title}
+        <Div p="5%" bg="white">
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タイトル
             </Text>
-          ) : null}
-          <Input
-            placeholder="タイトルを入力してください"
-            value={newWiki.title}
-            onChangeText={text => setNewWiki(w => ({...w, title: text}))}
-            mb="sm"
-          />
-          <Div mb={10} flexDir="row">
-            <Div alignItems="center">
-              <Text fontSize={16} mb={4}>
-                タイプを選択
+            {errors.title && touched.title ? (
+              <Text fontSize={16} color="tomato">
+                {errors.title}
               </Text>
-              <Button
-                bg="white"
-                borderWidth={1}
-                borderColor={'#ececec'}
-                p="md"
-                color="black"
-                w={windowWidth * 0.9}
-                onPress={() => typeDropdownRef.current.open()}>
-                {newWiki.type
-                  ? wikiTypeNameFactory(
-                      newWiki.type,
-                      newWiki.ruleCategory,
-                      true,
-                      newWiki.boardCategory,
-                    )
-                  : 'タイプを選択してください'}
-              </Button>
+            ) : null}
+            <Input
+              placeholder="タイトルを入力してください"
+              value={newWiki.title}
+              fontSize={16}
+              rounded="xl"
+              onChangeText={text => setNewWiki(w => ({...w, title: text}))}
+            />
+          </Div>
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タイプを選択
+            </Text>
+            <Button
+              block
+              bg="white"
+              borderWidth={1}
+              borderColor={'#ececec'}
+              color="black"
+              rounded="xl"
+              suffix={
+                <Icon
+                  position="absolute"
+                  right={8}
+                  name="down"
+                  fontSize={16}
+                  color="gray"
+                  fontFamily="AntDesign"
+                />
+              }
+              onPress={() => typeDropdownRef.current.open()}>
+              {newWiki.type
+                ? wikiTypeNameFactory(
+                    newWiki.type,
+                    newWiki.ruleCategory,
+                    true,
+                    newWiki.boardCategory,
+                  )
+                : 'タイプを選択してください'}
+            </Button>
+          </Div>
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タグを選択
+            </Text>
+            <Button
+              bg="white"
+              rounded="circle"
+              color="blue700"
+              fontSize={14}
+              fontWeight="bold"
+              borderWidth={1}
+              borderColor="blue700"
+              py="md"
+              px="lg"
+              mb="sm"
+              onPress={() => setVisibleTagModal(true)}
+              prefix={
+                <Icon
+                  name="add"
+                  fontSize={14}
+                  color="blue700"
+                  fontFamily="MaterialIcons"
+                />
+              }>
+              タグを追加
+            </Button>
+            <Div
+              flexDir="row"
+              flexWrap="wrap"
+              w={'100%'}
+              justifyContent="flex-start">
+              {newWiki.tags?.map(t => (
+                <TagButton
+                  key={t.id}
+                  mr={4}
+                  mb={8}
+                  fontSize="md"
+                  color={tagFontColorFactory(t.type)}
+                  bg={tagBgColorFactory(t.type)}>
+                  {t.name}
+                </TagButton>
+              ))}
             </Div>
-            {/* {!isEdit && (
-              <Div>
-                <Text fontSize={16} fontWeight="bold" mb={4}>
-                  入力形式を選択
-                </Text>
-                <Button
-                  bg="white"
-                  borderWidth={1}
-                  borderColor={'#ececec'}
-                  p="md"
-                  color="black"
-                  w={windowWidth * 0.4}
-                  onPress={() => textFormatDropdownRef.current.open()}>
-                  {newWiki.textFormat === 'html'
-                    ? 'デフォルト'
-                    : 'マークダウン'}
-                </Button>
-              </Div>
-            )} */}
           </Div>
-          <Button
-            bg="green600"
-            w={'100%'}
-            mb={8}
-            onPress={() => setVisibleTagModal(true)}>
-            {newWiki.tags?.length
-              ? `${newWiki.tags?.length}個のタグ`
-              : 'タグを選択'}
-          </Button>
-          <Div
-            flexDir="row"
-            flexWrap="wrap"
-            mb={8}
-            w={'100%'}
-            justifyContent="flex-start">
-            {newWiki.tags?.map(t => (
-              <TagButton
-                key={t.id}
-                mr={4}
-                mb={8}
-                color="white"
-                bg={tagColorFactory(t.type)}>
-                {t.name}
-              </TagButton>
-            ))}
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              本文
+            </Text>
+            {errors.body && touched.body ? (
+              <Text fontSize={16} color="tomato">
+                {errors.body}
+              </Text>
+            ) : null}
+            <Div mb={60}>
+              <TextEditor
+                textFormat={newWiki.textFormat}
+                onUploadImage={onUploadImage}
+                initialBody={newWiki.body}
+                onChange={text => setNewWiki(w => ({...w, body: text}))}
+              />
+            </Div>
           </Div>
-        </Div>
-        {errors.body && touched.body ? (
-          <Text fontSize={16} color="tomato">
-            {errors.body}
-          </Text>
-        ) : null}
-        <Div mb={60}>
-          <TextEditor
-            textFormat={newWiki.textFormat}
-            onUploadImage={onUploadImage}
-            initialBody={newWiki.body}
-            onChange={text => setNewWiki(w => ({...w, body: text}))}
-          />
         </Div>
       </KeyboardAwareScrollView>
     </WholeContainer>

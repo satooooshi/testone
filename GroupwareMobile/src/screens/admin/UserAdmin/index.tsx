@@ -12,7 +12,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {User, UserRole, UserTag} from '../../../types';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
@@ -99,7 +98,11 @@ const UserAdmin: React.FC = () => {
   ];
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="Admin" />
+      <HeaderWithTextButton
+        title="ユーザー管理"
+        enableBackButton={true}
+        screenForBack={'Menu'}
+      />
       <SearchForm
         searchTarget="user"
         defaultValue={{word: '', selectedTags}}

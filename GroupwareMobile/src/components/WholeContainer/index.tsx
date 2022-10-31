@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import tailwind from 'tailwind-rn';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {layoutBackgroundGrayColor} from '../../utils/colors';
 
 type WholeContainerProps = {
   color?: 'auth' | 'white' | 'gray';
@@ -53,7 +54,7 @@ const WholeContainerStyle = StyleSheet.create({
     backgroundColor: '#fff',
   },
   grayColor: {
-    backgroundColor: '#F2F4FA',
+    backgroundColor: layoutBackgroundGrayColor,
   },
   statusBar: {
     flex: 0,

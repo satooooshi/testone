@@ -23,7 +23,6 @@ import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoBy
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useAPIGetUserGoodList} from '../../../hooks/api/wiki/useAPIGetUserGoodList';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {
   BoardCategory,
   RoomType,
@@ -222,11 +221,6 @@ const AccountDetail: React.FC = () => {
 
   const mySelfOfNot = id === user?.id || !id;
 
-  const handleLogout = () => {
-    logout();
-    setUser({});
-  };
-
   const inviteCall = async () => {
     if (user && profile) {
       await sendCallInvitation(user, profile);
@@ -275,19 +269,19 @@ const AccountDetail: React.FC = () => {
       <HeaderWithTextButton
         title={'アカウント情報'}
         activeTabName={'アカウント情報'}
-        enableBackButton={userID !== user?.id}
+        enableBackButton={true}
         // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
         // onPressRightButton={mySelfOfNot ? handleLogout : undefined}
         screenForBack={
           route.params?.previousScreenName
             ? route.params.previousScreenName
+            : userID === user?.id
+            ? 'Menu'
             : undefined
         }
       />
       {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
-      <ScrollDiv
-        contentContainerStyle={accountDetailStyles.scrollView}
-        bg="white">
+      <ScrollDiv bg="white">
         {profile && (
           <>
             <Div px={18}>

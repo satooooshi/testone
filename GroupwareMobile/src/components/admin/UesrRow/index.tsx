@@ -114,7 +114,23 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
             </Div> */}
             </Div>
             <Div flexDir="row" alignItems="center">
-              <Div m={10}>
+              <Div mr={8}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('AdminStack', {
+                      screen: 'attendance',
+                      params: {id: currentUser.id},
+                    })
+                  }>
+                  <Icon
+                    name="time-outline"
+                    fontSize={23}
+                    color="red900"
+                    fontFamily="Ionicons"
+                  />
+                </TouchableOpacity>
+              </Div>
+              <Div mr={8}>
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate('AdminStack', {
@@ -132,7 +148,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               </Div>
               {!loadingDelete ? (
                 <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                  <Icon name="delete" fontSize={23} color="tomato" />
+                  <Icon name="delete" fontSize={22} color="tomato" />
                 </TouchableOpacity>
               ) : (
                 <ActivityIndicator />

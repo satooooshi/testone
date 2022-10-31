@@ -20,8 +20,17 @@ const Home: React.FC = () => {
   const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
 
   const handleLogout = () => {
-    logout();
-    setUser({});
+    Alert.alert('ログアウトしてよろしいですか？', '', [
+      {text: 'キャンセル', style: 'cancel'},
+      {
+        text: 'ログアウト',
+        style: 'destructive',
+        onPress: () => {
+          logout();
+          setUser({});
+        },
+      },
+    ]);
   };
 
   return (
@@ -178,7 +187,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
-                navigation.navigate('IntroStack', {
+                navigation.navigate('EventStack', {
                   screen: 'EventList',
                   params: {
                     type: EventType.SUBMISSION_ETC,
