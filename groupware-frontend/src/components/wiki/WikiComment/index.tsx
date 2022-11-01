@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { TextFormat, User, Wiki, WikiType } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
-import {
-  dateTimeFormatterFromJSDDate,
-  dateTimeFormatterFromJSDDateWithoutTime,
-} from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, Button, Text, Spinner, Flex } from '@chakra-ui/react';
-
+import { dateTimeFormatterFromJSDDateWithoutTime } from 'src/utils/dateTimeFormatter';
+import { Avatar, Box, Button, Text, Flex } from '@chakra-ui/react';
 import MarkdownIt from 'markdown-it';
-import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
 import boldMascot from '@/public/bold-mascot.png';
-import Linkify from 'react-linkify';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
