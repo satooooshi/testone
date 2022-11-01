@@ -89,22 +89,28 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 <Link href={`/account/${writer?.id}`} passHref>
                   <a>
                     <Avatar
-                      className={qaCommentStyles.user_avatar}
+                      h="40px"
+                      w="40px"
+                      borderRadius="100%"
                       src={writer.avatarUrl}
                     />
                   </a>
                 </Link>
-                <Text color="gray">
+                <Text color="gray" ml="8px">
                   {writer.lastName + ' ' + writer.firstName}
                 </Text>
               </>
             ) : (
               <>
                 <Avatar
-                  className={qaCommentStyles.user_avatar}
+                  h="40px"
+                  w="40px"
+                  borderRadius="100%"
                   src={boldMascot.src}
                 />
-                <p className={qaCommentStyles.user_name}>ボールドくん</p>
+                <Text color="gray" ml="8px">
+                  ボールドくん
+                </Text>
               </>
             )}
           </Flex>
