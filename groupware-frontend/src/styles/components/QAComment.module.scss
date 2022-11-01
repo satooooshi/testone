@@ -1,13 +1,5 @@
 @import '../variables.scss';
 
-.user_info_wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  @media (max-width: 576px) {
-    margin-bottom: 8px;
-  }
-}
 .user_avatar {
   height: 40px;
   aspect-ratio: 1/1;

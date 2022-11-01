@@ -89,7 +89,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
     <>
       {createdAt && writer && (
         <Flex row justify="space-between" alignItems="center">
-          <Box className={qaCommentStyles.user_info_wrapper}>
+          <Flex row alignItems="center">
             {writer.existence ? (
               <>
                 <Link href={`/account/${writer?.id}`} passHref>
@@ -113,7 +113,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 <p className={qaCommentStyles.user_name}>ボールドくん</p>
               </>
             )}
-          </Box>
+          </Flex>
 
           <Box className={qaCommentStyles.info_left}>
             <Box display="flex" flexDir="column" alignItems="end">
