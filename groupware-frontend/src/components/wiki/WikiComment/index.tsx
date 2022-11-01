@@ -94,7 +94,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                     />
                   </a>
                 </Link>
-                <Text className={qaCommentStyles.user_name}>
+                <Text color="gray">
                   {writer.lastName + ' ' + writer.firstName}
                 </Text>
               </>
