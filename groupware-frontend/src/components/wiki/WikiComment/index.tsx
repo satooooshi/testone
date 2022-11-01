@@ -88,8 +88,8 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   return (
     <>
       {createdAt && writer && (
-        <div className={qaCommentStyles.question_uploader__info}>
-          <div className={qaCommentStyles.user_info_wrapper}>
+        <Box className={qaCommentStyles.question_uploader__info}>
+          <Box className={qaCommentStyles.user_info_wrapper}>
             {writer.existence ? (
               <>
                 <Link href={`/account/${writer?.id}`} passHref>
@@ -113,9 +113,9 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 <p className={qaCommentStyles.user_name}>ボールドくん</p>
               </>
             )}
-          </div>
+          </Box>
 
-          <div className={qaCommentStyles.info_left}>
+          <Box className={qaCommentStyles.info_left}>
             <Box display="flex" flexDir="column" alignItems="end">
               <Text fontSize={'15px'} display="flex" whiteSpace="nowrap">
                 {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
@@ -144,10 +144,10 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 {replyButtonName}
               </Button>
             ) : null}
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
-      <div className={qaCommentStyles.markdown}>
+      <Box className={qaCommentStyles.markdown}>
         <DraftMarkup
           renderHTML={
             textFormat && textFormat === 'markdown'
@@ -165,7 +165,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             </Button>
           </div>
         ) : null}
-      </div>
+      </Box>
       {wikiState?.type === WikiType.BOARD && (
         <Box
           ml="auto"
