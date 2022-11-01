@@ -5,7 +5,7 @@ import {
   dateTimeFormatterFromJSDDate,
   dateTimeFormatterFromJSDDateWithoutTime,
 } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, Button, Text, Spinner } from '@chakra-ui/react';
+import { Avatar, Box, Button, Text, Spinner, Flex } from '@chakra-ui/react';
 
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
@@ -88,7 +88,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   return (
     <>
       {createdAt && writer && (
-        <Box className={qaCommentStyles.question_uploader__info}>
+        <Flex row justify="space-between" alignItems="center">
           <Box className={qaCommentStyles.user_info_wrapper}>
             {writer.existence ? (
               <>
@@ -145,8 +145,9 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               </Button>
             ) : null}
           </Box>
-        </Box>
+        </Flex>
       )}
+
       <Box className={qaCommentStyles.markdown}>
         <DraftMarkup
           renderHTML={
