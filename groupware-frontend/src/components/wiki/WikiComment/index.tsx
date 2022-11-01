@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { TextFormat, User, Wiki, WikiType } from 'src/types';
-import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDateWithoutTime } from 'src/utils/dateTimeFormatter';
 import { Avatar, Box, Button, Text, Flex } from '@chakra-ui/react';
 import MarkdownIt from 'markdown-it';
