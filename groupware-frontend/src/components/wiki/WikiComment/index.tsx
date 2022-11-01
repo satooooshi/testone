@@ -149,7 +149,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         </Flex>
       )}
 
-      <Box className={qaCommentStyles.markdown}>
+      <Box color="gray">
         <DraftMarkup
           renderHTML={
             textFormat && textFormat === 'markdown'
@@ -158,14 +158,13 @@ const WikiComment: React.FC<WikiCommentProps> = ({
           }
         />
         {bestAnswerButtonName && onClickBestAnswerButton ? (
-          <div className={qaCommentStyles.best_answer_button_wrapper}>
+          <Flex justifyContent="flex-end">
             <Button
               colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
-              classnames={[qaCommentStyles.best_answer_button]}
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
               {bestAnswerButtonName}
             </Button>
-          </div>
+          </Flex>
         ) : null}
       </Box>
       {wikiState?.type === WikiType.BOARD && (
