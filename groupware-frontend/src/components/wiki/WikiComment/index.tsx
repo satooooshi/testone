@@ -100,9 +100,9 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                     />
                   </a>
                 </Link>
-                <p className={qaCommentStyles.user_name}>
+                <Text className={qaCommentStyles.user_name}>
                   {writer.lastName + ' ' + writer.firstName}
-                </p>
+                </Text>
               </>
             ) : (
               <>
@@ -115,7 +115,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             )}
           </Flex>
 
-          <Box className={qaCommentStyles.info_left}>
+          <Flex row alignItems="center">
             <Box display="flex" flexDir="column" alignItems="end">
               <Text fontSize={'15px'} display="flex" whiteSpace="nowrap">
                 {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
@@ -134,6 +134,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 </Text>
               )}
             </Box>
+
             {onClickReplyButton && replyButtonName ? (
               <Button
                 ml={3}
@@ -144,7 +145,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 {replyButtonName}
               </Button>
             ) : null}
-          </Box>
+          </Flex>
         </Flex>
       )}
 
