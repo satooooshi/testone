@@ -28,7 +28,6 @@ import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFrom
 import DropdownOpenerButton from '../../common/DropdownOpenerButton';
 import {useFormik} from 'formik';
 import {savingEventSchema} from '../../../utils/validation/schema';
-import DocumentPicker from 'react-native-document-picker';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -48,7 +47,9 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import tailwind from 'tailwind-rn';
+import {handlePickDocument} from '../../../utils/handlePickDocument';
 import {ActivityIndicator} from 'react-native-paper';
+import DocumentPicker from 'react-native-document-picker';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 

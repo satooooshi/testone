@@ -323,6 +323,8 @@ const QAQuestionList = () => {
         ? 'オール便'
         : type === WikiType.MAIL_MAGAZINE
         ? 'メルマガ'
+        : type === WikiType.INTERVIEW
+        ? '全社インタビュー'
         : 'All',
     tabs,
     rightButtonName: 'Wikiを作成',
