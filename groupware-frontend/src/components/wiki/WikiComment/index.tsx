@@ -12,6 +12,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '../GoodSendersModal';
 import { Link } from '@chakra-ui/react';
 import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
+import { BsReplyFill } from 'react-icons/bs';
 
 type WikiCommentProps = {
   textFormat?: TextFormat;
@@ -133,17 +134,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 </Text>
               )}
             </Box>
-
-            {onClickReplyButton && replyButtonName ? (
-              <Button
-                ml={3}
-                // borderRadius={50}
-                colorScheme="orange"
-                width="24"
-                onClick={onClickReplyButton}>
-                {replyButtonName}
-              </Button>
-            ) : null}
           </Flex>
         </Flex>
       )}
@@ -157,7 +147,20 @@ const WikiComment: React.FC<WikiCommentProps> = ({
           }
         />
         {bestAnswerButtonName && onClickBestAnswerButton ? (
-          <Flex justifyContent="flex-end">
+          <Flex row>
+            {onClickReplyButton ? (
+              <Button
+                mr="8px"
+                p={0}
+                borderRadius="full"
+                borderWidth={1}
+                borderColor="gray300"
+                bg="white"
+                color="gray"
+                onClick={onClickReplyButton}>
+                <BsReplyFill />
+              </Button>
+            ) : null}
             <Button
               colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
