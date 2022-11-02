@@ -22,7 +22,6 @@ type WikiCommentProps = {
   writer?: User;
   isWriter?: boolean;
   isExistsBestAnswer?: boolean;
-  replyButtonName?: string;
   onClickReplyButton?: () => void;
   bestAnswerButtonName?: string;
   onClickBestAnswerButton?: () => void;
@@ -37,7 +36,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   writer,
   isWriter,
   isExistsBestAnswer,
-  replyButtonName,
   onClickReplyButton,
   bestAnswerButtonName,
   onClickBestAnswerButton,
