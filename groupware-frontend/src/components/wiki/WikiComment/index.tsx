@@ -189,6 +189,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             justifyContent="center">
             <Link
               onClick={() => {
+                getGoodsForBoard(wikiState.id);
                 setGoodSendersModal(true);
               }}>
               <Text fontSize="20px">{`${wikiState.goodsCount}件のいいね`}</Text>
