@@ -145,21 +145,21 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               : body
           }
         />
-        {bestAnswerButtonName && onClickBestAnswerButton ? (
-          <Flex row>
-            {onClickReplyButton ? (
-              <Button
-                mr="8px"
-                p={0}
-                borderRadius="full"
-                borderWidth={1}
-                borderColor="gray.300"
-                bg="white"
-                color="gray"
-                onClick={onClickReplyButton}>
-                <BsReplyFill />
-              </Button>
-            ) : null}
+        <Flex row>
+          {onClickReplyButton ? (
+            <Button
+              mr="8px"
+              p={0}
+              borderRadius="full"
+              borderWidth={1}
+              borderColor="gray.300"
+              bg="white"
+              color="gray"
+              onClick={onClickReplyButton}>
+              <BsReplyFill />
+            </Button>
+          ) : null}
+          {bestAnswerButtonName && onClickBestAnswerButton ? (
             <Button
               borderWidth={1}
               borderColor={isExistsBestAnswer ? 'green.300' : 'gray.300'}
@@ -170,8 +170,8 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
               {bestAnswerButtonName}
             </Button>
-          </Flex>
-        ) : null}
+          ) : null}
+        </Flex>
       </Box>
       {wikiState?.type === WikiType.BOARD && (
         <Box
@@ -189,6 +189,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             justifyContent="center">
             <Link
               onClick={() => {
+                getGoodsForBoard(wikiState.id);
                 setGoodSendersModal(true);
               }}>
               <Text fontSize="20px">{`${wikiState.goodsCount}件のいいね`}</Text>
