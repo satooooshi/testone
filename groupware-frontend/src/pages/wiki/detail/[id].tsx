@@ -448,7 +448,6 @@ const QuestionDetail = () => {
                           createdAt={answer.createdAt}
                           writer={answer.writer}
                           isWriter={myself?.id === wiki.writer?.id}
-                          replyButtonName={'返信/追記'}
                           onClickReplyButton={() =>
                             handleClickStartInputtingReplyButton(answer)
                           }
