@@ -13,6 +13,7 @@ import GoodSendersModal from '../GoodSendersModal';
 import { Link } from '@chakra-ui/react';
 import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 import { BsReplyFill } from 'react-icons/bs';
+import { RiAwardFill, RiAwardLine } from 'react-icons/ri';
 
 type WikiCommentProps = {
   textFormat?: TextFormat;
@@ -152,7 +153,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                 p={0}
                 borderRadius="full"
                 borderWidth={1}
-                borderColor="gray300"
+                borderColor="gray.300"
                 bg="white"
                 color="gray"
                 onClick={onClickReplyButton}>
@@ -160,7 +161,12 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               </Button>
             ) : null}
             <Button
-              colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
+              borderWidth={1}
+              borderColor={isExistsBestAnswer ? 'green.300' : 'gray.300'}
+              color={isExistsBestAnswer ? 'green.300' : 'gray'}
+              bg="white"
+              borderRadius="2xl"
+              leftIcon={isExistsBestAnswer ? <RiAwardFill /> : <RiAwardLine />}
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
               {bestAnswerButtonName}
             </Button>
