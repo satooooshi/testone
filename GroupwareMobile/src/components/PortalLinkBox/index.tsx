@@ -238,7 +238,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'mail_magazine':
         return 'メルマガ';
       case 'interview':
-        return '全社インタビュー';
+        return '全社員インタビュー';
       case 'knowledge':
         return 'ナレッジ';
       case 'qa':

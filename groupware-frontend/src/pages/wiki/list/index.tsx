@@ -324,7 +324,7 @@ const QAQuestionList = () => {
         : type === WikiType.MAIL_MAGAZINE
         ? 'メルマガ'
         : type === WikiType.INTERVIEW
-        ? '全社インタビュー'
+        ? '全社員インタビュー'
         : 'All',
     tabs,
     rightButtonName: 'Wikiを作成',
