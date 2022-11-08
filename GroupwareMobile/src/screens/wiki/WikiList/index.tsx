@@ -38,7 +38,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       onPress: () => setType(WikiType.MAIL_MAGAZINE),
     },
     {
-      name: '全社インタビュー',
+      name: '全社員インタビュー',
       onPress: () => setType(WikiType.INTERVIEW),
     },
     {

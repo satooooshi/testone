@@ -377,7 +377,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: '全社インタビュー',
+          name: '全社員インタビュー',
           onClick: () => {
             {
               if (queryRefresh)

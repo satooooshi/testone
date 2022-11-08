@@ -241,7 +241,7 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.MAIL_MAGAZINE:
       return 'メルマガ';
     case PortalLinkType.INTERVIEW:
-      return '全社インタビュー';
+      return '全社員インタビュー';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:
@@ -285,7 +285,7 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.MAIL_MAGAZINE:
       return `会社から全社員に向けて、イベントのお知らせ事項のほか、部活動の告知、本社メンバーから伝えたいことなどラフなコンテンツをお届けしています。毎週水曜日に更新しますので、必ず確認してください！！`;
     case PortalLinkType.INTERVIEW:
-      return `全社インタビュー概要`;
+      return `変革PJで実施中の「全社員インタビュー」の公開スペースです。今まで接点のなかった社員同士の新たな交流のきっかけとなれば幸いです。`;
     case PortalLinkType.KNOWLEDGE:
       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
     case PortalLinkType.QA:
