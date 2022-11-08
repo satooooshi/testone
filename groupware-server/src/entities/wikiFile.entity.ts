@@ -14,10 +14,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { EventSchedule } from './event.entity';
+import { Wiki } from './wiki.entity';
 
-@Entity({ name: 'event_files' })
-export class EventFile {
+@Entity({ name: 'wiki_files' })
+export class WikiFile {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -39,12 +39,12 @@ export class EventFile {
   })
   name: string;
 
-  @ManyToOne(() => EventSchedule, (eventSchedule) => eventSchedule.files, {
+  @ManyToOne(() => Wiki, (wiki) => wiki.files, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'event_id' })
-  eventSchedule: EventSchedule;
+  @JoinColumn({ name: 'wiki_id' })
+  wiki: Wiki;
 
   @CreateDateColumn({
     type: 'datetime',
@@ -69,6 +69,5 @@ export class EventFile {
   @AfterUpdate()
   async changeToSignedURL?() {
     this.url = genStorageURL(this.url);
-    // this.url = await genSignedURL(this.url);
   }
 }

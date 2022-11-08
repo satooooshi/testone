@@ -19,6 +19,7 @@ import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -42,6 +43,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'green';
       case WikiType.MAIL_MAGAZINE:
         return 'blue';
+      case WikiType.INTERVIEW:
+        return 'red';
     }
   }, [wiki.type]);
 
@@ -86,6 +89,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         bottom={0}
         href={`/wiki/detail/${wiki.id}`}
       />
+
       <Box
         px="16px"
         display="flex"
@@ -93,31 +97,37 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         alignItems="center"
         mb="8px"
         justifyContent="space-bewtween">
-        <Box w="90%" display="flex" alignItems="center">
+        <Box display={'flex'} flexDir={'column'} width={'100%'}>
           {wiki.type !== WikiType.RULES && wikiState.writer ? (
-            <Link
-              href={`/account/${wikiState.writer.id}`}
-              passHref
-              _hover={{ textDecoration: 'none' }}>
-              <UserAvatar
-                user={wikiState.writer}
-                w="40px"
-                h="40px"
-                rounded="full"
-                mr="8px"
-              />
-            </Link>
+            <Box display={'flex'} w={'50%'} mb={1} alignItems={'center'}>
+              <Link
+                href={`/account/${wikiState.writer.id}`}
+                passHref
+                _hover={{ textDecoration: 'none' }}>
+                <UserAvatar
+                  user={wikiState.writer}
+                  w="40px"
+                  h="40px"
+                  rounded="full"
+                  mr="8px"
+                />
+              </Link>
+              <Text>{userNameFactory(wikiState.writer)}</Text>
+            </Box>
           ) : null}
-          <Text
-            color={darkFontColor}
-            fontSize={isSmallerThan768 ? '16px' : '20px'}
-            fontWeight={600}
-            display="block"
-            w="100%"
-            isTruncated
-            overflow="hidden">
-            {wikiState.title}
-          </Text>
+
+          <Box w="80%" display="flex" alignItems="center">
+            <Text
+              color={darkFontColor}
+              fontSize={isSmallerThan768 ? '16px' : '20px'}
+              fontWeight={600}
+              display="block"
+              w="100%"
+              isTruncated
+              overflow="hidden">
+              {wikiState.title}
+            </Text>
+          </Box>
         </Box>
       </Box>
       <Box
