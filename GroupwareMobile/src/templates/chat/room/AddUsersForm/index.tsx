@@ -53,9 +53,7 @@ const AddUsersForm: React.FC<RoomFormProps> = ({
       users={filteredUsers?.filter(u => u.id !== myProfile?.id) || []}
       onCloseModal={() => closeUserModal()}
       selectedUserRole={selectedUserRole}
-      defaultSelectedUsers={
-        room.members?.filter(u => u.id !== myProfile?.id) || []
-      }
+      defaultSelectedUsers={room.members || []}
       onCompleteModal={selectedUsers =>
         updateGroup({...room, members: selectedUsers})
       }
