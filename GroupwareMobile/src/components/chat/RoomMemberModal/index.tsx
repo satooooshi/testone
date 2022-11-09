@@ -22,6 +22,7 @@ import {User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import UserAvatar from '../../common/UserAvatar';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 type ModalContainerProps = Omit<ModalProps, 'children'>;
 
@@ -58,6 +59,7 @@ const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
     alreadySelectedUserRole,
     modalUsers,
   );
+  const {user: mySelf} = useAuthenticate();
 
   const onChangeHandle = (t: string) => {
     const words = t
@@ -168,7 +170,11 @@ const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
       <Div>
         <FlatList
           horizontal
-          data={selectedUsersInModal}
+          data={
+            isOwnerEdit
+              ? selectedUsersInModal
+              : selectedUsersInModal?.filter(u => u.id !== mySelf?.id)
+          }
           renderItem={({item}) => (
             <Div mr={'md'}>
               {isChatGroupOwner !== false && (
@@ -231,7 +237,10 @@ const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
         </Dropdown.Option>
       </Dropdown>
       <ScrollDiv contentContainerStyle={{width: '100%'}}>
-        {filteredUsers?.map(u => (
+        {(isOwnerEdit
+          ? filteredUsers
+          : filteredUsers?.filter(u => u.id !== mySelf?.id)
+        )?.map(u => (
           <TouchableOpacity key={u.id} onPress={() => handleToggleUser(u)}>
             <Div
               w={windowWidth}
