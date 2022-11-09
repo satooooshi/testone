@@ -125,6 +125,7 @@ const Chat: React.FC = () => {
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     Number(room.id),
     {
+      enabled: false,
       onError: () => {
         navigation.navigate('ChatStack', {
           screen: 'RoomList',
@@ -838,6 +839,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (isFocused) {
+      refetchRoomDetail();
       setIsTabBarVisible(false);
     } else {
       setIsTabBarVisible(true);
