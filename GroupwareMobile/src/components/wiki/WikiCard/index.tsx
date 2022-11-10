@@ -79,30 +79,21 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, goBackFromDetail}) => {
         p={10}
         mb={10}
         position="relative">
-        <Div
-          w="100%"
-          pl={5}
-          alignItems="center"
-          flexDir="row"
-          mb={
-            wiki.type === WikiType.BOARD || wiki.tags?.length ? 10 : undefined
-          }>
-          {wiki.type === WikiType.BOARD ? (
-            <Tag
-              fontSize={'md'}
-              h={24}
-              py={0}
-              bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
-              color="white"
-              ml={4}>
-              {wikiTypeNameFactory(
-                wiki.type,
-                wiki.ruleCategory,
-                true,
-                wiki?.boardCategory,
-              )}
-            </Tag>
-          ) : null}
+        <Div w="100%" pl={5} alignItems="center" flexDir="row" mb={10}>
+          <Tag
+            fontSize={'md'}
+            h={24}
+            py={0}
+            bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
+            color="white"
+            ml={4}>
+            {wikiTypeNameFactory(
+              wiki.type,
+              wiki.ruleCategory,
+              true,
+              wiki?.boardCategory,
+            )}
+          </Tag>
           {wiki.tags && wiki.tags.length ? (
             <Div>
               <FlatList
