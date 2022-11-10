@@ -63,7 +63,7 @@ import { isCreatableEvent } from 'src/utils/factory/isCreatableEvent';
 import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
 import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 
-type ExcludeFilesAndVideos = Pick<
+type ExcludeFilesAndVideosAndType = Pick<
   EventSchedule,
   | 'title'
   | 'description'
@@ -71,13 +71,13 @@ type ExcludeFilesAndVideos = Pick<
   | 'endAt'
   | 'tags'
   | 'imageURL'
-  | 'type'
   | 'hostUsers'
   | 'chatNeeded'
 >;
 
-export type CreateEventRequest = ExcludeFilesAndVideos & {
+export type CreateEventRequest = ExcludeFilesAndVideosAndType & {
   id?: number;
+  type?: EventType;
   videos: Partial<EventVideo>[];
   files: Partial<EventFile>[];
 };
@@ -114,7 +114,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       description: '',
       startAt: setDateTime(1, 19, 0),
       endAt: setDateTime(1, 21, 0),
-      type: EventType.CLUB,
+      type: undefined,
       imageURL: '',
       chatNeeded: false,
       hostUsers: [],
@@ -338,50 +338,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   );
 
   const isCreatableOther = isCreatableEvent(EventType.OTHER, user?.role);
-
-  useEffect(() => {
-    const getInitialEventType = () => {
-      if (isCreatableImpressiveUniversity) {
-        return EventType.IMPRESSIVE_UNIVERSITY;
-      }
-      if (isCreatableBolday) {
-        return EventType.BOLDAY;
-      }
-      if (isCreatableStudyMeeting) {
-        return EventType.STUDY_MEETING;
-      }
-      if (isCreatableCoach) {
-        return EventType.COACH;
-      }
-      if (isCreatableClub) {
-        return EventType.CLUB;
-      }
-      if (isCreatableSubmissionEtc) {
-        return EventType.SUBMISSION_ETC;
-      }
-      if (isCreatableOther) {
-        return EventType.OTHER;
-      }
-      return undefined;
-    };
-    const initialEventType = getInitialEventType();
-    if (!event && initialEventType) {
-      setNewEvent((e) => ({
-        ...e,
-        type: initialEventType,
-      }));
-    }
-  }, [
-    event,
-    isCreatableBolday,
-    isCreatableClub,
-    isCreatableCoach,
-    isCreatableImpressiveUniversity,
-    isCreatableStudyMeeting,
-    isCreatableSubmissionEtc,
-    isCreatableOther,
-    setNewEvent,
-  ]);
 
   const pushYoutube = () => {
     const youtubeRegex =
@@ -665,6 +621,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Text>
               <Select
                 onChange={(e) => {
+                  if (!e.target.value) {
+                    setNewEvent((e) => ({ ...e, type: undefined }));
+                    return;
+                  }
                   const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
                     ...prev,
@@ -676,6 +636,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
+                <option label={'指定なし'}></option>
                 {isCreatableImpressiveUniversity && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
                     感動大学

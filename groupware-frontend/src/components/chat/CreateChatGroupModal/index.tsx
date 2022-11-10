@@ -229,6 +229,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               setNewGroup((g) => ({ ...g, members: selected }));
               setMembersModal(false);
             }}
+            category="メンバー"
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
             <FormLabel fontWeight="bold">ルーム画像</FormLabel>
@@ -301,11 +302,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 <Box mr={'4px'} mb={'8px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    <IconButton
-                      onClick={() => removeFromSelectedMember(u as User)}
-                      aria-label="削除"
-                      icon={<MdCancel size={18} />}
-                    />
                   </ButtonGroup>
                 </Box>
               ))}

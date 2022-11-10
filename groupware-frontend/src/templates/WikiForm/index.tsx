@@ -16,6 +16,7 @@ import {
   Tag,
   TextFormat,
   WikiType,
+  WikiFile,
   RuleCategory,
   BoardCategory,
 } from 'src/types';
@@ -29,6 +30,7 @@ import {
   FormLabel,
   Text,
   Box,
+  Spinner,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { Editor, EditorState } from 'draft-js';
@@ -37,7 +39,10 @@ import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
-import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import {
+  uploadStorage,
+  useAPIUploadStorage,
+} from '@/hooks/api/storage/useAPIUploadStorage';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
@@ -45,6 +50,11 @@ import { stateFromHTML } from 'draft-js-import-html';
 import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import { isCreatableWiki } from 'src/utils/factory/isCreatableWiki';
+import { MdCancel } from 'react-icons/md';
+import { useDropzone } from 'react-dropzone';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import WikiFormStyle from '@/styles/components/WikiForm.module.scss';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -68,6 +78,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const { type } = router.query as { type: WikiType };
   const { user } = useAuthenticate();
   const [tagModal, setTagModal] = useState(false);
+  const [isLoadingRF, setIsloadingRF] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
@@ -76,8 +87,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
+    files: [],
     boardCategory:
       type === WikiType.BOARD || !type
         ? BoardCategory.QA
@@ -188,7 +200,36 @@ const WikiForm: React.FC<WikiFormProps> = ({
     }
   };
 
+  const {
+    getRootProps: getRelatedFileRootProps,
+    getInputProps: getRelatedFileInputProps,
+  } = useDropzone({
+    onDrop: (files: File[]) => {
+      setIsloadingRF(true);
+      uploadFiles(files, {
+        onSuccess: (urls: string[]) => {
+          const newFiles: Partial<WikiFile>[] = urls.map((u, i) => ({
+            url: u,
+            name: files[i].name,
+          }));
+          setNewQuestion((e) => ({
+            ...e,
+            files: [...(e.files || []), ...newFiles],
+          }));
+        },
+        onSettled: () => {
+          setIsloadingRF(false);
+        },
+      });
+    },
+  });
+
+  const { mutate: uploadFiles, isLoading } = useAPIUploadStorage();
+
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    if (!e.target.value) {
+      return setNewQuestion((e) => ({ ...e, type: undefined }));
+    }
     if (
       e.target.value === RuleCategory.RULES ||
       e.target.value === RuleCategory.ABC ||
@@ -311,17 +352,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
               flexDir={isSmallerThan768 ? 'column' : undefined}
               mb={isSmallerThan768 ? '16px' : undefined}>
               <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
+              {errors.type && touched.type ? (
+                <Text color="tomato">{errors.type}</Text>
+              ) : null}
               <Select
                 colorScheme="teal"
                 bg="white"
                 onChange={onTypeSelectionChange}
-                defaultValue={
-                  type === WikiType.RULES
-                    ? RuleCategory.RULES
-                    : type === WikiType.ALL_POSTAL
-                    ? type
-                    : BoardCategory.QA
-                }>
+                defaultValue={newQuestion.type}>
+                <option label={'指定なし'}></option>
                 {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
@@ -370,6 +409,22 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 }) ? (
                   <option value={WikiType.ALL_POSTAL}>
                     {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.MAIL_MAGAZINE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.MAIL_MAGAZINE}>
+                    {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.MAIL_MAGAZINE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.INTERVIEW}>
+                    {wikiTypeNameFactory(WikiType.INTERVIEW)}
                   </option>
                 ) : null}
 
@@ -566,6 +621,67 @@ const WikiForm: React.FC<WikiFormProps> = ({
             </Box>
           </Box>
         </Box>
+        <Text mb="16px">添付ファイル</Text>
+        <Box display="flex" flexDir="row" alignItems="center" mb="16px">
+          <div
+            {...getRelatedFileRootProps({
+              className: WikiFormStyle.image_dropzone,
+            })}>
+            {isLoadingRF ? (
+              <Spinner />
+            ) : (
+              <>
+                <input {...getRelatedFileInputProps()} />
+                <Text>クリックかドラッグアンドドロップで投稿</Text>
+              </>
+            )}
+          </div>
+        </Box>
+        {newQuestion.files?.length ? (
+          <Box mb="16px">
+            {newQuestion.files.map((f) => (
+              <Box
+                key={f.url}
+                borderColor={'blue.500'}
+                rounded="md"
+                borderWidth={1}
+                display="flex"
+                flexDir="row"
+                justifyContent="space-between"
+                alignItems="center"
+                h="40px"
+                w="350px"
+                mb="8px"
+                px="8px">
+                <Text
+                  color="blue.600"
+                  alignSelf="center"
+                  h="40px"
+                  verticalAlign="middle"
+                  textAlign="left"
+                  display="flex"
+                  alignItems="center"
+                  whiteSpace="nowrap"
+                  overflowX="auto"
+                  w="95%"
+                  css={hideScrollbarCss}>
+                  {f.name}
+                </Text>
+                <MdCancel
+                  className={WikiFormStyle.url_delete_button}
+                  onClick={() =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      files: newQuestion.files?.filter(
+                        (file) => file.url !== f.url,
+                      ),
+                    })
+                  }
+                />
+              </Box>
+            ))}
+          </Box>
+        ) : null}
         {newQuestion.tags?.length ? (
           <Box
             display="flex"

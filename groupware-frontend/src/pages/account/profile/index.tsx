@@ -392,7 +392,7 @@ const Profile = () => {
       </Box>
 
       <Box className={profileStyles.form_wrapper}>
-        <Stack direction="row" w="100%">
+        {/* <Stack direction="row" w="100%">
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'} fontSize="14px">
               姓
@@ -452,7 +452,7 @@ const Profile = () => {
               onChange={handleChange}
             />
           </FormControl>
-        </Stack>
+        </Stack> */}
         <FormControl className={profileStyles.input_wrapper}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             メールアドレス
@@ -525,7 +525,7 @@ const Profile = () => {
             </Radio>
           </Stack>
         </FormControl>
-        <FormControl mb={4}>
+        {/* <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             所属支社
           </FormLabel>
@@ -539,7 +539,7 @@ const Profile = () => {
             <option value={BranchType.TOKYO}>東京</option>
             <option value={BranchType.OSAKA}>大阪</option>
           </Select>
-        </FormControl>
+        </FormControl> */}
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             自己紹介
@@ -559,6 +559,7 @@ const Profile = () => {
           <FormLabel fontWeight={'bold'} fontSize="14px">
             技術の紹介
           </FormLabel>
+
           <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={userInfo?.tags || []}
