@@ -53,7 +53,6 @@ export const useChatSocket = (
   const connect = () => {
     if (socket.disconnected) {
       socket.connect();
-      console.log('socket connected.');
     }
   };
 

@@ -28,6 +28,7 @@ type SearchFormProps = {
   searchTarget: SearchTarget;
   defaultValue?: SearchFormValue;
   isVisible: boolean;
+  onClear: () => void;
   onCloseModal: () => void;
   onSubmit: (value: SearchFormValue) => void;
   defaultSelectedTagIds?: number[];
@@ -37,6 +38,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   searchTarget,
   defaultValue,
   isVisible,
+  onClear,
   onCloseModal,
   onSubmit,
   defaultSelectedTagIds = [],
@@ -67,6 +69,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
     }
   }, [defaultValue, setSelectedTags]);
 
+  const handleOnClear = () => {
+    setWord('');
+    setSelectedTags([]);
+    onClear();
+  };
   useFocusEffect(
     useCallback(() => {
       refetch();
@@ -75,12 +82,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   );
 
   return (
-    <Overlay
-      px={16}
-      py={32}
-      h={240 + selectedTags.length * 8}
-      style={{maxHeight: '80%'}}
-      visible={isVisible}>
+    <Overlay px={16} py={32} style={{maxHeight: '80%'}} visible={isVisible}>
       <Button
         bg="gray400"
         h={35}
@@ -128,7 +130,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <Tag
               key={t.id}
               fontSize={'lg'}
-              h={28}
               py={0}
               bg={tagColorFactory((t as AllTag).type)}
               color="white"
@@ -141,10 +142,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Button
           w={'100%'}
           bg="pink600"
+          mb={8}
           onPress={() =>
             onSubmit({word, selectedTags: selectedTags as AllTag[]})
           }>
           検索
+        </Button>
+        <Button w={'100%'} bg="gray" onPress={handleOnClear}>
+          クリア
         </Button>
       </Div>
     </Overlay>

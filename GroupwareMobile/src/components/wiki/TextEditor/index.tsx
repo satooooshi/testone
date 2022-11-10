@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -10,6 +10,7 @@ type TextEditorProps = {
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
   initialBody?: string;
   onChange: (text: string) => void;
+  quillRef: React.MutableRefObject<QuillEditor | null>;
 };
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -17,11 +18,10 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onUploadImage,
   initialBody,
   onChange,
+  quillRef,
 }) => {
   const [height, setHeight] = useState<number>(200);
   const markdownit = new MarkdownIt();
-  const quillRef = useRef<QuillEditor | null>(null);
-
   const customHandler = (name: string) => {
     if (name === 'image') {
       onUploadImage(async imageURL => {

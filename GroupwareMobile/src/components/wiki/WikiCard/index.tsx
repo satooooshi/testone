@@ -21,10 +21,10 @@ import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
-  type?: WikiType | undefined;
+  goBackFromDetail?: (yes: boolean) => void;
 };
 
-const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
+const WikiCard: React.FC<WikiCardProps> = ({wiki, goBackFromDetail}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
   const routes = navigation.getState()?.routes;
@@ -61,13 +61,14 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
   return (
     <TouchableHighlight
       underlayColor="none"
-      onPress={() =>
+      onPress={() => {
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
-          params: {id: wiki.id, previousScreenName: routes[routes?.length - 1]},
+          params: {id: wiki.id},
           initial: false,
-        })
-      }>
+        });
+        goBackFromDetail && goBackFromDetail(true);
+      }}>
       <Div
         w="95%"
         bg="white"
@@ -84,11 +85,9 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           alignItems="center"
           flexDir="row"
           mb={
-            !type || type === WikiType.BOARD || wiki.tags?.length
-              ? 10
-              : undefined
+            wiki.type === WikiType.BOARD || wiki.tags?.length ? 10 : undefined
           }>
-          {!type || type === WikiType.BOARD ? (
+          {wiki.type === WikiType.BOARD ? (
             <Tag
               fontSize={'md'}
               h={24}

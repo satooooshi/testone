@@ -45,6 +45,10 @@ export const isCreatableWiki = (context: Context): boolean => {
       return false;
     case WikiType.ALL_POSTAL:
       return userRole === UserRole.ADMIN;
+    case WikiType.MAIL_MAGAZINE:
+      return userRole === UserRole.ADMIN;
+    case WikiType.INTERVIEW:
+      return userRole === UserRole.ADMIN;
     case WikiType.RULES:
       return userRole === UserRole.ADMIN;
   }
