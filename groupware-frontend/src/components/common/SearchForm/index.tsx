@@ -199,16 +199,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
                 onClick={handleModalSearchButton}>
                 検索
               </Button>
-              <Button
-                colorScheme="blackAlpha"
-                w="70px"
-                h="80%"
-                size="sm"
-                ml="auto"
-                mr={2}
-                onClick={handleModalResetButton}>
-                クリア
-              </Button>
             </InputRightElement>
           </InputGroup>
           <Box
@@ -240,6 +230,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
                   {selectedTags.length}
                 </Badge>
               ) : null}
+            </Button>
+            <Button
+              colorScheme="blackAlpha"
+              ml="16px"
+              onClick={handleModalResetButton}>
+              クリア
             </Button>
             {selectItems && (
               <Select
