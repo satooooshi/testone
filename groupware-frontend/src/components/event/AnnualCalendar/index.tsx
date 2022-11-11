@@ -121,9 +121,9 @@ const AnnualCalendar: React.FC = () => {
               justifyContent="flex-start"
               mb="72px">
               <Box
+                w="90%"
                 justifyContent="center"
                 alignItems="center"
-                maxW={isSmallerThan768 ? '99vw' : undefined}
                 overflowX="auto"
                 css={hideScrollbarCss}
                 alignSelf="center">
