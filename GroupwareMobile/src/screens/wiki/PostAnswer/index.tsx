@@ -20,11 +20,13 @@ import RenderHtml from 'react-native-render-html';
 import MarkdownIt from 'markdown-it';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import QuillEditor from 'react-native-cn-quill';
 
 const PostAnswer: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostAnswerRouteProps>();
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
   const wikiId = route.params.id;
   const {data: wikiInfo} = useAPIGetWikiDetail(wikiId);
   const mdParser = new MarkdownIt({breaks: true});
@@ -60,6 +62,7 @@ const PostAnswer: React.FC = () => {
     validationSchema: answerSchema,
     onSubmit: a => {
       saveAnswer(a);
+      quillRef.current?.blur();
     },
   });
 
@@ -129,6 +132,7 @@ const PostAnswer: React.FC = () => {
                 textFormat={wikiInfo.textFormat}
                 onUploadImage={handleUploadImage}
                 onChange={text => setNewAnswer(a => ({...a, body: text}))}
+                quillRef={quillRef}
               />
             </Div>
           </KeyboardAwareScrollView>

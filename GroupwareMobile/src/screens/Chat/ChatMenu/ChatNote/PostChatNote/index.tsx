@@ -14,8 +14,6 @@ import {socket} from '../../../../../utils/socket';
 const PostChatNote: React.FC = () => {
   const {mutate: createChatNote} = useAPICreateChatNote({
     onSuccess: result => {
-      console.log('result--------', result.systemMessage);
-
       socket.emit('message', {
         type: 'send',
         chatMessage: result.systemMessage,

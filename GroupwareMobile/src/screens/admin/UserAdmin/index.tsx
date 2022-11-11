@@ -107,6 +107,10 @@ const UserAdmin: React.FC = () => {
         searchTarget="user"
         defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}
+        onClear={() => {
+          queryRefresh({word: ''}, []);
+          setVisibleSearchFormModal(false);
+        }}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
           queryRefresh({word: values.word}, values.selectedTags);

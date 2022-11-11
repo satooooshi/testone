@@ -23,6 +23,7 @@ export const deleteReactionURL = (reactionId: string) =>
   `/${chatURL}/v2/reaction/${reactionId}`;
 export const getReactionsURL = `${chatURL}/get-reactions`;
 export const leaveChatRoomURL = `/${chatURL}/leave-room`;
+export const deleteChatRoomURL = `/${chatURL}/delete-room`;
 export const noteURL = (roomId: string) => `${chatURL}/v2/room/${roomId}/note`;
 export const albumURL = (roomId: string) =>
   `${chatURL}/v2/room/${roomId}/album`;

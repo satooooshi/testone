@@ -35,7 +35,7 @@ import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
 } from '../../../utils/dropdown/helper';
-import {profileSchema} from '../../../utils/validation/schema';
+import {adminEditUserProfileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -95,7 +95,7 @@ const EditedProfile: React.FC = () => {
     useFormik<Partial<User>>({
       initialValues: profile || initialValues,
       enableReinitialize: true,
-      validationSchema: profileSchema,
+      validationSchema: adminEditUserProfileSchema,
       onSubmit: v => updateUser(v),
     });
   const checkValidateErrors = async () => {

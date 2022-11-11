@@ -289,7 +289,7 @@ const Profile: React.FC = () => {
                 </Div>
               </Div>
             </Div>
-            <Div mb="xl">
+            {/* <Div mb="xl">
               <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 姓
               </Text>
@@ -374,7 +374,7 @@ const Profile: React.FC = () => {
                 }>
                 {branchTypeNameFactory(BranchType.OSAKA)}
               </Dropdown.Option>
-            </Dropdown>
+            </Dropdown> */}
             <Div mb="xl">
               <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 自己紹介
