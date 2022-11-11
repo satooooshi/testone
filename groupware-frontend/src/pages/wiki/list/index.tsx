@@ -28,6 +28,7 @@ import {
   wikiTypeNameFactory,
 } from 'src/utils/wiki/wikiTypeNameFactory';
 import TabList from '@/components/common/TabList';
+import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -58,13 +59,19 @@ const QAQuestionList = () => {
   };
 
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
-    const selectedTagIDs = selectedTags.map((t) => t.id.toString());
-    const tagQuery = selectedTagIDs.join('+');
+    let tagQuery;
+    if (query.tag === '') {
+      tagQuery = '';
+    } else {
+      const selectedTagIDs = selectedTags.map((t) => t.id.toString());
+      tagQuery = selectedTagIDs.join('+');
+    }
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
       tag: tagQuery,
     });
+
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
@@ -83,7 +90,11 @@ const QAQuestionList = () => {
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
-        : '全て',
+        : type === WikiType.MAIL_MAGAZINE
+        ? 'メルマガ'
+        : type === WikiType.INTERVIEW
+        ? '全社員インタビュー'
+        : 'All',
     tabs,
   };
 
@@ -98,6 +109,12 @@ const QAQuestionList = () => {
   }, [tag, tags]);
 
   const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
+
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '', tag: '' });
+  };
 
   return (
     <LayoutWithTab
@@ -133,7 +150,8 @@ const QAQuestionList = () => {
                 })
               : null
           }
-          onClear={() => setSelectedTags([])}
+          onClearTag={() => setSelectedTags([])}
+          onClear={() => resetSearch()}
           // value={searchWord}
           // onChange={(e) => setSearchWord(e.currentTarget.value)}
           // onClickButton={() =>

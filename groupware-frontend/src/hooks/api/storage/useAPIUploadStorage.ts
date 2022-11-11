@@ -43,18 +43,22 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     return file;
   };
 
-  const fileNames = files.map((f) => f.name);
+  const fileNames = files.map((f) => f.name.normalize('NFC'));
   try {
     const res = await axiosInstance.post(uploadStorageURL, fileNames);
     const signedURLMapping: { [fileName: string]: string } = res.data;
+
     const fileURLs = await Promise.all(
       files.map(async (f) => {
         const formData = new FormData();
         const resizeImageBlob = await resizeImage(f);
         const fileChangedToBlob = new File([resizeImageBlob], `${f.name}`);
         formData.append('file', fileChangedToBlob);
-        await axios.put(signedURLMapping[f.name], fileChangedToBlob);
-        return signedURLMapping[f.name];
+        await axios.put(
+          signedURLMapping[f.name.normalize('NFC')],
+          fileChangedToBlob,
+        );
+        return signedURLMapping[f.name.normalize('NFC')];
       }),
     );
     const urlResponse = await axiosInstance.post<string[]>(

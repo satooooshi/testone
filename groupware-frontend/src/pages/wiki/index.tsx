@@ -26,6 +26,8 @@ const Wiki = () => {
         <PortalLinkBox href={PortalLinkType.RULES} />
         <PortalLinkBox href={PortalLinkType.ALL_POSTAL} />
         <PortalLinkBox href={PortalLinkType.BOARD} />
+        <PortalLinkBox href={PortalLinkType.MAIL_MAGAZINE} />
+        <PortalLinkBox href={PortalLinkType.INTERVIEW} />
       </SimpleGrid>
     </LayoutWithTab>
   );

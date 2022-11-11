@@ -2,7 +2,12 @@ import Link from 'next/link';
 import React, { CSSProperties } from 'react';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { FaSchool } from 'react-icons/fa';
-import { GiBookCover, GiTeacher, GiPartyPopper } from 'react-icons/gi';
+import {
+  GiBookCover,
+  GiTeacher,
+  GiPartyPopper,
+  GiMicrophone,
+} from 'react-icons/gi';
 import { BsChatDotsFill } from 'react-icons/bs';
 import { FaUserCog } from 'react-icons/fa';
 import { FcSportsMode } from 'react-icons/fc';
@@ -25,6 +30,7 @@ import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { FiMessageSquare } from 'react-icons/fi';
+import { BiPaperPlane } from 'react-icons/bi';
 
 export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
@@ -36,6 +42,8 @@ export enum PortalLinkType {
   WIKI = '/wiki',
   RULES = '/wiki/list?type=rule&rule_category=philosophy',
   ALL_POSTAL = '/wiki/list?type=all-postal',
+  MAIL_MAGAZINE = '/wiki/list?type=mail_magazine',
+  INTERVIEW = '/wiki/list?type=interview',
   KNOWLEDGE = '/wiki/list?type=knowledge',
   QA = `/wiki/list?type=qa`,
   BOARD = `/wiki/list?type=board`,
@@ -134,6 +142,20 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
             portalLinkBoxStyles.icon,
             portalLinkBoxStyles.all_postal,
           )}
+        />
+      );
+    case PortalLinkType.MAIL_MAGAZINE:
+      return (
+        <BiPaperPlane
+          className={clsx(portalLinkBoxStyles.icon)}
+          color={'blue'}
+        />
+      );
+    case PortalLinkType.INTERVIEW:
+      return (
+        <GiMicrophone
+          className={clsx(portalLinkBoxStyles.icon)}
+          color={'red'}
         />
       );
     case PortalLinkType.RULES:
@@ -240,6 +262,10 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '社内規則';
     case PortalLinkType.ALL_POSTAL:
       return 'オール便';
+    case PortalLinkType.MAIL_MAGAZINE:
+      return 'メルマガ';
+    case PortalLinkType.INTERVIEW:
+      return '全社員インタビュー';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:
@@ -288,6 +314,10 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.ALL_POSTAL:
       return `会社から全社員に向けての重要連絡事項です。今後の提出期限や重要なお知らせを記載しています。
 毎週金曜日に更新しますので必ず確認してください。`;
+    case PortalLinkType.MAIL_MAGAZINE:
+      return `会社から全社員に向けて、イベントのお知らせ事項のほか、部活動の告知、本社メンバーから伝えたいことなどラフなコンテンツをお届けしています。毎週水曜日に更新しますので、必ず確認してください！！`;
+    case PortalLinkType.INTERVIEW:
+      return `変革PJで実施中の「全社員インタビュー」の公開スペースです。今まで接点のなかった社員同士の新たな交流のきっかけとなれば幸いです。`;
     case PortalLinkType.KNOWLEDGE:
       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
     case PortalLinkType.QA:

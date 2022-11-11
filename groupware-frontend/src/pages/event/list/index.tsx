@@ -2,6 +2,7 @@
 import { Tab } from 'src/types/header/tab/types';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import eventListStyles from '@/styles/layouts/EventList.module.scss';
+import { eventPropGetter } from 'src/utils/eventPropGetter';
 import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
@@ -342,26 +343,6 @@ const EventList = () => {
     }
   };
 
-  const eventPropGetter = (event: any): any => {
-    const type = event.type;
-    switch (type) {
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return { style: { backgroundColor: '#3182ce' } };
-      case EventType.STUDY_MEETING:
-        return { style: { backgroundColor: '#38a169' } };
-      case EventType.BOLDAY:
-        return { style: { backgroundColor: '#f6ad55' } };
-      case EventType.COACH:
-        return { style: { backgroundColor: '#90cdf4', color: '#65657d' } };
-      case EventType.CLUB:
-        return { style: { backgroundColor: '#f56565' } };
-      case EventType.SUBMISSION_ETC:
-        return { style: { backgroundColor: '#086f83' } };
-      case EventType.OTHER:
-        return { style: { backgroundColor: '#a9a9a9' } };
-    }
-  };
-
   const memorizedEvent = useMemo<any[] | undefined>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
       if (ev) {
@@ -450,6 +431,85 @@ const EventList = () => {
       setSelectedTags(searchedTags);
     }
   }, [tag, tags]);
+
+  const topTabBehaviorList: TopTabBehavior[] = [
+    {
+      tabName: 'Myカレンダー',
+      onClick: () => {
+        queryRefresh({
+          page: '1',
+          personal: 'true',
+          from: from || '',
+          to: to || '',
+        });
+      },
+      isActiveTab: !!(isCalendar && personal),
+    },
+    {
+      tabName: '全体カレンダー',
+      onClick: () => {
+        queryRefresh({
+          personal: '',
+          page: '1',
+          from: from || '',
+          to: to || '',
+        });
+      },
+      isActiveTab: !!(isCalendar && !personal),
+    },
+    {
+      tabName: '今後のイベント',
+      onClick: () => {
+        queryRefresh({
+          page: '1',
+          status: 'future',
+          from: undefined,
+          to: undefined,
+        });
+      },
+      isActiveTab: !isCalendar && status === 'future',
+    },
+    {
+      tabName: '過去のイベント',
+      onClick: () => {
+        queryRefresh({
+          page: '1',
+          status: 'past',
+          from: undefined,
+          to: undefined,
+        });
+      },
+      isActiveTab: !isCalendar && status === 'past',
+    },
+    {
+      tabName: '進行中のイベント',
+      onClick: () => {
+        queryRefresh({
+          page: '1',
+          status: 'current',
+          from: undefined,
+          to: undefined,
+        });
+      },
+      isActiveTab: !isCalendar && status === 'current',
+    },
+  ];
+
+  const resetSearch = () => {
+    setSearchWord('');
+    setSelectedTags([]);
+    router.push(
+      generateEventSearchQueryString({
+        ...router.query,
+        word: '',
+        tag: '',
+      }),
+      undefined,
+      {
+        shallow: true,
+      },
+    );
+  };
 
   return (
     <LayoutWithTab
@@ -560,7 +620,8 @@ const EventList = () => {
                   to: undefined,
                 });
               }}
-              onClear={() => setSelectedTags([])}
+              onClear={() => resetSearch()}
+              onClearTag={() => setSelectedTags([])}
               // value={searchWord || ''}
               // onChange={(e) => setSearchWord(e.currentTarget.value)}
               // onClickButton={() =>

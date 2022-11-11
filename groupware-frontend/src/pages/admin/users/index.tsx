@@ -108,6 +108,12 @@ const UserAdmin: React.FC = () => {
     router.push(`/admin/users${queryParam}`, undefined, { shallow: true });
   };
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '' });
+  };
+
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
       router.back();
@@ -142,7 +148,8 @@ const UserAdmin: React.FC = () => {
         <title>ボールド | ユーザー管理</title>
       </Head>
       <SearchForm
-        onClear={() => setSelectedTags([])}
+        onClearTag={() => setSelectedTags([])}
+        onClear={() => resetSearch()}
         onClickButton={(w) => queryRefresh({ page: '1', word: w })}
         tags={tags || []}
         selectedTags={selectedTags}
@@ -178,6 +185,7 @@ const UserAdmin: React.FC = () => {
           作成
         </Button>
       </ChakraLink>
+
       <div className={userAdminStyles.table_wrapper}>
         <table className={userAdminStyles.table}>
           <tbody>

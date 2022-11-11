@@ -441,6 +441,34 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
+          name: 'メルマガ',
+          onClick: () => {
+            {
+              if (queryRefresh)
+                queryRefresh({
+                  page: '1',
+                  type: WikiType.MAIL_MAGAZINE,
+                  rule_category: undefined,
+                  board_category: undefined,
+                });
+            }
+          },
+        },
+        {
+          name: '全社員インタビュー',
+          onClick: () => {
+            {
+              if (queryRefresh)
+                queryRefresh({
+                  page: '1',
+                  type: WikiType.INTERVIEW,
+                  rule_category: undefined,
+                  board_category: undefined,
+                });
+            }
+          },
+        },
+        {
           name: '掲示板',
           onClick: () => {
             {
