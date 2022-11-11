@@ -351,6 +351,7 @@ const QuestionDetail = () => {
 
           {wiki.files && wiki.files.length ? (
             <Flex
+              mt={'40px'}
               mb={'40px'}
               ml="40px"
               rounded="md"
