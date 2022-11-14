@@ -84,7 +84,7 @@ const TravelForm = ({
   };
 
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       <Text fontSize={22} fontWeight="bold">{`申請#${
         index ? index + 1 : 1
       }`}</Text>
@@ -272,7 +272,7 @@ const TravelForm = ({
       (index === undefined ||
         (index !== undefined && !attendance?.travelCost?.[index + 1])) ? (
         <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
-          <Button colorScheme="blue" onClick={() => handleSubmit()}>
+          <Button colorScheme="brand" onClick={() => handleSubmit()}>
             {values.createdAt ? '更新する' : '保存する'}
           </Button>
         </Box>

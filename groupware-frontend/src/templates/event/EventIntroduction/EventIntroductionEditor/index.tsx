@@ -129,7 +129,7 @@ const EventIntroductionEditor = forwardRef<
             <div className={eventPRStyles.edit_button_wrapper}>
               <Button
                 width="40"
-                colorScheme="blue"
+                colorScheme="brand"
                 onClick={() => {
                   checkErrors();
                 }}>

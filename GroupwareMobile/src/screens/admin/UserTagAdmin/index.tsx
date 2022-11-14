@@ -5,13 +5,11 @@ import {ActivityIndicator} from 'react-native-paper';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
 import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {TagType, UserRole, UserTag} from '../../../types';
 
 const UserTagAdmin: React.FC = () => {
@@ -63,7 +61,6 @@ const UserTagAdmin: React.FC = () => {
   const modifiedTags: UserTag[] =
     tags?.map(t => ({...t, name: modifyStrToFlat(t.name)})) || [];
 
-  const tabs = useAdminHeaderTab();
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -106,13 +103,13 @@ const UserTagAdmin: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <HeaderWithTextButton
-        title={'タグ管理'}
-        tabs={tabs}
-        activeTabName={'タグ管理(ユーザー)'}
+        title={'タグ管理(ユーザー)'}
+        enableBackButton={true}
+        screenForBack={'Menu'}
       />
       <ScrollDiv
+        alignSelf="center"
         contentContainerStyle={{
-          ...tagAdminStyles.scrollView,
           width: windowWidth * 0.9,
         }}>
         {isAdmin ? (
@@ -121,14 +118,14 @@ const UserTagAdmin: React.FC = () => {
               tags={techTags || []}
               tagType={TagType.TECH}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
             <TagCollapse
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
               onPressSaveButton={handleCreate}
-              onLongPressTag={handleDelete}
+              onPressDeleteTag={handleDelete}
               mb={'lg'}
             />
           </>
@@ -137,14 +134,14 @@ const UserTagAdmin: React.FC = () => {
           tags={clubTags || []}
           tagType={TagType.CLUB}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         <TagCollapse
           tags={hobbyTags || []}
           tagType={TagType.HOBBY}
           onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
+          onPressDeleteTag={handleDelete}
           mb={'lg'}
         />
         {isAdmin ? (
@@ -152,7 +149,7 @@ const UserTagAdmin: React.FC = () => {
             tags={otherTags || []}
             tagType={TagType.OTHER}
             onPressSaveButton={handleCreate}
-            onLongPressTag={handleDelete}
+            onPressDeleteTag={handleDelete}
             mb={'lg'}
           />
         ) : null}

@@ -100,7 +100,7 @@ const AttendanceTableRow = ({
             targetData?.category !== AttendanceCategory.COMMON
               ? targetData?.verifiedAt
                 ? 'red'
-                : 'blue'
+                : 'brand'
               : 'black'
           }>
           {date.setLocale('ja').toFormat('d日(EEE)')}
@@ -135,14 +135,14 @@ const AttendanceTableRow = ({
             {targetData.travelCost.length ? (
               <Button
                 onClick={() => setSelectedDateForApplication(date)}
-                colorScheme="blue">
+                colorScheme="brand">
                 確認
               </Button>
             ) : null}
           </Td>
           <Td>
             {targetData.detail.length ? (
-              <Button colorScheme="blue" onClick={() => setDetailModal(true)}>
+              <Button colorScheme="brand" onClick={() => setDetailModal(true)}>
                 確認
               </Button>
             ) : null}
@@ -159,8 +159,8 @@ const AttendanceView = () => {
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
-    { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
+    { name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
+    { name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
 
   const { data: userInfo } = useAPIGetMiniProfileById(id);

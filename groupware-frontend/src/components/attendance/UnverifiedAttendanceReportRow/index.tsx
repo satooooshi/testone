@@ -47,13 +47,13 @@ const UnverifiedAttendanceReportRow: React.FC<UnverifiedAttendanceReportRowProps
         <Td>
           <Button
             fontSize={16}
-            colorScheme="blue"
+            colorScheme="brand"
             onClick={() => setDetailModal(true)}>
             詳細
           </Button>
         </Td>
         {/* <Box w={'10%'} justifyContent="center" alignItems="center">
-          <Text fontSize={13} color="blue" onPress={() => setDetailModal(true)}>
+          <Text fontSize={13} color="brand" onPress={() => setDetailModal(true)}>
           詳細
           </Text>
         </Box> */}

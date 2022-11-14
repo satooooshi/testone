@@ -203,7 +203,7 @@ const RoomList: React.FC = () => {
       <Div alignItems="center">
         <Input
           w={'90%'}
-          mb={20}
+          mb={5}
           placeholder="検索"
           onChangeText={e => {
             const filteredRooms = chatRooms.filter(r => {
@@ -225,7 +225,8 @@ const RoomList: React.FC = () => {
         {/* <Text>ルーム数{chatRooms.length}</Text> */}
         {chatRooms.length ? (
           <FlatList
-            style={{height: '80%'}}
+            ListHeaderComponent={<Div h={10} />}
+            ListFooterComponent={<Div h={130} />}
             refreshControl={
               <RefreshControl
                 refreshing={!isCompletedRefetchAllRooms}

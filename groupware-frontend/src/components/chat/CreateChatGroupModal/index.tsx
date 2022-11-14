@@ -17,6 +17,7 @@ import {
   IconButton,
   Avatar,
   Spinner,
+  Stack,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { chatGroupSchema } from 'src/utils/validation/schema';
@@ -34,6 +35,8 @@ import EditChatGroupMembersModal from '../EditChatGroupMembersModal';
 import { MdCancel } from 'react-icons/md';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import { AiOutlineArrowLeft, AiOutlineDelete } from 'react-icons/ai';
+import { FiEdit2 } from 'react-icons/fi';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -195,18 +198,24 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     <Modal onClose={onClose} scrollBehavior="inside" isOpen={isOpen}>
       <ModalOverlay />
       <ModalContent h="90vh" bg={'#f9fafb'} textAlign="center">
-        <ModalHeader
-          flexDir="row"
-          justifyContent="space-between"
-          display="flex"
-          mr="24px">
+        <ModalHeader flexDir="row" display="flex" mr="24px">
           <Text>新しいルーム</Text>
+          <Box flex={1} />
+          <Button
+            size="sm"
+            colorScheme="gray"
+            variant="outline"
+            color="gray"
+            fontWeight="bold"
+            onClick={() => closeModal()}>
+            戻る
+          </Button>
           <Button
             size="sm"
             flexDir="row"
+            ml="8px"
             onClick={checkErrors}
-            mb="8px"
-            colorScheme="green"
+            colorScheme="brand"
             alignItems="center">
             {isLoading ? <Spinner /> : <Text display="inline">作成</Text>}
           </Button>
@@ -220,60 +229,64 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               setNewGroup((g) => ({ ...g, members: selected }));
               setMembersModal(false);
             }}
+            category="メンバー"
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
+            <FormLabel fontWeight="bold">ルーム画像</FormLabel>
             {selectImageUrl ? (
-              <Box display="flex" flexDirection="column">
-                <Box>
-                  <ReactCrop
-                    keepSelection={true}
-                    imageStyle={{
-                      minHeight: '100px',
-                      maxHeight: '300px',
-                      minWidth: '100px',
-                    }}
-                    src={selectImageUrl}
-                    crop={crop}
-                    onChange={(newCrop) => onChange(newCrop)}
-                    onImageLoaded={onLoad}
-                    circularCrop={true}
-                  />
-                </Box>
-                <Button
-                  my="15px"
-                  onClick={() => resetImageUrl()}
-                  colorScheme="blue">
-                  既存画像を削除
-                </Button>
+              <Box>
+                <ReactCrop
+                  keepSelection={true}
+                  imageStyle={{
+                    minHeight: '100px',
+                    maxHeight: '300px',
+                    minWidth: '100px',
+                  }}
+                  src={selectImageUrl}
+                  crop={crop}
+                  onChange={(newCrop) => onChange(newCrop)}
+                  onImageLoaded={onLoad}
+                  circularCrop={true}
+                />
+                <Stack
+                  justifyContent="center"
+                  direction="row"
+                  my="8px"
+                  cursor="pointer"
+                  color="red"
+                  onClick={() => resetImageUrl()}>
+                  <AiOutlineDelete />
+                  <Text fontSize="14px">画像を削除する</Text>
+                </Stack>
               </Box>
             ) : (
-              <>
-                <FormLabel>ルーム画像</FormLabel>
-                <Box
-                  m="0 auto"
-                  textAlign="center"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  border="3px dashed #eeeeee"
-                  w="300px"
-                  h="300px"
+              <Box
+                m="0 auto"
+                textAlign="center"
+                w="200px"
+                rounded="full"
+                cursor="pointer"
+                {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Avatar
+                  src={newGroup.imageURL}
+                  h="200px"
+                  w="200px"
                   rounded="full"
-                  cursor="pointer"
-                  {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <Avatar
-                    src={newGroup.imageURL}
-                    h="100%"
-                    w="100%"
-                    rounded="full"
-                    alt=""
-                  />
-                </Box>
-              </>
+                  alt=""
+                />
+                <Stack
+                  justifyContent="center"
+                  direction="row"
+                  my="8px"
+                  color="blue.400">
+                  <FiEdit2 />
+                  <Text fontSize="14px">画像を編集する</Text>
+                </Stack>
+              </Box>
             )}
             <Box mb="16px">
-              <FormLabel>ルーム名</FormLabel>
+              <FormLabel fontWeight="bold">ルーム名</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -283,26 +296,15 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 placeholder="ルーム名を入力して下さい"
               />
             </Box>
+            <FormLabel fontWeight="bold">メンバー</FormLabel>
             <Box mb="16px" display="flex" flexDir="row" flexWrap="wrap">
               {newGroup.members?.map((u) => (
                 <Box mr={'4px'} mb={'8px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    <IconButton
-                      onClick={() => removeFromSelectedMember(u as User)}
-                      aria-label="削除"
-                      icon={<MdCancel size={18} />}
-                    />
                   </ButtonGroup>
                 </Box>
               ))}
-              <Button
-                colorScheme="pink"
-                fontWeight="bold"
-                w="100%"
-                onClick={() => closeModal()}>
-                メンバーを編集
-              </Button>
             </Box>
           </Box>
         </ModalBody>

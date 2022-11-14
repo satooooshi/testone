@@ -62,6 +62,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       },
     },
   });
+
   const theme = {
     styles: {
       global: {
@@ -71,6 +72,52 @@ function MyApp({ Component, pageProps }: AppProps) {
           fontFamily:
             "'游ゴシック体', YuGothic, '游ゴシック', 'Yu Gothic', sans-serif",
         },
+      },
+    },
+    components: {
+      Button: {
+        baseStyle: {
+          _focus: {
+            boxShadow: 'none',
+          },
+        },
+      },
+      Link: {
+        baseStyle: {
+          _focus: {
+            boxShadow: 'none',
+          },
+        },
+      },
+    },
+    colors: {
+      // Bold
+      // brand: {
+      //   50: '#ebf8ff',
+      //   100: '#bee3f8',
+      //   200: '#90cdf4',
+      //   300: '#63b3ed',
+      //   400: '#4299e1',
+      //   500: '#3182ce',
+      //   600: '#2b6cb0',
+      //   700: '#2c5282',
+      //   800: '#2a4365',
+      //   900: '#1a365d',
+      // },
+
+      // fanreturn
+      brand: {
+        50: 'rgba(0, 174, 189, 0.1)',
+        100: 'rgba(0, 174, 189, 0.2)',
+        200: 'rgba(0, 174, 189, 0.4)',
+        300: 'rgba(0, 174, 189, 0.6)',
+        400: 'rgba(0, 174, 189, 0.8)',
+        // #00aebd
+        500: 'rgba(0, 174, 189, 1)',
+        600: 'rgba(0, 174, 189, 1)',
+        700: 'rgba(0, 174, 189, 1)',
+        800: 'rgba(0, 174, 189, 1)',
+        900: 'rgba(0, 174, 189, 1)',
       },
     },
   };

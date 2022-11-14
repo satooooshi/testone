@@ -7,6 +7,7 @@ import {headerStyles} from '../../styles/component/header.style';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RootStackParamList} from '../../types/navigator/RootStackParamList';
+import {EventType} from '../../types';
 
 export type Tab = {
   name: string;
@@ -36,20 +37,28 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
   screenForBack,
   children,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   return (
     <>
       <Div
         h={48}
-        bg="#ececec"
+        bg="white"
         py="xs"
         px="lg"
-        row
-        justifyContent="space-between">
-        <Div maxW="40%" h="100%" row alignItems="center">
-          {enableBackButton && (
+        flexDir="row"
+        justifyContent="center"
+        alignItems="center">
+        {enableBackButton && (
+          <Div position="absolute" left={10}>
             <TouchableOpacity
               onPress={() => {
+                if (screenForBack === 'EventIntroduction') {
+                  navigation.navigate('EventStack', {
+                    screen: 'EventIntroduction',
+                    params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                  });
+                  return;
+                }
                 if (screenForBack) {
                   navigation.goBack();
                   navigation.navigate(screenForBack as any);
@@ -59,13 +68,14 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
               }}>
               <Icon name="left" fontSize={26} mr={4} />
             </TouchableOpacity>
-          )}
-          {/* ハンバーガーメニュー */}
-          {/* <TouchableOpacity
+          </Div>
+        )}
+        {/* ハンバーガーメニュー */}
+        {/* <TouchableOpacity
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
             <Ionicons name="menu-outline" size={26} />
           </TouchableOpacity> */}
-          <TouchableHighlight
+        {/* <TouchableHighlight
             onPress={() => navigation.navigate('Home' as any)}
             underlayColor="none">
             <FastImage
@@ -73,16 +83,15 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
               resizeMode="contain"
               source={require('../../../assets/bold-logo.png')}
             />
-          </TouchableHighlight>
-          <Text
-            fontSize={16}
-            ml="lg"
-            fontWeight="bold"
-            color={darkFontColor}
-            numberOfLines={1}>
-            {title}
-          </Text>
-        </Div>
+          </TouchableHighlight> */}
+        <Text
+          fontSize={16}
+          mx="auto"
+          fontWeight="bold"
+          color={darkFontColor}
+          numberOfLines={1}>
+          {title}
+        </Text>
         {children}
       </Div>
       {tabs && tabs.length ? (

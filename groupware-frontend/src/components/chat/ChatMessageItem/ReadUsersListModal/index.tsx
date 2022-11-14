@@ -71,9 +71,9 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
               alignItems="center"
               w="50%"
               pb={'4px'}
-              borderBottomColor={readOrUnread ? 'blue.500' : undefined}
+              borderBottomColor={readOrUnread ? 'brand.500' : undefined}
               borderBottomWidth={readOrUnread ? 3 : undefined}
-              color={readOrUnread ? 'blue.500' : undefined}>
+              color={readOrUnread ? 'brand.500' : undefined}>
               <Text fontSize={20}>既読</Text>
             </Link>
             <Link
@@ -84,9 +84,9 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
               justifyContent="center"
               alignItems="center"
               w="50%"
-              borderBottomColor={!readOrUnread ? 'blue.500' : undefined}
+              borderBottomColor={!readOrUnread ? 'brand.500' : undefined}
               borderBottomWidth={!readOrUnread ? 3 : undefined}
-              color={!readOrUnread ? 'blue.500' : undefined}>
+              color={!readOrUnread ? 'brand.500' : undefined}>
               <Text fontSize={20}>未読</Text>
             </Link>
           </Box>

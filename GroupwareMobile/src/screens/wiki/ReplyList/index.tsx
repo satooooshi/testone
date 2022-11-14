@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Div, Text, Collapse, Button} from 'react-native-magnus';
+import {Div, Text, Collapse, Icon} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import RenderHtml from 'react-native-render-html';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
-import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenProps';
-import {useNavigation} from '@react-navigation/native';
 import {darkFontColor} from '../../../utils/colors';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
@@ -17,38 +15,44 @@ type ReplyListProps = {
 };
 
 const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
-  const navigation: PostReplyNavigationProps =
-    useNavigation<PostReplyNavigationProps>();
   const mdParser = new MarkdownIt({breaks: true});
   const {width: windowWidth} = useWindowDimensions();
   const [repliesHeight, setRepliesHeight] = useState<number>(100);
   return (
     <>
-      <Button
-        bg="pink600"
-        w={'100%'}
-        onPress={() => {
-          navigation.navigate('WikiStack', {
-            screen: 'PostReply',
-            params: {id: answer.id},
-            initial: false,
-          });
-        }}>
-        返信する
-      </Button>
       {answer.replies?.length ? (
         <Collapse mb={8}>
           <Collapse.Header
-            pt={12}
-            pb={12}
-            bg={darkFontColor}
-            w={'100%'}
-            rounded="none"
-            justifyContent="center">
-            <Text fontSize={14} color="white">
-              回答への返信{answer.replies.length}件
-            </Text>
-          </Collapse.Header>
+            bg="white"
+            color="gray"
+            py="lg"
+            prefix={
+              <Icon
+                name="triangle-down"
+                mr="lg"
+                color="gray"
+                fontFamily="Octicons"
+              />
+            }
+            activePrefix={
+              <Icon
+                name="triangle-up"
+                mr="lg"
+                color="gray"
+                fontFamily="Octicons"
+              />
+            }
+            suffix={
+              <Text color="gray" fontSize={14}>
+                {`${answer.replies.length}件の返信`}を見る
+              </Text>
+            }
+            activeSuffix={
+              <Text color="gray" fontSize={14}>
+                {`${answer.replies.length}件の返信`}を閉じる
+              </Text>
+            }
+          />
           <Collapse.Body mb={8} h={repliesHeight}>
             <Div onLayout={e => setRepliesHeight(e.nativeEvent.layout.height)}>
               {answer.replies.length ? (
@@ -56,7 +60,7 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                   reply =>
                     reply.writer && (
                       <>
-                        <Div flexDir="column" mb={16}>
+                        <Div flexDir="column">
                           <Div
                             flexDir="row"
                             justifyContent="flex-start"
@@ -67,26 +71,27 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                                   onPressAvatar(reply.writer);
                                 }
                               }}>
-                              <Div>
+                              <Div mr={8}>
                                 <UserAvatar
-                                  w={64}
-                                  h={64}
+                                  w={32}
+                                  h={32}
                                   user={reply.writer}
                                   GoProfile={true}
                                 />
                               </Div>
                             </TouchableOpacity>
-                            <Text fontSize={18} color={darkFontColor}>
+                            <Text fontSize={14} color={darkFontColor}>
                               {userNameFactory(reply.writer)}
                             </Text>
+                            <Div flex={1} />
+                            <Text fontSize={14} color={darkFontColor}>
+                              {dateTimeFormatterFromJSDDate({
+                                dateTime: new Date(reply.createdAt),
+                              })}
+                            </Text>
                           </Div>
-                          <Text textAlignVertical="bottom" textAlign="right">
-                            {`投稿日: ${dateTimeFormatterFromJSDDate({
-                              dateTime: new Date(reply.createdAt),
-                            })}`}
-                          </Text>
                         </Div>
-                        <Div bg="white" rounded="md" p={8} mb={16}>
+                        <Div bg="white" rounded="md" pb={8} ml={40} mb={16}>
                           <RenderHtml
                             contentWidth={windowWidth * 0.9}
                             source={{

@@ -7,6 +7,7 @@ import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIn
 import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
 import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
 import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
+import AnnualCalendar from 'src/components/event/AnnualCalendar';
 
 const ImpressionUniversity: React.FC = () => {
   const router = useRouter();
@@ -43,8 +44,9 @@ const ImpressionUniversity: React.FC = () => {
       bottomImgSources={bottomImgSources}
       onSaveIntroduction={saveEventIntroduction}
       onSuccessToSaveIntroduction={() => refetch()}
-      headerProps={initialHeaderValue}
-    />
+      headerProps={initialHeaderValue}>
+      <AnnualCalendar />
+    </EventIntroductionTemplate>
   );
 };
 

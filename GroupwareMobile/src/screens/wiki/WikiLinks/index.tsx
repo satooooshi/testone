@@ -56,15 +56,28 @@ const WikiLinks: React.FC = () => {
           alignItems="center"
           justifyContent="flex-start"
           mb="lg">
-          <PortalLinkBox
-            type="mail_magazine"
-            onPress={() =>
-              navigation.navigate('WikiStack', {
-                screen: 'WikiList',
-                params: {type: WikiType.MAIL_MAGAZINE},
-              })
-            }
-          />
+          <Div mr={'lg'}>
+            <PortalLinkBox
+              type="mail_magazine"
+              onPress={() =>
+                navigation.navigate('WikiStack', {
+                  screen: 'WikiList',
+                  params: {type: WikiType.MAIL_MAGAZINE},
+                })
+              }
+            />
+          </Div>
+          <Div mr={'lg'}>
+            <PortalLinkBox
+              type="interview"
+              onPress={() =>
+                navigation.navigate('WikiStack', {
+                  screen: 'WikiList',
+                  params: {type: WikiType.INTERVIEW},
+                })
+              }
+            />
+          </Div>
         </Div>
       </Div>
     </WholeContainer>

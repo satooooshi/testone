@@ -7,6 +7,7 @@ import {darkFontColor} from '../../../utils/colors';
 import {reactionStickers} from '../../../utils/factory/reactionStickers';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import UserAvatar from '../../common/UserAvatar';
+import {mentionTransform} from '../../../utils/messageTransform';
 
 type ReplyTargetProps = {
   onPressCloseIcon: () => void;
@@ -25,7 +26,7 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
   const content = (type: ChatMessageType) => {
     switch (type) {
       case ChatMessageType.TEXT:
-        return replyParentMessage.content;
+        return mentionTransform(replyParentMessage.content);
       case ChatMessageType.IMAGE:
         return '写真';
       case ChatMessageType.VIDEO:

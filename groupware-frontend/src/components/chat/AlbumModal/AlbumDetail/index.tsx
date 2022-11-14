@@ -125,7 +125,7 @@ const AlbumDetail: React.FC<AlbumDetailProps> = ({
                       mr="4px"
                       onClick={onClickEdit}
                       mb="8px"
-                      colorScheme="blue"
+                      colorScheme="brand"
                       alignItems="center">
                       <Text display="inline">アルバムを編集</Text>
                     </Button>

@@ -3,6 +3,7 @@ import EventCard from '@/components/common/EventCard';
 import { EventIntroduction, EventSchedule } from 'src/types';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import Image from 'next/image';
+import { SimpleGrid } from '@chakra-ui/react';
 
 export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
@@ -34,28 +35,38 @@ const EventIntroductionViewer: React.FC<EventIntroductionProps> = ({
           )}
         </div>
       </div>
+
       <div className={eventPRStyles.latest_events_wrapper}>
         {recommendedEvents?.length ? (
-          <p className={eventPRStyles.latest_events_text}>
-            直近のおすすめイベント
-          </p>
+          <>
+            <p className={eventPRStyles.latest_events_text}>
+              直近のおすすめイベント
+            </p>
+            <div className={eventPRStyles.event_card_list}>
+              <SimpleGrid
+                w="100%"
+                minChildWidth="360px"
+                maxChildWidth="420px"
+                spacing="20px">
+                {recommendedEvents?.map(
+                  (eventSchedule, index) =>
+                    index <= 4 && (
+                      <div
+                        key={eventSchedule.id}
+                        className={eventPRStyles.event_card}>
+                        <EventCard eventSchedule={eventSchedule} />
+                      </div>
+                    ),
+                )}
+              </SimpleGrid>
+            </div>
+          </>
         ) : (
           <p className={eventPRStyles.no_latest_event_text}>
             直近一週間にイベントはありません
           </p>
         )}
-        <div className={eventPRStyles.event_card_list}>
-          {recommendedEvents?.map(
-            (eventSchedule, index) =>
-              index <= 4 && (
-                <div
-                  key={eventSchedule.id}
-                  className={eventPRStyles.event_card}>
-                  <EventCard eventSchedule={eventSchedule} />
-                </div>
-              ),
-          )}
-        </div>
+
         <div className={eventPRStyles.info_wrapper}>
           <div className={eventPRStyles.title_wrapper}>
             <p className={eventPRStyles.title}>{eventIntroduction.title}</p>

@@ -84,13 +84,22 @@ const UserList: React.FC = () => {
           setTag(values.selectedTags?.map(t => t.id.toString()).join('+'));
           setVisibleSearchFormModal(false);
         }}
+        onClear={() => {
+          setWord('');
+          setTag('');
+          setVisibleSearchFormModal(false);
+        }}
       />
       <SearchFormOpenerButton
         bottom={10}
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <HeaderWithTextButton title="社員名鑑" />
+      <HeaderWithTextButton
+        title="社員名鑑"
+        enableBackButton={true}
+        screenForBack={'Menu'}
+      />
       <TopTab.Navigator
         initialRouteName={topTabNames[0]}
         screenOptions={{tabBarScrollEnabled: true}}>

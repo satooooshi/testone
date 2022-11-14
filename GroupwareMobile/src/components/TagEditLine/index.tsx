@@ -1,8 +1,11 @@
 import React from 'react';
-import {Button, Div, DivProps, Tag} from 'react-native-magnus';
+import {FlatList} from 'react-native';
+import {Button, Div, DivProps, Icon, Tag, Text} from 'react-native-magnus';
 import {AllTag, TagType} from '../../types';
 import {tagTypeNameFactory} from '../../utils/factory/tag/tagTypeNameFactory';
+import {tagBgColorFactory} from '../../utils/factory/tagBgColorFactory';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
+import {tagFontColorFactory} from '../../utils/factory/tagFontColorFactory';
 
 type TagEditLineProps = DivProps & {
   onPressRightButton: () => void;
@@ -14,36 +17,54 @@ const TagEditLine: React.FC<TagEditLineProps> = props => {
   const {onPressRightButton, tags, tagType} = props;
 
   return (
-    <Div
-      {...props}
-      borderBottomWidth={1}
-      flexDir="row"
-      alignItems="flex-end"
-      justifyContent="space-between">
-      <Div w={'70%'} flexWrap="wrap" flexDir="row">
-        {tags?.map(t => (
-          <Tag
-            key={t.id}
-            px={'sm'}
-            h={28}
-            bg={tagColorFactory(tagType)}
-            color="white"
-            mr={4}
-            mb={4}>
-            {t.name}
-          </Tag>
-        ))}
-      </Div>
+    <>
       <Button
-        px={'md'}
-        alignSelf="flex-end"
-        onPress={onPressRightButton}
-        mb={4}
+        bg="white"
+        rounded="circle"
+        color="blue700"
+        fontSize={14}
         fontWeight="bold"
-        bg={tagColorFactory(tagType)}>
-        {`${tagTypeNameFactory(tagType)}タグ`}
+        borderWidth={1}
+        borderColor="blue700"
+        py="md"
+        px="lg"
+        mb="sm"
+        onPress={onPressRightButton}
+        prefix={
+          <Icon
+            name="add"
+            fontSize={14}
+            color="blue700"
+            fontFamily="MaterialIcons"
+          />
+        }>
+        タグを追加
       </Button>
-    </Div>
+      {tags && tags.length ? (
+        <Div flexDir="row" alignItems="center" mb="sm">
+          <Text fontSize={16} mr="sm">
+            選択したタグ
+          </Text>
+          <FlatList
+            horizontal
+            data={tags}
+            renderItem={({item: t}) => (
+              <Tag
+                key={t.id}
+                px="lg"
+                py="sm"
+                bg={tagBgColorFactory(tagType)}
+                color={tagFontColorFactory(tagType)}
+                rounded="circle"
+                mr={4}
+                mb={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        </Div>
+      ) : null}
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import React, {
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
+import { AiOutlinePlus } from 'react-icons/ai';
 import {
   EventFile,
   EventSchedule,
@@ -28,7 +29,6 @@ import {
   Button,
   ButtonGroup,
   FormControl,
-  FormLabel,
   Input,
   Textarea,
   Select,
@@ -44,6 +44,7 @@ import {
   useMediaQuery,
   InputGroup,
   InputRightElement,
+  Flex,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -53,13 +54,14 @@ import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { Crop } from 'react-image-crop';
 import { DateTime } from 'luxon';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { darkFontColor } from 'src/utils/colors';
 import { isCreatableEvent } from 'src/utils/factory/isCreatableEvent';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 
 type ExcludeFilesAndVideosAndType = Pick<
   EventSchedule,
@@ -373,7 +375,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         display="flex"
         flexDirection={isSmallerThan768 ? 'row' : 'column'}
         justifyContent="space-between"
-        borderBottomColor="blue.500"
+        borderBottomColor="brand.500"
         borderBottomWidth={1}
         pb="8px"
         alignItems="center"
@@ -381,7 +383,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         w="100%"
         position={isSmallerThan768 ? 'sticky' : undefined}
         zIndex={50}
-        bg={'#ececec'}
         top={isSmallerThan768 ? '-15px' : undefined}
         pt={isSmallerThan768 ? '15px' : undefined}>
         <Box
@@ -395,7 +396,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onClick={() => {
               checkErrors();
             }}
-            colorScheme="blue">
+            colorScheme="brand">
             {isLoading ? <Spinner /> : <Text>イベントを保存</Text>}
           </Button>
           <MdCancel
@@ -406,28 +407,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       </Box>
       <Box display="flex" flexDir={isSmallerThan768 ? 'column' : 'row'}>
         <Box
-          display="flex"
-          flexDir="column"
           w={isSmallerThan768 ? '100%' : '48%'}
           overflowY="auto"
           mr={isSmallerThan768 ? 0 : '16px'}
           css={hideScrollbarCss}>
+          <Text fontWeight="bold" mb="8px">
+            イベントタイトル
+          </Text>
           <Input
             type="text"
             name="title"
             placeholder="タイトルを入力してください"
             value={newEvent.title}
-            background="white"
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, title: e.target.value }))
             }
-            bg="white"
-            textAlign="left"
-            p="8px"
-            fontSize="22px"
-            fontWeight="bold"
-            color={darkFontColor}
+            mb="16px"
+            rounded="xl"
           />
+          <Text fontWeight="bold" mb="8px">
+            イベント日時
+          </Text>
           <Box textAlign="center" mb="16px">
             <Box
               display="flex"
@@ -444,10 +444,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
                     label="開始日時"
                     hour24
+                    labelAlignment="left"
                     formatStyle={'medium'}
                   />
                 ) : (
-                  <Text color={'blue.600'}>
+                  <Text color={'brand.600'}>
                     提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
                   </Text>
                 )}
@@ -473,15 +474,18 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       : '締切日時'
                   }
                   hour24
+                  labelAlignment="left"
                   formatStyle={'medium'}
                 />
               </Box>
             </Box>
           </Box>
+          <Text fontWeight="bold" mb="8px">
+            イベント概要
+          </Text>
           <Textarea
             name="description"
             placeholder="概要を入力してください"
-            p="10px"
             h={isSmallerThan768 ? '1vh' : '280px'}
             w="100%"
             wordBreak="break-all"
@@ -491,18 +495,23 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, description: e.target.value }))
             }
-            background="white"
-            cols={50}
+            cols={3}
             wrap="hard"
           />
-          <Button
-            alignSelf="flex-end"
-            mb="8px"
-            onClick={() => setUserModal(true)}
-            size="sm"
-            colorScheme="pink">
-            開催者/講師を編集
-          </Button>
+          <Flex alignItems="center" mb="8px">
+            <Text fontWeight="bold" mr="8px">
+              開催者/講師
+            </Text>
+            <Button
+              onClick={() => setUserModal(true)}
+              size="sm"
+              rounded="full"
+              variant="outline"
+              // leftIcon={<AiOutlinePlus />}
+              colorScheme="brand">
+              編集
+            </Button>
+          </Flex>
           <SelectUserModal
             isOpen={userModal}
             selectedUsers={newEvent.hostUsers || []}
@@ -513,12 +522,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           <Box
             display="flex"
             flexDir="row"
-            justifyContent="flex-start"
             flexWrap="wrap"
+            mb="16px"
             maxH="200px">
             {newEvent.hostUsers?.map((u) => (
               <Box mb="5px" mr="4px" key={u.id}>
-                <ButtonGroup isAttached size="xs" colorScheme="purple">
+                <ButtonGroup isAttached size="xs" color="blue.600">
                   <Button mr="-px">{u.lastName + u.firstName}</Button>
                   <IconButton
                     onClick={() => toggleHostUser(u)}
@@ -529,30 +538,39 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             ))}
           </Box>
-          <Button
-            alignSelf="flex-end"
-            mb="8px"
-            onClick={() => openTagModal()}
-            size="sm"
-            colorScheme="green">
-            タグを編集
-          </Button>
+          <Flex alignItems="center" mb="8px">
+            <Text fontWeight="bold" mr="8px">
+              タグ
+            </Text>
+            <Button
+              onClick={() => openTagModal()}
+              size="sm"
+              rounded="full"
+              variant="outline"
+              // leftIcon={<AiOutlinePlus />}
+              colorScheme="brand">
+              編集
+            </Button>
+          </Flex>
           <Box
             display="flex"
             flexDir="row"
-            justifyContent="flex-start"
             flexWrap="wrap"
+            mb="16px"
             maxH="200px">
             {newEvent.tags?.map((t) => (
               <Box mb="5px" mr="4px" key={t.id}>
                 <ButtonGroup
                   isAttached
                   size="xs"
-                  colorScheme={tagColorFactory(t.type)}>
-                  <Button mr="-px">{t.name}</Button>
+                  color={tagFontColorFactory(t.type)}>
+                  <Button mr="-px" bg={tagBgColorFactory(t.type)}>
+                    {t.name}
+                  </Button>
                   <IconButton
                     onClick={() => toggleTag(t)}
                     aria-label="削除"
+                    bg={tagBgColorFactory(t.type)}
                     icon={<MdCancel size={18} />}
                   />
                 </ButtonGroup>
@@ -561,8 +579,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           </Box>
         </Box>
         <Box
-          display="flex"
-          flexDir="column"
           w={isSmallerThan768 ? '100%' : '48%'}
           overflowY="auto"
           css={hideScrollbarCss}>
@@ -570,9 +586,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <Box mb="16px">
               <FormControl>
-                <FormLabel>
+                <Text fontWeight="bold" mb="8px">
                   チャットルームの作成(作成後に変更することはできません)
-                </FormLabel>
+                </Text>
                 <RadioGroup ml={1} defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
@@ -600,10 +616,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Box mb="16px">
             <FormControl>
-              <FormLabel>タイプ</FormLabel>
+              <Text fontWeight="bold" mb="8px">
+                タイプ
+              </Text>
               <Select
-                colorScheme="teal"
-                bg="white"
                 onChange={(e) => {
                   if (!e.target.value) {
                     setNewEvent((e) => ({ ...e, type: undefined }));
@@ -647,7 +663,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Select>
             </FormControl>
           </Box>
-          <Text mb="15px">サムネイル</Text>
+          <Text fontWeight="bold" mb="8px">
+            サムネイル
+          </Text>
 
           {((newEvent.imageURL && !selectThumbnailUrl) ||
             selectThumbnailUrl) && (
@@ -656,7 +674,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onClick={() => {
                 onClickDeleteImage();
               }}
-              colorScheme="blue">
+              colorScheme="brand">
               既存画像を削除
             </Button>
           )}
@@ -702,7 +720,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Box>
             )}
           </Box>
-          <Text mb="16px">参考資料</Text>
+          <Text fontWeight="bold" mb="8px">
+            参考資料
+          </Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <div
               {...getRelatedFileRootProps({
@@ -723,7 +743,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {newEvent.files.map((f) => (
                 <Box
                   key={f.url}
-                  borderColor={'blue.500'}
+                  borderColor={'brand.500'}
                   rounded="md"
                   borderWidth={1}
                   display="flex"
@@ -734,7 +754,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   mb="8px"
                   px="8px">
                   <Text
-                    color="blue.600"
+                    color="brand.600"
                     alignSelf="center"
                     h="40px"
                     verticalAlign="middle"
@@ -762,7 +782,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               ))}
             </Box>
           ) : null}
-          <Text mb="16px">関連動画</Text>
+          <Text fontWeight="bold" mb="8px">
+            関連動画
+          </Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <InputGroup>
               <Input
@@ -792,7 +814,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             {newEvent?.videos?.map((y) => (
               <Box
                 key={y.url}
-                borderColor={'blue.500'}
+                borderColor={'brand.500'}
                 borderWidth={1}
                 rounded="md"
                 display="flex"
@@ -803,7 +825,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 mb="8px"
                 px="8px">
                 <Text
-                  color="blue.600"
+                  color="brand.600"
                   alignSelf="center"
                   h="40px"
                   verticalAlign="middle"

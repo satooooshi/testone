@@ -27,12 +27,11 @@ const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
       onPress={onPress}
       style={{
         ...tailwind(
-          'bg-white rounded-md justify-center items-center h-16 px-2',
+          'bg-white rounded-full justify-center items-center h-10 w-10 ml-3  px-2',
         ),
       }}>
       <>
-        <Icon name="share" fontFamily="MaterialCommunityIcons" fontSize={24} />
-        <Text color="blue800">チャットで共有</Text>
+        <Icon name="share" fontFamily="Entypo" fontSize={24} />
       </>
     </TouchableHighlight>
   );

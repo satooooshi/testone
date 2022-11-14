@@ -58,7 +58,7 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Box borderTopWidth={5} borderTopColor={'blue.600'} fontSize={20}>
+            <Box borderTopWidth={5} borderTopColor={'brand.600'} fontSize={20}>
               <Box display="flex" flexDir="row" mt={5}>
                 <Text fontWeight="bold">日付:</Text>
                 <Text ml={5}>

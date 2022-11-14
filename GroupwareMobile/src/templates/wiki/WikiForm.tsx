@@ -1,22 +1,38 @@
 import {useFormik} from 'formik';
+import {
+  Button,
+  Div,
+  Dropdown,
+  Icon,
+  Input,
+  Tag as TagButton,
+  Text,
+} from 'react-native-magnus';
+import {Alert, Platform, useWindowDimensions} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {Button, Div, Input, Tag as TagButton, Text} from 'react-native-magnus';
 import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
 import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
-import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import {tagFontColorFactory} from '../../utils/factory/tagFontColorFactory';
+import {tagBgColorFactory} from '../../utils/factory/tagBgColorFactory';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
+import {blueColor} from '../../utils/colors';
+import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import ModalSelectingWikiType, {
   SelectWikiArg,
 } from '../../components/wiki/ModalSelectWikiType';
+import QuillEditor from 'react-native-cn-quill';
+import DocumentPicker from 'react-native-document-picker';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -37,7 +53,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
   saveWiki,
   onUploadImage,
 }) => {
+  //const navigation = useNavigation<PostWikiRouteProps>();
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
   const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
@@ -45,6 +63,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     tags: [],
     type: type || undefined,
     ruleCategory: ruleCategory || RuleCategory.NON_RULE,
+    files: [],
     boardCategory: boardCategory
       ? boardCategory
       : !type || type === WikiType.BOARD
@@ -68,8 +87,61 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return;
       }
       saveWiki(w);
+      quillRef.current?.blur();
     },
   });
+  const {mutate: uploadFile} = useAPIUploadStorage();
+
+  const normalizeURL = (url: string) => {
+    const filePrefix = 'file://';
+    if (url.startsWith(filePrefix)) {
+      url = url.substring(filePrefix.length);
+      url = decodeURI(url);
+      return url;
+    }
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const res = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles],
+      });
+      const formData = new FormData();
+      formData.append('files', {
+        name: res.name,
+        uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
+        type: res.type,
+      });
+      uploadFile(formData, {
+        onSuccess: uploadedURL => {
+          setNewWiki(e => {
+            const newWikiFile = {url: uploadedURL[0], name: res.name};
+            if (e.files && e.files.length) {
+              return {
+                ...e,
+                files: [...e.files, newWikiFile],
+              };
+            }
+            return {
+              ...e,
+              files: [newWikiFile],
+            };
+          });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
+      });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+      } else {
+        throw err;
+      }
+    }
+  };
+
   const {width: windowWidth} = useWindowDimensions();
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
@@ -78,6 +150,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   const {user} = useAuthenticate();
 
+  const removeFile = (fileUrl: string) => {
+    setNewWiki(e => {
+      if (e.files?.length) {
+        return {...e, files: e.files.filter(f => f.url !== fileUrl)};
+      }
+      return e;
+    });
+  };
   useEffect(() => {
     const safetySubmit = async () => {
       handleSubmit();
@@ -152,6 +232,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       <HeaderWithTextButton
         title={wiki?.id ? 'Wiki編集' : 'Wiki作成'}
         enableBackButton={true}
+        rightButtonName={'投稿'}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <ModalSelectingWikiType
         isVisible={visibleSelectTypeModal}
@@ -182,114 +264,163 @@ const WikiForm: React.FC<WikiFormProps> = ({
         ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         keyboardDismissMode={'none'}>
-        <Div w="90%" alignItems="center" alignSelf="center">
-          <Text fontSize={16}>タイトル</Text>
-          {errors.title && touched.title ? (
-            <Text fontSize={16} color="tomato">
-              {errors.title}
+        <Div p="5%" bg="white">
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タイトル
             </Text>
-          ) : null}
-          <Input
-            placeholder="タイトルを入力してください"
-            value={newWiki.title}
-            onChangeText={text => setNewWiki(w => ({...w, title: text}))}
-            mb="sm"
-          />
-          <Div mb={10} flexDir="row">
-            <Div alignItems="center">
-              <Text fontSize={16} mb={4}>
-                タイプを選択
+            {errors.title && touched.title ? (
+              <Text fontSize={16} color="tomato">
+                {errors.title}
               </Text>
-              {errors.type && touched.type ? (
-                <Text fontSize={16} color="tomato">
-                  {errors.type}
-                </Text>
-              ) : null}
-              <Button
-                bg="white"
-                borderWidth={1}
-                borderColor={'#ececec'}
-                p="md"
-                color="black"
-                w={windowWidth * 0.9}
-                onPress={() => setVisibleSelectTypeModal(true)}>
-                {newWiki.type
-                  ? wikiTypeNameFactory(
-                      newWiki.type,
-                      newWiki.ruleCategory,
-                      true,
-                      newWiki.boardCategory,
-                    )
-                  : 'タイプを選択してください'}
-              </Button>
+            ) : null}
+            <Input
+              placeholder="タイトルを入力してください"
+              value={newWiki.title}
+              fontSize={16}
+              rounded="xl"
+              onChangeText={text => setNewWiki(w => ({...w, title: text}))}
+            />
+          </Div>
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タイプを選択
+            </Text>
+            {errors.type && touched.type ? (
+              <Text fontSize={16} color="tomato">
+                {errors.type}
+              </Text>
+            ) : null}
+            <Button
+              block
+              bg="white"
+              borderWidth={1}
+              borderColor={'#ececec'}
+              color="black"
+              rounded="xl"
+              suffix={
+                <Icon
+                  position="absolute"
+                  right={8}
+                  name="down"
+                  fontSize={16}
+                  color="gray"
+                  fontFamily="AntDesign"
+                />
+              }
+              onPress={() => setVisibleSelectTypeModal(true)}>
+              {newWiki.type
+                ? wikiTypeNameFactory(
+                    newWiki.type,
+                    newWiki.ruleCategory,
+                    true,
+                    newWiki.boardCategory,
+                  )
+                : 'タイプを選択してください'}
+            </Button>
+          </Div>
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              タグを選択
+            </Text>
+            <Button
+              bg="white"
+              rounded="circle"
+              color="blue700"
+              fontSize={14}
+              fontWeight="bold"
+              borderWidth={1}
+              borderColor="blue700"
+              py="md"
+              px="lg"
+              mb="sm"
+              onPress={() => setVisibleTagModal(true)}
+              prefix={
+                <Icon
+                  name="add"
+                  fontSize={14}
+                  color="blue700"
+                  fontFamily="MaterialIcons"
+                />
+              }>
+              タグを追加
+            </Button>
+            <Div
+              flexDir="row"
+              flexWrap="wrap"
+              w={'100%'}
+              justifyContent="flex-start">
+              {newWiki.tags?.map(t => (
+                <TagButton
+                  key={t.id}
+                  mr={4}
+                  mb={8}
+                  fontSize="md"
+                  color={tagFontColorFactory(t.type)}
+                  bg={tagBgColorFactory(t.type)}>
+                  {t.name}
+                </TagButton>
+              ))}
             </Div>
-            {/* {!isEdit && (
-              <Div>
-                <Text fontSize={16} fontWeight="bold" mb={4}>
-                  入力形式を選択
-                </Text>
-                <Button
-                  bg="white"
-                  borderWidth={1}
-                  borderColor={'#ececec'}
-                  p="md"
-                  color="black"
-                  w={windowWidth * 0.4}
-                  onPress={() => textFormatDropdownRef.current.open()}>
-                  {newWiki.textFormat === 'html'
-                    ? 'デフォルト'
-                    : 'マークダウン'}
-                </Button>
-              </Div>
-            )} */}
           </Div>
-          <Button
-            bg="green600"
-            w={'100%'}
-            mb={8}
-            onPress={() => setVisibleTagModal(true)}>
-            {newWiki.tags?.length
-              ? `${newWiki.tags?.length}個のタグ`
-              : 'タグを選択'}
-          </Button>
+
           <Div
-            flexDir="row"
-            flexWrap="wrap"
-            mb={8}
-            w={'100%'}
-            justifyContent="flex-start">
-            {newWiki.tags?.map(t => (
-              <TagButton
-                key={t.id}
-                mr={4}
-                mb={8}
-                color="white"
-                bg={tagColorFactory(t.type)}>
-                {t.name}
-              </TagButton>
-            ))}
+            flexDir="column"
+            alignItems="flex-start"
+            alignSelf="center"
+            mb={'lg'}>
+            <Text fontSize={16}>添付ファイルを選択</Text>
+            <DropdownOpenerButton
+              name={'タップでファイルを選択'}
+              onPress={() => handlePickDocument()}
+            />
           </Div>
-          <Button
-            mb={16}
-            bg="pink600"
-            w={'100%'}
-            onPress={() => setWillSubmit(true)}>
-            投稿
-          </Button>
-        </Div>
-        {errors.body && touched.body ? (
-          <Text fontSize={16} color="tomato">
-            {errors.body}
-          </Text>
-        ) : null}
-        <Div mb={60}>
-          <TextEditor
-            textFormat={newWiki.textFormat}
-            onUploadImage={onUploadImage}
-            initialBody={newWiki.body}
-            onChange={text => setNewWiki(w => ({...w, body: text}))}
-          />
+          {newWiki.files?.map(f => (
+            <Div
+              key={f.id}
+              mb={'lg'}
+              w={'100%'}
+              h={'10%'}
+              borderColor={blueColor}
+              borderWidth={1}
+              px={8}
+              py={8}
+              flexDir="row"
+              justifyContent="space-between"
+              rounded="md">
+              <Text fontSize={16} color={blueColor} w="80%">
+                {f.name}
+              </Text>
+              <TouchableOpacity onPress={() => removeFile(f.url || '')}>
+                <Icon name="closecircle" color="gray900" fontSize={24} />
+              </TouchableOpacity>
+            </Div>
+          ))}
+
+          <Div mb="lg">
+            <Text fontSize={16} mb={4}>
+              本文
+            </Text>
+            {errors.body && touched.body ? (
+              <Text fontSize={16} color="tomato">
+                {errors.body}
+              </Text>
+            ) : null}
+            <Div mb={60}>
+              <TextEditor
+                textFormat={newWiki.textFormat}
+                onUploadImage={onUploadImage}
+                initialBody={newWiki.body}
+                onChange={text => setNewWiki(w => ({...w, body: text}))}
+                quillRef={quillRef}
+              />
+            </Div>
+          </Div>
         </Div>
       </KeyboardAwareScrollView>
     </WholeContainer>

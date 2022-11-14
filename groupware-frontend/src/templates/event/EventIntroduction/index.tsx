@@ -8,7 +8,7 @@ import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import { UseMutateFunction } from 'react-query';
 import { AxiosError } from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import EventIntroductionEditor from './EventIntroductionEditor';
@@ -22,6 +22,7 @@ import { Tab } from 'src/types/header/tab/types';
 import { blueColor } from 'src/utils/colors';
 
 export interface EventIntroductionProps {
+  children?: ReactNode;
   recommendedEvents?: EventSchedule[];
   type: EventType;
   eventIntroduction?: EventIntroduction;
@@ -39,6 +40,7 @@ export interface EventIntroductionProps {
 }
 
 const EventIntroductionTemplate: React.FC<EventIntroductionProps> = ({
+  children,
   recommendedEvents,
   type,
   eventIntroduction,
@@ -129,6 +131,7 @@ const EventIntroductionTemplate: React.FC<EventIntroductionProps> = ({
             eventIntroduction={eventIntroduction}
           />
         ) : null}
+        {children}
       </div>
     </LayoutWithTab>
   );

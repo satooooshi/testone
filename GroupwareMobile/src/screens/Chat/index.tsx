@@ -124,6 +124,18 @@ const Chat: React.FC = () => {
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     Number(room.id),
+    {
+      enabled: false,
+      onError: () => {
+        navigation.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+        editChatGroup({
+          ...room,
+          members: room.members?.filter(u => u.id !== myself?.id),
+        });
+      },
+    },
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
@@ -158,7 +170,8 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
+  const {handleEnterRoom, refetchRoomCard, editChatGroup, RemovedRoomId} =
+    useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
@@ -826,6 +839,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (isFocused) {
+      refetchRoomDetail();
       setIsTabBarVisible(false);
     } else {
       setIsTabBarVisible(true);
@@ -858,6 +872,12 @@ const Chat: React.FC = () => {
     },
     [room.id, myself?.id, refetchUpdatedMessages],
   );
+
+  useEffect(() => {
+    if (RemovedRoomId === room.id) {
+      refetchRoomDetail();
+    }
+  }, [RemovedRoomId, refetchRoomDetail, room.id]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -936,7 +956,6 @@ const Chat: React.FC = () => {
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => {
-          console.log(message.fileName);
           playVideoOnModal({
             uri: message.content,
             fileName: message.fileName,
@@ -1236,7 +1255,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue400'}>
+      <Div h="100%" bg="white">
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}
@@ -1352,62 +1371,65 @@ const Chat: React.FC = () => {
           title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
           enableBackButton={true}
           screenForBack={'RoomList'}>
-          <Div style={tailwind('flex flex-row')}>
-            <TouchableOpacity
-              style={tailwind('flex flex-row mr-1')}
-              onPress={() => setVisibleSearchInput(true)}>
-              <Icon
-                name="search"
-                fontFamily="Feather"
-                fontSize={26}
-                color={darkFontColor}
-              />
-            </TouchableOpacity>
+          <Div position="absolute" right={30}>
+            <Div style={tailwind('flex flex-row')}>
+              <TouchableOpacity
+                style={tailwind('flex flex-row mr-1')}
+                onPress={() => setVisibleSearchInput(true)}>
+                <Icon
+                  name="search"
+                  fontFamily="Feather"
+                  fontSize={26}
+                  color={darkFontColor}
+                />
+              </TouchableOpacity>
 
-            {roomDetail?.members &&
-            roomDetail.members.length === 2 &&
-            roomDetail.roomType !== RoomType.GROUP ? (
-              <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
-                <Button
-                  bg="transparent"
-                  pb={-3}
-                  onPress={() => {
-                    Alert.alert('通話しますか？', undefined, [
-                      {
-                        text: 'はい',
-                        onPress: () => inviteCall(),
-                      },
-                      {
-                        text: 'いいえ',
-                        onPress: () => {},
-                      },
-                    ]);
-                  }}>
-                  <Icon
-                    name="call-outline"
-                    fontFamily="Ionicons"
-                    fontSize={25}
-                    color="gray700"
-                  />
-                </Button>
-              </Div>
-            ) : null}
+              {roomDetail?.members &&
+              roomDetail.members.length === 2 &&
+              roomDetail.roomType !== RoomType.GROUP ? (
+                <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
+                  <Button
+                    bg="transparent"
+                    pb={7}
+                    pl={5}
+                    onPress={() => {
+                      Alert.alert('通話しますか？', undefined, [
+                        {
+                          text: 'はい',
+                          onPress: () => inviteCall(),
+                        },
+                        {
+                          text: 'いいえ',
+                          onPress: () => {},
+                        },
+                      ]);
+                    }}>
+                    <Icon
+                      name="call-outline"
+                      fontFamily="Ionicons"
+                      fontSize={25}
+                      color="gray700"
+                    />
+                  </Button>
+                </Div>
+              ) : null}
 
-            <TouchableOpacity
-              style={tailwind('flex flex-row')}
-              onPress={() =>
-                navigation.navigate('ChatStack', {
-                  screen: 'ChatMenu',
-                  params: {room: roomDetail ? roomDetail : room, removeCache},
-                })
-              }>
-              <Icon
-                name="dots-horizontal-circle-outline"
-                fontFamily="MaterialCommunityIcons"
-                fontSize={26}
-                color={darkFontColor}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() =>
+                  navigation.navigate('ChatStack', {
+                    screen: 'ChatMenu',
+                    params: {room: roomDetail ? roomDetail : room, removeCache},
+                  })
+                }>
+                <Icon
+                  name="dots-horizontal-circle-outline"
+                  fontFamily="MaterialCommunityIcons"
+                  fontSize={26}
+                  color={darkFontColor}
+                />
+              </TouchableOpacity>
+            </Div>
           </Div>
         </HeaderTemplate>
 

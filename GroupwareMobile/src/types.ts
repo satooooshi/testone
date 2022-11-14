@@ -58,6 +58,7 @@ export enum WikiType {
   //掲示板
   BOARD = 'board',
   MAIL_MAGAZINE = 'mail_magazine',
+  INTERVIEW = 'interview',
 }
 
 export enum RuleCategory {
@@ -187,6 +188,7 @@ export interface Wiki {
   writer?: User;
   answers?: QAAnswer[];
   tags?: Tag[];
+  files?: Partial<WikiFile>[];
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
@@ -194,6 +196,15 @@ export interface Wiki {
   isGoodSender?: boolean;
   goodsCount?: number;
   answersCount?: number;
+}
+
+export interface WikiFile {
+  id: number;
+  url: string;
+  name?: string;
+  wiki?: Wiki;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface QAAnswerReply {
@@ -340,6 +351,7 @@ export interface ChatGroup {
   isMute?: boolean;
   memberCount: number;
   members?: User[];
+  owner: User[];
   previousMembers?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;

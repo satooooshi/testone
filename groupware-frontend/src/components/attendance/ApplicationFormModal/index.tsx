@@ -103,7 +103,7 @@ const ApplicationForm = ({
   // };
 
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       {errors?.attendanceTime ? (
         <FormLabel color="tomato">{errors?.attendanceTime}</FormLabel>
       ) : null}
@@ -291,7 +291,7 @@ const ApplicationForm = ({
         </Select>
       </FormControl>
       <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
-        <Button colorScheme={'blue'} onClick={() => handleSubmit()}>
+        <Button colorScheme={'brand'} onClick={() => handleSubmit()}>
           {values.id ? '更新' : '申請'}
         </Button>
         {application?.id && (

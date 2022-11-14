@@ -73,7 +73,7 @@ export const AttendanceReportRow = ({
       <Td>
         <Button
           fontSize={16}
-          colorScheme="blue"
+          colorScheme="brand"
           onClick={() => setDetailModal(true)}>
           詳細
         </Button>
@@ -89,8 +89,8 @@ const AttendanceReport = () => {
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
-    { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
+    { name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
+    { name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
 
   const [visibleFormModal, setFormModal] = useState(false);

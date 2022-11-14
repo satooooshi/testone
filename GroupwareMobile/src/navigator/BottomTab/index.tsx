@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Home from '../../screens/Home';
+import Menu from '../../screens/Menu';
 import EventList from '../../screens/event/EventList';
 // import Wiki from '../../screens/wiki';
 import {RootStackParamList} from '../../types/navigator/RootStackParamList';
@@ -59,7 +60,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const WikiStack = () => (
-  <Stack.Navigator initialRouteName="WikiLinks">
+  <Stack.Navigator initialRouteName="WikiList">
     <Stack.Screen
       name="WikiLinks"
       component={WikiLinks}
@@ -110,11 +111,7 @@ const EventStack = () => (
       component={EventList}
       options={{headerShown: false}}
     />
-    <Stack.Screen
-      name="EventIntroduction"
-      component={EventIntroduction}
-      options={{headerShown: false}}
-    />
+
     <Stack.Screen
       name="EventDetail"
       component={EventDetail}
@@ -123,6 +120,16 @@ const EventStack = () => (
     <Stack.Screen
       name="Share"
       component={Share}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
+const IntroStack = () => (
+  <Stack.Navigator initialRouteName="EventIntroduction">
+    <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -340,7 +347,7 @@ const BottomTab = () => {
           backgroundColor: darkFontColor,
         },
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Home"
         component={Home}
         options={{
@@ -351,6 +358,21 @@ const BottomTab = () => {
               fontFamily="MaterialCommunityIcons"
               color={color}
               fontSize={26}
+            />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="AttendanceStack"
+        component={AttendanceStack}
+        options={{
+          tabBarLabel: '勤怠管理',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="work"
+              fontFamily="MaterialIcons"
+              color={color}
+              fontSize={23}
             />
           ),
         }}
@@ -389,6 +411,7 @@ const BottomTab = () => {
         name="UsersStack"
         component={UserListStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '社員名鑑',
           tabBarIcon: ({color}) => (
             <Icon
@@ -447,6 +470,7 @@ const BottomTab = () => {
         name="AccountStack"
         component={AccountStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: 'アカウント',
           tabBarIcon: ({color}) => (
             <>
@@ -460,25 +484,12 @@ const BottomTab = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="AttendanceStack"
-        component={AttendanceStack}
-        options={{
-          tabBarLabel: '勤怠管理',
-          tabBarIcon: ({color}) => (
-            <Icon
-              name="work"
-              fontFamily="MaterialIcons"
-              color={color}
-              fontSize={23}
-            />
-          ),
-        }}
-      />
+
       <Tab.Screen
         name="AdminStack"
         component={AdminStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '管理',
           tabBarIcon: ({color}) =>
             isAdmin ? (
@@ -492,6 +503,31 @@ const BottomTab = () => {
             ) : (
               <Icon name="tags" color={color} fontSize={26} />
             ),
+        }}
+      />
+      <Tab.Screen
+        name="Menu"
+        component={Menu}
+        options={{
+          tabBarLabel: 'メニュー',
+          tabBarIcon: ({color}) => (
+            <>
+              <Icon
+                name="menu"
+                fontFamily="Feather"
+                color={color}
+                fontSize={23}
+              />
+            </>
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="IntroStack"
+        component={IntroStack}
+        options={{
+          tabBarItemStyle: {display: 'none'},
         }}
       />
     </Tab.Navigator>

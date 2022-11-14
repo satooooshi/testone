@@ -4,6 +4,7 @@ import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
 import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
+import studyMeetingImage from '@/public/study_meeting.jpg';
 import studyMeetingImage1 from '@/public/study_meeting_1.jpg';
 import studyMeetingImage2 from '@/public/study_meeting_2.jpg';
 import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
@@ -24,8 +25,8 @@ const StudyMeeting: React.FC = () => {
     EventType.STUDY_MEETING,
   );
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
-  const headlineImgSource =
-    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_studygroup_main.png';
+  // const headlineImgSource =
+  //   'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_studygroup_main.png';
 
   const bottomImgSources = [studyMeetingImage1, studyMeetingImage2];
 
@@ -34,7 +35,7 @@ const StudyMeeting: React.FC = () => {
       recommendedEvents={recommendedEvents}
       type={type}
       eventIntroduction={eventIntroduction}
-      headlineImgSource={headlineImgSource}
+      headlineImgSource={studyMeetingImage}
       bottomImgSources={bottomImgSources}
       onSaveIntroduction={saveEventIntroduction}
       onSuccessToSaveIntroduction={() => refetch()}

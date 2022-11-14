@@ -429,7 +429,6 @@ const Navigator = () => {
           //rtmにログインしないとinvitationが受け取れないので、アプリ起動時かユーザーがログインしたときにrtmにもログインする(ログインIDは自由に決められるのでアプリのユーザーIDをrtmのログインIDにする)
           await rtmEngine.createInstance(AGORA_APP_ID);
           await rtmEngine.loginV2(user?.id.toString(), res.data);
-          console.log('login as ', user?.id.toString());
         }
       } else {
         await rtmEngine.createInstance(AGORA_APP_ID);
@@ -496,6 +495,8 @@ const Navigator = () => {
             body: remoteMessage.data?.message || remoteMessage.data?.body || '',
             android: {
               channelId: channelId,
+              smallIcon: 'ic_push_notification', // optional, defaults to 'ic_launcher'.
+              //color: '#6B7EFF',  if set, the logo will not be visible. if not set, the icon background will be app manifest's toned-down default_notification_color
               pressAction: {
                 id: 'action_id',
                 launchActivity: 'default',
@@ -531,7 +532,6 @@ const Navigator = () => {
   );
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('setBackgroundMessageHandler called');
     if (Platform.OS === 'android') {
       setTimeout(() => asyncHandleNotifi(remoteMessage), 10);
     }
@@ -543,8 +543,6 @@ const Navigator = () => {
   });
 
   const naviateByNotif = (notification: any) => {
-    console.log('naviateByNotif called ------');
-
     if (
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
@@ -581,20 +579,15 @@ const Navigator = () => {
   useEffect(() => {
     if (user?.id) {
       notifee.onForegroundEvent(({type, detail}) => {
-        console.log('onForegroundEvent call', type);
-
         switch (type) {
           case EventType.DISMISSED:
             break;
           case EventType.PRESS:
-            console.log('onForegroundEvent pressed', type);
             naviateByNotif(detail.notification);
             break;
         }
       });
       notifee.onBackgroundEvent(async ({type, detail}) => {
-        console.log('onBackgroundEvent call');
-
         switch (type) {
           case EventType.DISMISSED:
             break;

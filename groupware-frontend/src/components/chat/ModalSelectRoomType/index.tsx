@@ -73,6 +73,7 @@ const ModalSelectRoomType: React.FC<ModalSelectRoomTypeProps> = ({
                 setIsOpenCreateChatGroupModal(true);
               }
             }}
+            category="メンバー"
           />
           <CreateChatGroupModal
             isOpen={isOpenCreateChatGroupModal}

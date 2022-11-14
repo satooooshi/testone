@@ -215,7 +215,7 @@ const EditAlbum: React.FC<EditAlbumProps> = ({
                         mr="4px"
                         onClick={() => handleSubmit()}
                         mb="8px"
-                        colorScheme="blue"
+                        colorScheme="brand"
                         alignItems="center">
                         <Text display="inline">アルバムを更新</Text>
                       </Button>

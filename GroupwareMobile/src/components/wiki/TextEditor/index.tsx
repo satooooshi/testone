@@ -1,15 +1,16 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import QuillEditor, {QuillToolbar} from 'react-native-cn-quill';
-import {blueColor} from '../../../utils/colors';
+import {blueColor, grayColor} from '../../../utils/colors';
 
 type TextEditorProps = {
   textFormat?: TextFormat;
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
   initialBody?: string;
   onChange: (text: string) => void;
+  quillRef: React.MutableRefObject<QuillEditor | null>;
 };
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -17,11 +18,10 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onUploadImage,
   initialBody,
   onChange,
+  quillRef,
 }) => {
   const [height, setHeight] = useState<number>(200);
   const markdownit = new MarkdownIt();
-  const quillRef = useRef<QuillEditor | null>(null);
-
   const customHandler = (name: string) => {
     if (name === 'image') {
       onUploadImage(async imageURL => {
@@ -53,7 +53,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
             ? initialBody
             : undefined
         }
-        style={{...textEditorStyles.quillEditor, minHeight: height}}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          ...textEditorStyles.quillEditor,
+          minHeight: height,
+          borderColor: grayColor,
+          borderWidth: 1,
+          borderRadius: 10,
+        }}
         quill={{
           // not required just for to show how to pass this props
           placeholder: '本文を入力',
@@ -83,6 +90,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             provider: provided => ({
               ...provided,
               borderTopWidth: 0,
+              overflow: 'hidden',
             }),
             root: provided => ({
               ...provided,
