@@ -124,6 +124,18 @@ const Chat: React.FC = () => {
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     Number(room.id),
+    {
+      enabled: false,
+      onError: () => {
+        navigation.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+        editChatGroup({
+          ...room,
+          members: room.members?.filter(u => u.id !== myself?.id),
+        });
+      },
+    },
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
@@ -158,7 +170,8 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
+  const {handleEnterRoom, refetchRoomCard, editChatGroup, RemovedRoomId} =
+    useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
@@ -826,6 +839,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (isFocused) {
+      refetchRoomDetail();
       setIsTabBarVisible(false);
     } else {
       setIsTabBarVisible(true);
@@ -858,6 +872,12 @@ const Chat: React.FC = () => {
     },
     [room.id, myself?.id, refetchUpdatedMessages],
   );
+
+  useEffect(() => {
+    if (RemovedRoomId === room.id) {
+      refetchRoomDetail();
+    }
+  }, [RemovedRoomId, refetchRoomDetail, room.id]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -936,7 +956,6 @@ const Chat: React.FC = () => {
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => {
-          console.log(message.fileName);
           playVideoOnModal({
             uri: message.content,
             fileName: message.fileName,

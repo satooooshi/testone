@@ -39,6 +39,8 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { isEditableWiki } from 'src/utils/factory/isCreatableWiki';
+import { FileIcon } from 'src/pages/event/[id]';
+// import FileIcon from '@/components/common/FileIcon';
 
 type TOCHead = string[];
 
@@ -299,6 +301,7 @@ const QuestionDetail = () => {
             <Heading my={3} size="lg">
               {wiki.title}
             </Heading>
+
             {headLinkContents &&
             headLinkContents.length &&
             !(
@@ -345,6 +348,31 @@ const QuestionDetail = () => {
               />
             </Box>
           </Box>
+
+          {wiki.files && wiki.files.length ? (
+            <Flex
+              mt={'40px'}
+              mb={'40px'}
+              ml="40px"
+              rounded="md"
+              bg="white"
+              flexDir="column"
+              mr="auto"
+              p="40px">
+              <Text fontWeight="bold" mb="16px">
+                添付ファイル
+              </Text>
+              <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
+                {wiki.files.map((f) =>
+                  f.url && f.name ? (
+                    <Box mr="4px" mb="4px" key={f.id}>
+                      <FileIcon url={f.url} name={f.name} />
+                    </Box>
+                  ) : null,
+                )}
+              </Box>
+            </Flex>
+          ) : null}
           {wiki.type === WikiType.BOARD ? (
             <Box
               display="flex"
@@ -448,7 +476,6 @@ const QuestionDetail = () => {
                           createdAt={answer.createdAt}
                           writer={answer.writer}
                           isWriter={myself?.id === wiki.writer?.id}
-                          replyButtonName={'返信/追記'}
                           onClickReplyButton={() =>
                             handleClickStartInputtingReplyButton(answer)
                           }

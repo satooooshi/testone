@@ -22,6 +22,7 @@ import {
 import { QAAnswer } from './qaAnswer.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
+import { WikiFile } from './wikiFile.entity';
 import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum WikiType {
@@ -29,6 +30,8 @@ export enum WikiType {
   ALL_POSTAL = 'all-postal',
   //掲示板
   BOARD = 'board',
+  MAIL_MAGAZINE = 'mail_magazine',
+  INTERVIEW = 'interview',
 }
 
 export enum RuleCategory {
@@ -119,6 +122,9 @@ export class Wiki {
     default: 'markdown',
   })
   textFormat: TextFormat;
+
+  @OneToMany(() => WikiFile, (file) => file.wiki)
+  files: WikiFile[];
 
   @Column({
     type: 'datetime',

@@ -1,11 +1,7 @@
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import React, { useEffect, useState } from 'react';
 import { ChatGroup, User } from 'src/types';
-import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, Box, useToast, Text } from '@chakra-ui/react';
-import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { Tab } from 'src/types/header/tab/types';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import ChatBox from '@/components/chat/ChatBox';
@@ -13,9 +9,8 @@ import 'emoji-mart/css/emoji-mart.css';
 import RoomList from '@/components/chat/RoomList';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import ChatLayout from '@/components/chat/Layout';
-import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useAPIDeleteChatRoom } from '@/hooks/api/chat/useAPIDeleteChatRoom';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
-import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 const ChatDetail = () => {
@@ -28,7 +23,6 @@ const ChatDetail = () => {
   //   transports: ['websocket'],
   // });
   const { setChatGroupsState, chatGroups } = useHandleBadge();
-
   const { refetch: getRoom } = useAPIGetRoomDetail(Number(id), {
     enabled: false,
     onSuccess: (data) => {
@@ -41,9 +35,14 @@ const ChatDetail = () => {
       setCurrentRoom(data);
     },
     onError: (err) => {
-      setCurrentRoom(undefined);
       if (err?.response?.data?.message) {
         alert(err?.response?.data?.message);
+        console.log('status code = ', err?.response?.status);
+
+        if (err?.response?.status === 412) {
+          setChatGroupsState(chatGroups.filter((g) => g.id !== Number(id)));
+        }
+        setCurrentRoom(undefined);
       }
     },
   });
@@ -63,11 +62,19 @@ const ChatDetail = () => {
     },
   });
 
+  const { mutate: deleteChatGroup } = useAPIDeleteChatRoom();
+
   const handleMenuSelected = (menuValue: MenuValue) => {
     switch (menuValue) {
       case 'editMembers':
         dispatchModal({
           type: 'editMembersModalVisible',
+          value: true,
+        });
+        break;
+      case 'editOwners':
+        dispatchModal({
+          type: 'editOwnersModalVisible',
           value: true,
         });
         break;
@@ -92,6 +99,20 @@ const ChatDetail = () => {
           );
         }
         break;
+    }
+    if (menuValue === 'deleteRoom') {
+      if (confirm('このルームを解散してよろしいですか？')) {
+        deleteChatGroup(
+          { id: Number(id) },
+          {
+            onSuccess: () => {
+              router.push('/chat', undefined, { shallow: true });
+              setChatGroupsState(chatGroups.filter((g) => g.id != Number(id)));
+            },
+          },
+        );
+      }
+      return;
     }
   };
 

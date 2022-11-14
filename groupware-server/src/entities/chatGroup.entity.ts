@@ -117,6 +117,21 @@ export class ChatGroup {
   })
   members?: User[];
 
+  @ManyToMany(() => User, (user) => user.chatGroupOwner, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chatGroupOwner_joining',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  owner?: User[];
+
   @ManyToMany(() => User, (user) => user.leftChatGroups, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

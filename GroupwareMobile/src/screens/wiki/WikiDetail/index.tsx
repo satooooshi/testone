@@ -8,6 +8,7 @@ import {
   Icon,
   ScrollDiv,
   Modal,
+  Image,
 } from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
@@ -49,6 +50,10 @@ import {
 } from '../../../utils/dateTimeFormatterFromJSDate';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
+import FileIcon from '../../../components/common/FileIcon';
+import ImageView from 'react-native-image-viewing';
+import DownloadIcon from '../../../components/common/DownLoadIcon';
+import ChatShareIcon from '../../../components/common/ChatShareIcon';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
 import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
@@ -70,6 +75,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const [wikiState, setWikiState] = useState(wikiInfo);
   const [isVisibleTOCModal, setIsVisibleTOCModal] = useState<boolean>(false);
   const [activeEntry, setActiveEntry] = useState<string>('');
+  const [imageModal, setImageModal] =
+    useState<{index: number; visible: boolean}>();
 
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
@@ -78,7 +85,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       : wikiState?.textFormat === 'markdown'
       ? mdParser.render(wikiState?.body || '')
       : '';
-  const {dom, headings} = useDom(wikiBody);
+  const {dom, headings, imageUrls} = useDom(wikiBody);
   const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
   const {mutate: getGoodsForBoard, data: goodsForBoard} =
     useAPIGetGoodsForBoard();
@@ -320,6 +327,57 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
+        <ScrollDiv mb={5} flexDir="row" horizontal>
+          {imageUrls.length
+            ? imageUrls.map((i, index) => (
+                <TouchableHighlight
+                  onPress={() => setImageModal({visible: true, index: index})}>
+                  <Image
+                    w={50}
+                    h={50}
+                    mt={5}
+                    mb={20}
+                    mr={5}
+                    source={{uri: i}}
+                  />
+                </TouchableHighlight>
+              ))
+            : null}
+        </ScrollDiv>
+        <Text fontWeight="bold" fontSize={16}>
+          {wikiInfo?.files?.length ? '添付ファイル' : null}
+        </Text>
+        <Div flexDir="row" flexWrap="wrap" mt={10} mb={10}>
+          {wikiInfo?.files?.map(f =>
+            f.url && f.name ? (
+              <Div mr={4} mb={4}>
+                <FileIcon url={f.url} name={f.name} />
+              </Div>
+            ) : null,
+          )}
+        </Div>
+        <ImageView
+          animationType="slide"
+          images={imageUrls.map(i => {
+            return {uri: i};
+          })}
+          imageIndex={imageModal?.index ? imageModal?.index : 0}
+          visible={!!imageModal?.visible}
+          onRequestClose={() => setImageModal(undefined)}
+          swipeToCloseEnabled={false}
+          doubleTapToZoomEnabled={true}
+          FooterComponent={({imageIndex}) => (
+            <Div>
+              <DownloadIcon url={imageUrls[imageIndex]} />
+              <ChatShareIcon
+                image={{
+                  fileName: `image${imageIndex + 1}.png`,
+                  uri: imageUrls[imageIndex],
+                }}
+              />
+            </Div>
+          )}
+        />
 
         {goodsForBoard && (
           <GoodSendersModal

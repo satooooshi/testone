@@ -51,7 +51,7 @@ const UserModal: React.FC<UserModalProps> = props => {
     clear,
   } = useSelectedUsers(defaultSelectedUsers || []);
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
-  const [modalUsers, setModalUsers] = useState<User[]>();
+  const [modalUsers, setModalUsers] = useState<User[]>(users);
   const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
     alreadySelectedUserRole,
     modalUsers,
@@ -74,7 +74,7 @@ const UserModal: React.FC<UserModalProps> = props => {
 
   const onCloseUserModal = () => {
     onCloseModal();
-    setModalUsers(users);
+    setModalUsers([]);
     setSearchWords(undefined);
     selectUserRole('All');
     clear();

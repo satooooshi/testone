@@ -324,6 +324,7 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
+    chatGroup.owner = chatGroup?.members?.filter((u) => u.id === user.id) || [];
     const savedGroup = await this.chatService.v2SaveChatGroup(
       chatGroup,
       req.user.id,
@@ -426,6 +427,13 @@ export class ChatController {
         silentNotification,
       );
     }
+  }
+
+  @Post('delete-room')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteGroup(@Body() chatGroup: Partial<ChatGroup>) {
+    const { id: chatGroupId } = chatGroup;
+    await this.chatService.deleteChatRoom(chatGroupId);
   }
 
   @Delete('/v2/reaction/:reactionId')

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
@@ -716,6 +717,33 @@ export class ChatService {
     return savedMessage;
   }
 
+  async deleteChatRoom(chatGroupID: number) {
+    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
+    if (!targetGroup) {
+      throw new BadRequestException('The chat room has already been deleted.');
+    }
+    const manager = getManager();
+    const members: User[] = await manager.query(
+      'select chat_group_id, users.id as id from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [chatGroupID],
+    );
+    await this.chatGroupRepository.delete(chatGroupID);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'remove',
+        screen: '',
+        id: targetGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      members.map((u) => u.id),
+      silentNotification,
+    );
+  }
+
   public async deleteMessage(message: Partial<ChatMessage>) {
     if (!message.chatGroup || !message.chatGroup.id) {
       throw new BadRequestException('No group is selected');
@@ -755,7 +783,7 @@ export class ChatService {
   public async joinChatGroup(user: User, chatGroupID: number) {
     const targetGroup: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },
-      relations: ['members'],
+      relations: ['members', 'owner'],
     });
 
     const isUserJoining = targetGroup.members.filter(
@@ -791,6 +819,11 @@ export class ChatService {
       throw new BadRequestException('The user is not participant');
     }
 
+    const isOwner = !!(await manager.query(
+      'select user_id from user_chatGroupOwner_joining where user_id = ? AND chat_group_id = ?',
+      [user.id, chatGroupID],
+    ));
+
     await this.chatGroupRepository
       .createQueryBuilder()
       .update(ChatGroup)
@@ -802,11 +835,32 @@ export class ChatService {
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .remove(user.id);
+    if (isOwner) {
+      await this.chatGroupRepository
+        .createQueryBuilder()
+        .relation(ChatGroup, 'owner')
+        .of(chatGroupID)
+        .remove(user.id);
+
+      const otherMemberIds = await manager.query(
+        'select user_id as id from user_chat_joining where user_id <> ? AND chat_group_id = ?',
+        [user.id, chatGroupID],
+      );
+
+      if (otherMemberIds.length) {
+        await this.chatGroupRepository
+          .createQueryBuilder()
+          .relation(ChatGroup, 'owner')
+          .of(chatGroupID)
+          .add(otherMemberIds[0].id);
+      }
+    }
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'previousMembers')
       .of(chatGroupID)
       .add(user.id);
+
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
@@ -976,6 +1030,7 @@ export class ChatService {
       members: newData.members,
       memberCount: newData.members.length,
       name: newData.name,
+      owner: newData.owner,
       updatedAt: new Date(),
     });
     if (existGroup.name !== newGroup.name) {
@@ -1044,6 +1099,9 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
+    const ownerIds = newData.owner.map((u) => u.id);
+    const users = await this.userRepository.findByIds(userIds);
+    const owners = await this.userRepository.findByIds(ownerIds);
     if (newData.roomType === RoomType.TALK_ROOM) {
       const name = newData.members?.map((m) => m.lastName + m.firstName).join();
       newData.name = name.slice(0, 20);
@@ -1093,12 +1151,22 @@ export class ChatService {
       return existGroup[0];
     }
 
+    newData.members = users;
+    newData.owner = owners;
+
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create({
         ...newData,
         memberCount,
       }),
     );
+    const initLastReadTime = newGroup.members.map((u) => ({
+      user: u,
+      chatGroup: newGroup,
+      readTime: new Date(),
+    }));
+    await this.lastReadChatTimeRepository.save(initLastReadTime);
+
     return newGroup;
   }
 
@@ -1168,7 +1236,8 @@ export class ChatService {
       .getOne();
 
     if (!existRoom) {
-      throw new InternalServerErrorException('the room is not exist');
+      // throw new InternalServerErrorException('the room is not exist');
+      throw new HttpException('the room is not exist', 412);
     }
 
     const manager = getManager();
@@ -1180,10 +1249,15 @@ export class ChatService {
       'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
+    const owners: User[] = await manager.query(
+      'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chatGroupOwner_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
 
     // existRoom.previousMembers = previousMembers;
-    checkAloneRoom(existRoom, userId);
     existRoom.members = members;
+    existRoom.owner = owners;
+    checkAloneRoom(existRoom, userId);
     // existRoom.imageURL = await genSignedURL(existRoom.imageURL);
     // existRoom.members = await Promise.all(
     //   members.map(async (m) => ({
@@ -1205,12 +1279,12 @@ export class ChatService {
     // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
 
     const manager = getManager();
-    const isMember = await manager.query(
+    const isMember: User[] = await manager.query(
       'select chat_group_id from user_chat_joining where chat_group_id = ? AND user_id = ?',
       [chatGroupId, user.id],
     );
 
-    if (!isMember) {
+    if (!isMember.length) {
       throw new NotAcceptableException('Something went wrong');
     }
 

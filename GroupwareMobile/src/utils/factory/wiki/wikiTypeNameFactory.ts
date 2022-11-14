@@ -38,6 +38,10 @@ export const wikiTypeNameFactory = (
       }
     case WikiType.ALL_POSTAL:
       return 'オール便';
+    case WikiType.MAIL_MAGAZINE:
+      return 'メルマガ';
+    case WikiType.INTERVIEW:
+      return '全社員インタビュー';
     case WikiType.RULES:
       if (nested) {
         switch (ruleCategory) {

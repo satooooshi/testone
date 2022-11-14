@@ -95,6 +95,11 @@ const UserList = () => {
     }
   }, [query.tag, tags]);
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    queryRefresh({ page: '1', word: '', tag: '' });
+  };
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
@@ -104,7 +109,8 @@ const UserList = () => {
       </Head>
       {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
       <SearchForm
-        onClear={() => setSelectedTags([])}
+        onClearTag={() => setSelectedTags([])}
+        onClear={() => resetSearch()}
         // value={searchWord || ''}
         // onChange={(e) => setSearchWord(e.currentTarget.value)}
         // onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
