@@ -12,7 +12,7 @@ const unmatchPasswordConfirmation = '再入力と新しいパスワードが一�
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
 const kanaFormatMessage = 'カタカナのみで入力してください。';
-// const minHostUsersMessage = '開催者/講師は一人以上設定してください';
+// const minHostUsersMessage = '開催者は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().required(`メールアドレスは${requireMessage}`),

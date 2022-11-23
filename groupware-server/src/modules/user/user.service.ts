@@ -44,13 +44,9 @@ export class UserService {
       case UserRole.ADMIN:
         return '管理者';
       case UserRole.COMMON:
-        return '一般社員';
-      case UserRole.EXTERNAL_INSTRUCTOR:
-        return '講師(外部)';
-      case UserRole.INTERNAL_INSTRUCTOR:
-        return '講師(社員)';
-      case UserRole.COACH:
-        return '本社勤務';
+        return 'ファン';
+      case UserRole.INFLUENCER:
+        return 'インフルエンサー';
     }
   }
 
@@ -64,16 +60,16 @@ export class UserService {
       { label: '名', value: 'firstName' },
       { label: '自己紹介', value: 'introduce' },
       { label: '役職', value: 'role' },
-      { label: '社員コード', value: 'employeeId' },
-      { label: '技術', value: 'technologyTag' },
-      { label: '部活動', value: 'clubTag' },
-      { label: '資格', value: 'qualificationTag' },
+      // { label: '社員コード', value: 'employeeId' },
+      { label: '才能・スキル', value: 'technologyTag' },
+      { label: 'ジャンル', value: 'clubTag' },
+      { label: '活動地域', value: 'qualificationTag' },
       { label: '趣味', value: 'hobbyTag' },
       { label: 'その他のタグ', value: 'otherTag' },
       { label: 'イベント参加数', value: 'eventCount' },
-      { label: '質問数', value: 'questionCount' },
+      { label: 'メッセージ数', value: 'questionCount' },
       { label: '回答数', value: 'answerCount' },
-      { label: 'ナレッジ投稿数', value: 'knowledgeCount' },
+      { label: 'コメント数', value: 'knowledgeCount' },
     ];
     const csvParser = new Parser({ fields: csvFields });
     const searchQuery = this.userRepository

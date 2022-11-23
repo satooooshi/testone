@@ -1,15 +1,18 @@
 export type UserRoleInApp = 'All' | UserRole;
 export enum UserRole {
   ADMIN = 'admin',
-  EXTERNAL_INSTRUCTOR = 'external_instructor',
-  INTERNAL_INSTRUCTOR = 'internal_instructor',
-  COACH = 'coach',
+  INFLUENCER = 'influencer',
   COMMON = 'common',
 }
 
 export enum BranchType {
-  TOKYO = 'tokyo',
-  OSAKA = 'osaka',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
+  OTHER = 'other',
   NON_SET = 'non_set',
 }
 
@@ -24,12 +27,12 @@ export enum ChatMessageType {
 }
 
 export enum EventType {
-  IMPRESSIVE_UNIVERSITY = 'impressive_university',
-  STUDY_MEETING = 'study_meeting',
-  BOLDAY = 'bolday',
-  COACH = 'coach',
-  CLUB = 'club',
-  SUBMISSION_ETC = 'submission_etc',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
   OTHER = 'other',
 }
 

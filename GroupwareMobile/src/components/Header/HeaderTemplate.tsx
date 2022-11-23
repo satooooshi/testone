@@ -81,7 +81,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             <FastImage
               style={headerStyles.logoImage}
               resizeMode="contain"
-              source={require('../../../assets/bold-logo.png')}
+              source={require('../../../assets/fanreturn_logo.png')}
             />
           </TouchableHighlight> */}
         <Text
@@ -98,6 +98,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
         <Div h={48} bg="white" py="xs" px="xs" row alignItems="center">
           <FlatList
             style={headerStyles.tabList}
+            showsHorizontalScrollIndicator={false}
             data={tabs}
             horizontal
             renderItem={({item: t}) => (

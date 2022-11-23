@@ -286,15 +286,11 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'submission_etc':
         return '〆切一覧';
       case 'wiki':
-        return '社内Wiki';
+        return 'News';
       case 'rules':
         return '社内規則';
       case 'all-postal':
-        return 'オール便';
-      case 'mail_magazine':
-        return 'メルマガ';
-      case 'interview':
-        return '全社員インタビュー';
+        return '運営からのお知らせ';
       case 'knowledge':
         return 'ナレッジ';
       case 'qa':
@@ -314,7 +310,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'board':
         return '掲示板';
       case 'users':
-        return '社員名鑑';
+        return 'メンバー';
       case 'attendance':
         return '勤怠打刻';
       case 'logout':

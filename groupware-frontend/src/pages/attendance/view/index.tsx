@@ -75,6 +75,7 @@ const AttendanceRow = ({
     user: user as User,
     travelCost: [],
   };
+
   const { mutate: createAttendance } = useAPICreateAttendance({
     onSuccess: (created) => {
       setValues(created);
@@ -445,7 +446,7 @@ const AttendanceView = () => {
         activeTabName: '勤怠打刻',
       }}>
       <Head>
-        <title>ボールド | 勤怠打刻</title>
+        <title>FanReturn | 勤怠打刻</title>
       </Head>
       <DefaultModal
         onCloseModal={() => setDefaultModal(false)}

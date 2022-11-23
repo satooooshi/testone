@@ -224,7 +224,8 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          ボールド | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
+          FanReturn |{' '}
+          {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
@@ -302,10 +303,10 @@ const MyAccountInfo = () => {
                   <Text>
                     {profile.isPhonePublic ? profile.phone : '非公開'}
                   </Text>
-                  <Text fontWeight="bold">所属支社</Text>
+                  <Text fontWeight="bold">ジャンル</Text>
                   <Text>{branchTypeNameFactory(profile.branch)}</Text>
-                  <Text fontWeight="bold">社員コード</Text>
-                  <Text>{profile.employeeId || '未登録'}</Text>
+                  {/* <Text fontWeight="bold">社員コード</Text>
+                  <Text>{profile.employeeId || '未登録'}</Text> */}
                 </SimpleGrid>
                 <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
                   タグ
@@ -317,10 +318,10 @@ const MyAccountInfo = () => {
                   mb="20px"
                   rounded="5px"
                   spacingY="16px">
-                  <Text fontWeight="bold">技術タグ</Text>
+                  <Text fontWeight="bold">才能・スキルタグ</Text>
                   <UserTagList tags={profile.tags} type={TagType.TECH} />
                   <Text mb="8px">{profile.introduceTech || '未入力'}</Text>
-                  <Text fontWeight="bold">資格タグ</Text>
+                  <Text fontWeight="bold">ジャンルタグ</Text>
                   <UserTagList
                     tags={profile.tags}
                     type={TagType.QUALIFICATION}
@@ -328,7 +329,7 @@ const MyAccountInfo = () => {
                   <Text mb="8px">
                     {profile.introduceQualification || '未入力'}
                   </Text>
-                  <Text fontWeight="bold">部活動タグ</Text>
+                  <Text fontWeight="bold">活動地域タグ</Text>
                   <UserTagList tags={profile.tags} type={TagType.CLUB} />
                   <Text mb="8px">{profile.introduceClub || '未入力'}</Text>
                   <Text fontWeight="bold">趣味タグ</Text>
@@ -336,33 +337,32 @@ const MyAccountInfo = () => {
                   <Text mb="8px">{profile.introduceHobby || '未入力'}</Text>
                 </SimpleGrid>
                 <Box w="100%">
-                  {profile?.id !== user?.id &&
-                    profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
-                      <Button
-                        h={'64px'}
-                        w={'64px'}
-                        bg={blueColor}
-                        position={'fixed'}
-                        top={'auto'}
-                        bottom={'24px'}
-                        right={'24px'}
-                        rounded={'full'}
-                        zIndex={1}
-                        px={0}
-                        _hover={{ textDecoration: 'none' }}>
-                        <HiOutlineChat
-                          style={{ width: 40, height: 40 }}
-                          onClick={() =>
-                            createGroup({
-                              name: '',
-                              members: [profile],
-                              roomType: RoomType.PERSONAL,
-                            })
-                          }
-                          color="white"
-                        />
-                      </Button>
-                    )}
+                  {profile?.id !== user?.id && (
+                    <Button
+                      h={'64px'}
+                      w={'64px'}
+                      bg={blueColor}
+                      position={'fixed'}
+                      top={'auto'}
+                      bottom={'24px'}
+                      right={'24px'}
+                      rounded={'full'}
+                      zIndex={1}
+                      px={0}
+                      _hover={{ textDecoration: 'none' }}>
+                      <HiOutlineChat
+                        style={{ width: 40, height: 40 }}
+                        onClick={() =>
+                          createGroup({
+                            name: '',
+                            members: [profile],
+                            roomType: RoomType.PERSONAL,
+                          })
+                        }
+                        color="white"
+                      />
+                    </Button>
+                  )}
                 </Box>
               </>
             )}

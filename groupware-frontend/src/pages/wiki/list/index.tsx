@@ -82,19 +82,13 @@ const QAQuestionList = () => {
   });
 
   const initialHeaderValue = {
-    title: '社内Wiki',
+    title: 'News',
     activeTabName:
-      type === WikiType.RULES
-        ? '社内規則'
-        : type === WikiType.BOARD
+      type === WikiType.BOARD
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
-        ? 'オール便'
-        : type === WikiType.MAIL_MAGAZINE
-        ? 'メルマガ'
-        : type === WikiType.INTERVIEW
-        ? '全社員インタビュー'
-        : 'All',
+        ? '運営からのお知らせ'
+        : '全て',
     tabs,
   };
 
@@ -121,7 +115,7 @@ const QAQuestionList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | Wiki</title>
+        <title>FanReturn | Wiki</title>
       </Head>
       {/* <Box w="100%" mb="24px">
         <TopTabBar topTabBehaviorList={topTab} />

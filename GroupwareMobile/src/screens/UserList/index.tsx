@@ -61,9 +61,7 @@ const UserList: React.FC = () => {
     'AllRole',
     UserRole.ADMIN,
     UserRole.COMMON,
-    UserRole.COACH,
-    UserRole.INTERNAL_INSTRUCTOR,
-    UserRole.EXTERNAL_INSTRUCTOR,
+    UserRole.INFLUENCER,
   ];
 
   useEffect(() => {
@@ -95,11 +93,7 @@ const UserList: React.FC = () => {
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <HeaderWithTextButton
-        title="社員名鑑"
-        enableBackButton={true}
-        screenForBack={'Menu'}
-      />
+      <HeaderWithTextButton title="メンバー" />
       <TopTab.Navigator
         initialRouteName={topTabNames[0]}
         screenOptions={{tabBarScrollEnabled: true}}>
@@ -150,36 +144,10 @@ const UserList: React.FC = () => {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               isLoading={isLoading}
-              userRole={UserRole.COACH}
+              userRole={UserRole.INFLUENCER}
             />
           )}
-          options={{title: userRoleNameFactory(UserRole.COACH)}}
-        />
-        <TopTab.Screen
-          name={topTabNames[4]}
-          children={() => (
-            <UserCardList
-              userList={usersForInfiniteScroll}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              isLoading={isLoading}
-              userRole={UserRole.INTERNAL_INSTRUCTOR}
-            />
-          )}
-          options={{title: userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}}
-        />
-        <TopTab.Screen
-          name={topTabNames[5]}
-          children={() => (
-            <UserCardList
-              userList={usersForInfiniteScroll}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              isLoading={isLoading}
-              userRole={UserRole.EXTERNAL_INSTRUCTOR}
-            />
-          )}
-          options={{title: userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}}
+          options={{title: userRoleNameFactory(UserRole.INFLUENCER)}}
         />
       </TopTab.Navigator>
     </WholeContainer>

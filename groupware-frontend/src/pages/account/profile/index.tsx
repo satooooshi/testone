@@ -272,7 +272,7 @@ const Profile = () => {
         activeTabName: 'プロフィール編集',
       }}>
       <Head>
-        <title>ボールド | プロフィール編集</title>
+        <title>FanReturn | プロフィール編集</title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
         <Button bg="white" w="120px" onClick={() => router.back()}>
@@ -527,7 +527,7 @@ const Profile = () => {
         </FormControl>
         {/* <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            所属支社
+            ジャンル
           </FormLabel>
           <Select
             name="branch"
@@ -536,8 +536,13 @@ const Profile = () => {
             border="none"
             onChange={handleChange}>
             <option value={BranchType.NON_SET}>未設定</option>
-            <option value={BranchType.TOKYO}>東京</option>
-            <option value={BranchType.OSAKA}>大阪</option>
+            <option value={BranchType.ARTIST}>アーティスト</option>
+            <option value={BranchType.IDOL}>アイドル</option>
+            <option value={BranchType.YOUTUBER}>YouTuber</option>
+            <option value={BranchType.TIKTOKER}>TikToker</option>
+            <option value={BranchType.INSTAGRAMER}>インスタグラマー</option>
+            <option value={BranchType.TALENT}>タレント</option>
+            <option value={BranchType.OTHER}>その他</option>
           </Select>
         </FormControl> */}
         <FormControl mb={4}>

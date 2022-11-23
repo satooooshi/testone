@@ -83,7 +83,7 @@ const ChatLayout: FC<Props> = ({
         setMembersModal: setMembersModal,
       }}>
       <Head>
-        <title>ボールド | Chat</title>
+        <title>FanReturn | Chat</title>
       </Head>
 
       {modalStates && dispatchModal ? (

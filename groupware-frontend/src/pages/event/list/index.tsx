@@ -119,7 +119,7 @@ const initialEventValue = {
     hours: 21,
     minutes: 0,
   }),
-  type: EventType.STUDY_MEETING,
+  type: EventType.ARTIST,
   imageURL: '',
   chatNeeded: false,
   hostUsers: [],
@@ -129,13 +129,13 @@ const initialEventValue = {
 };
 
 const eventTitleText = {
-  [EventType.IMPRESSIVE_UNIVERSITY]: '感動大学',
-  [EventType.STUDY_MEETING]: '勉強会',
-  [EventType.BOLDAY]: 'BOLDay',
-  [EventType.COACH]: 'コーチ制度',
-  [EventType.CLUB]: '部活動',
-  [EventType.SUBMISSION_ETC]: '提出物等',
-  [EventType.OTHER]: 'その他',
+  [EventType.ARTIST]: 'アーティスト',
+  [EventType.IDOL]: 'アイドル',
+  [EventType.YOUTUBER]: 'YouTuber',
+  [EventType.TIKTOKER]: 'TikToker',
+  [EventType.INSTAGRAMER]: 'インスタグラマー',
+  [EventType.TALENT]: 'タレント',
+  [EventType.OTHER]: 'other',
 };
 
 type EventListGetParams = SearchQueryToGetEvents & {
@@ -269,23 +269,26 @@ const EventList = () => {
   };
 
   const activeTabName = () => {
-    if (type === EventType.IMPRESSIVE_UNIVERSITY) {
-      return EventTab.IMPRESSIVE_UNIVERSITY;
+    if (type === EventType.ARTIST) {
+      return EventTab.ARTIST;
     }
-    if (type === EventType.BOLDAY) {
-      return EventTab.BOLDAY;
+    if (type === EventType.IDOL) {
+      return EventTab.IDOL;
     }
-    if (type === EventType.STUDY_MEETING) {
-      return EventTab.STUDY_MEETING;
+    if (type === EventType.YOUTUBER) {
+      return EventTab.YOUTUBER;
     }
-    if (type === EventType.COACH) {
-      return EventTab.COACH;
+    if (type === EventType.TIKTOKER) {
+      return EventTab.TIKTOKER;
     }
-    if (type === EventType.CLUB) {
-      return EventTab.CLUB;
+    if (type === EventType.INSTAGRAMER) {
+      return EventTab.INSTAGRAMER;
     }
-    if (type === EventType.SUBMISSION_ETC) {
-      return EventTab.SUBMISSION_ETC;
+    if (type === EventType.TALENT) {
+      return EventTab.TALENT;
+    }
+    if (type === EventType.OTHER) {
+      return EventTab.OTHER;
     }
     if (type === EventType.OTHER) {
       return EventTab.OTHER;
@@ -340,6 +343,26 @@ const EventList = () => {
     if (confirm('イベント日時が変更されます。よろしいですか？')) {
       const newEventInfo = { ...event, startAt: start, endAt: end };
       updateEvent(newEventInfo);
+    }
+  };
+
+  const eventPropGetter = (event: any): any => {
+    const type = event.type;
+    switch (type) {
+      case EventType.ARTIST:
+        return { style: { backgroundColor: '#3182ce' } };
+      case EventType.IDOL:
+        return { style: { backgroundColor: '#38a169' } };
+      case EventType.YOUTUBER:
+        return { style: { backgroundColor: '#f6ad55' } };
+      case EventType.TIKTOKER:
+        return { style: { backgroundColor: '#90cdf4', color: '#65657d' } };
+      case EventType.INSTAGRAMER:
+        return { style: { backgroundColor: '#f56565' } };
+      case EventType.TALENT:
+        return { style: { backgroundColor: '#086f83' } };
+      case EventType.OTHER:
+        return { style: { backgroundColor: 'gray' } };
     }
   };
 
@@ -517,7 +540,7 @@ const EventList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
-          ボールド | {type ? eventTitleText[type] : '全てのイベント'}
+          FanReturn | {type ? eventTitleText[type] : '全てのイベント'}
         </title>
       </Head>
       <CreateEventModal

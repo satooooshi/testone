@@ -92,7 +92,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     files: [],
     boardCategory:
       type === WikiType.BOARD || !type
-        ? BoardCategory.QA
+        ? BoardCategory.OTHER
         : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
@@ -306,7 +306,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           tabs,
         }}>
         <Head>
-          <title>ボールド | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
+          <title>FanReturn | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
         </Head>
         <TagModal
           isOpen={tagModal}
@@ -359,9 +359,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 colorScheme="teal"
                 bg="white"
                 onChange={onTypeSelectionChange}
-                defaultValue={newQuestion.type}>
-                <option label={'指定なし'}></option>
-                {isCreatableWiki({
+                defaultValue={
+                  type === WikiType.RULES
+                    ? RuleCategory.RULES
+                    : type === WikiType.ALL_POSTAL
+                    ? type
+                    : BoardCategory.QA
+                }>
+                {/* {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
@@ -402,7 +407,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       )}
                     </option>
                   </>
-                ) : null}
+                ) : null} */}
                 {isCreatableWiki({
                   type: WikiType.ALL_POSTAL,
                   userRole: user?.role,
@@ -412,38 +417,28 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   </option>
                 ) : null}
                 {isCreatableWiki({
-                  type: WikiType.MAIL_MAGAZINE,
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.KNOWLEDGE,
                   userRole: user?.role,
                 }) ? (
-                  <option value={WikiType.MAIL_MAGAZINE}>
-                    {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.MAIL_MAGAZINE,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={WikiType.INTERVIEW}>
-                    {wikiTypeNameFactory(WikiType.INTERVIEW)}
+                  <option value={BoardCategory.KNOWLEDGE}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.KNOWLEDGE,
+                    )}
                   </option>
                 ) : null}
 
-                <option value={BoardCategory.KNOWLEDGE}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.KNOWLEDGE,
-                  )}
-                </option>
-                <option value={BoardCategory.QA}>
+                {/* <option value={BoardCategory.QA}>
                   {wikiTypeNameFactory(
                     WikiType.BOARD,
                     undefined,
                     true,
                     BoardCategory.QA,
                   )}
-                </option>
+                </option> */}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.NEWS,
@@ -455,20 +450,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.NEWS,
-                    )}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.BOARD,
-                  boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-                    {wikiTypeNameFactory(
-                      WikiType.BOARD,
-                      undefined,
-                      true,
-                      BoardCategory.IMPRESSIVE_UNIVERSITY,
                     )}
                   </option>
                 ) : null}
@@ -488,20 +469,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 ) : null}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
-                  boardCategory: BoardCategory.STUDY_MEETING,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={BoardCategory.STUDY_MEETING}>
-                    {wikiTypeNameFactory(
-                      WikiType.BOARD,
-                      undefined,
-                      true,
-                      BoardCategory.STUDY_MEETING,
-                    )}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.BOARD,
                   boardCategory: BoardCategory.SELF_IMPROVEMENT,
                   userRole: user?.role,
                 }) ? (
@@ -514,7 +481,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     )}
                   </option>
                 ) : null}
-                {isCreatableWiki({
+                {/* {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
                   userRole: user?.role,
@@ -541,7 +508,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       BoardCategory.CELEBRATION,
                     )}
                   </option>
-                ) : null}
+                ) : null} */}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.OTHER,

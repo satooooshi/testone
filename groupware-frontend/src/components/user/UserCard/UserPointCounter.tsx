@@ -17,11 +17,11 @@ const UserPointCounter: React.FC<UserPointCounterType> = ({
       case 'event':
         return 'イベント参加数';
       case 'question':
-        return '質問数';
+        return 'メッセージ数';
       case 'answer':
-        return '質問回答数';
+        return 'メッセージ回答数';
       case 'knowledge':
-        return 'ナレッジ投稿数';
+        return 'コメント数';
     }
   }, [label]);
 

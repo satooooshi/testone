@@ -5,6 +5,6 @@ export const travelCostCategoryName = (category: TravelCostCategory) => {
     case TravelCostCategory.CLIENT:
       return '現場(お客様都合)';
     case TravelCostCategory.INHOUSE:
-      return 'ボールド(自社都合)';
+      return 'Valleyin(自社都合)';
   }
 };

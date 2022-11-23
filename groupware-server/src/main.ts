@@ -30,6 +30,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:8080',
+      'https://valleyin-app-frontend-sgzkfl3uyq-an.a.run.app',
       'https://editor-example-kabasawa-sgzkfl3uyq-an.a.run.app',
       'https://groupware-frontend.vercel.app',
       'groupware-frontend.vercel.app',
@@ -38,7 +39,8 @@ async function bootstrap() {
       'https://frontend-bold-groupware-develop-zznmsfdywq-an.a.run.app',
       'https://groupware-frontend-theta.vercel.app',
       'https://groupware-seven.vercel.app',
-      'https://valleyin-sample-app-groupware-frontend-sgzkfl3uyq-an.a.run.app',
+      'https://valleyin-vallyein-app-groupware-frontend-sgzkfl3uyq-an.a.run.app',
+      'https://frontend-for-client2-sgzkfl3uyq-an.a.run.app',
       '*',
       process.env.CLIENT_DOMAIN,
     ],

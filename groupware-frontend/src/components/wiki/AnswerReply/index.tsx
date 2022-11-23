@@ -33,14 +33,13 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
               </a>
             </Link>
           ) : (
-            <Avatar
-              cursor="pointer"
-              h="50px"
-              w="50px"
-              borderRadius="25px"
-              mr="20px"
-              src={boldMascot.src}
-            />
+            <>
+              <Avatar
+                className={answerReplyStyles.user_avatar}
+                src={boldMascot.src}
+              />
+              <p className={answerReplyStyles.user_name}>vallyeinくん</p>
+            </>
           )}
           <Text color="gray">{userNameFactory(reply.writer)}</Text>
         </Flex>

@@ -183,9 +183,6 @@ const ExportCsv = () => {
               </Box>
             </Box>
 
-            <Text color={darkFontColor} mt={5}>
-              ※提出物等を除いて出力されます
-            </Text>
             <Text color={darkFontColor} mt={3}>
               ※開始日で選択した日付以降、終了日で指定した日付以前に終了したイベントデータが出力されます
             </Text>

@@ -276,7 +276,7 @@ const Profile = () => {
         title: 'Admin',
       }}>
       <Head>
-        <title>ボールド | プロフィール編集</title>
+        <title>FanReturn | プロフィール編集</title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
         <Button bg="white" w="120px" onClick={() => router.back()}>
@@ -530,7 +530,7 @@ const Profile = () => {
         </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            <p>社員区分</p>
+            <p>メンバー区分</p>
           </FormLabel>
           <Select
             name="role"
@@ -542,14 +542,8 @@ const Profile = () => {
             <option value={UserRole.ADMIN}>
               {userRoleNameFactory(UserRole.ADMIN)}
             </option>
-            <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-              {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-            </option>
-            <option value={UserRole.INTERNAL_INSTRUCTOR}>
-              {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-            </option>
-            <option value={UserRole.COACH}>
-              {userRoleNameFactory(UserRole.COACH)}
+            <option value={UserRole.INFLUENCER}>
+              {userRoleNameFactory(UserRole.INFLUENCER)}
             </option>
             <option value={UserRole.COMMON}>
               {userRoleNameFactory(UserRole.COMMON)}
@@ -558,7 +552,7 @@ const Profile = () => {
         </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            所属支社
+            ジャンル
           </FormLabel>
           <Select
             name="branch"
@@ -567,8 +561,13 @@ const Profile = () => {
             border="none"
             onChange={handleChange}>
             <option value={BranchType.NON_SET}>未設定</option>
-            <option value={BranchType.TOKYO}>東京</option>
-            <option value={BranchType.OSAKA}>大阪</option>
+            <option value={BranchType.ARTIST}>アーティスト</option>
+            <option value={BranchType.IDOL}>アイドル</option>
+            <option value={BranchType.YOUTUBER}>YouTuber</option>
+            <option value={BranchType.TIKTOKER}>TikToker</option>
+            <option value={BranchType.INSTAGRAMER}>インスタグラマー</option>
+            <option value={BranchType.TALENT}>タレント</option>
+            <option value={BranchType.OTHER}>その他</option>
           </Select>
         </FormControl>
         <FormControl mb={4}>

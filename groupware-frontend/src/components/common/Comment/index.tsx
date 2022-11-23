@@ -43,7 +43,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ body, date, writer }) => {
                 // className={eventCommentStyles.user_avatar}
                 src={boldMascot.src}
               />
-              <p className={eventCommentStyles.user_name}>ボールドくん</p>
+              <p className={eventCommentStyles.user_name}>Valleyinくん</p>
             </Box>
           )}
         </Box>

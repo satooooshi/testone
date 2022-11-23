@@ -62,7 +62,7 @@ const AttendanceVerifyReport: React.FC = () => {
           <Text fontSize={16}>氏名</Text>
         </Div>
         <Div w={'20%'} justifyContent="center" alignItems="center">
-          <Text fontSize={16}>社員区分</Text>
+          <Text fontSize={16}>メンバー区分</Text>
         </Div>
         <Div w={'30%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>区分</Text>

@@ -12,13 +12,9 @@ const WikiLinks: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="社内Wiki Home" />
-      <Div ml={7} mt="lg">
-        <Div
-          flexDir="row"
-          alignItems="center"
-          justifyContent="flex-start"
-          mb="lg">
+      <HeaderWithTextButton title="News Home" />
+      <Div alignItems="center" mt="lg">
+        <Div flexDir="row" alignItems="center" justifyContent="center" mb="lg">
           <Div mr="lg">
             <PortalLinkBox
               type="rules"
