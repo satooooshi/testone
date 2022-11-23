@@ -1,0 +1,15 @@
+export const liteEditorPlugins = [
+  'header',
+  'font-bold',
+  'font-italic',
+  'font-strikethrough',
+  'block-quote',
+  'block-code-inline',
+  'block-code-block',
+  'image',
+  'clear',
+  'logger',
+  'mode-toggle',
+  'full-screen',
+  'tab-insert',
+];

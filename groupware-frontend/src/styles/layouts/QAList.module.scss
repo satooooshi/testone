@@ -1,0 +1,39 @@
+@import '../variables.scss';
+
+.qa_list {
+  margin-bottom: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  @media (max-width: 768px) {
+    // width: 100vw;
+    // margin-right: 0;
+  }
+}
+.pagination_wrapper {
+  position: absolute;
+  bottom: 16px;
+  right: auto;
+  left: auto;
+}
+.top_contents_wrapper {
+  height: 2700px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.search_form_wrapper {
+  width: 100%;
+  display: flex;
+  margin-bottom: 24px;
+  flex-direction: row;
+  justify-content: center;
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+  }
+}

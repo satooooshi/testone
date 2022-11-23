@@ -1,0 +1,54 @@
+@import '../variables.scss';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  width: 50vw;
+  background: $header_background_color;
+  border-bottom: 1px solid #b0b0b0;
+
+  @media (max-width: 768px) {
+    width: 85vw;
+  }
+}
+
+.top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.user_info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 40%;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  margin-right: 10px;
+}
+
+.user_name {
+  color: $dark_font_color;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.date {
+  color: $dark_font_color;
+  font-size: 18px;
+}
+
+.content {
+  color: $dark_font_color;
+  word-wrap: break-word;
+  overflow: hidden;
+}

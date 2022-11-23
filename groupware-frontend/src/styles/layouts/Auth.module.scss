@@ -1,0 +1,20 @@
+.screen_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  justify-content: space-evenly;
+  align-self: center;
+  padding: 0px 60px;
+}
+
+.logo_image {
+  width: 473px;
+  height: 372px;
+}
+
+.validation_error_text {
+  font: size 18px;
+  color: tomato;
+}

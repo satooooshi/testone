@@ -1,0 +1,12 @@
+.box_wrapper {
+  margin-right: 16px;
+  margin-bottom: 24px;
+}
+.box_row_wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-self: center;
+  width: 100%;
+}
