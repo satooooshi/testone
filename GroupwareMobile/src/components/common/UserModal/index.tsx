@@ -143,7 +143,7 @@ const UserModal: React.FC<UserModalProps> = props => {
         alignSelf="center"
         mb={'lg'}>
         <Text fontSize={16} mb={'sm'}>
-          メンバー区分を選択
+          社員区分を選択
         </Text>
         <Button
           alignSelf="center"
@@ -218,9 +218,9 @@ const UserModal: React.FC<UserModalProps> = props => {
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          onPress={() => selectUserRole(UserRole.INFLUENCER)}
-          value={UserRole.INFLUENCER}>
-          {userRoleNameFactory(UserRole.INFLUENCER)}
+          onPress={() => selectUserRole(UserRole.COACH)}
+          value={UserRole.COACH}>
+          {userRoleNameFactory(UserRole.COACH)}
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}

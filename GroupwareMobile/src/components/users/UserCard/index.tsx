@@ -217,19 +217,19 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           {user.eventCount || 0}
         </Text>
         <Text color="gray" fontSize={10} mr={5}>
-          メッセージ数
+          質問数
         </Text>
         <Text color="gray" fontSize={10} mr={15}>
           {user.questionCount || 0}
         </Text>
         <Text color="gray" fontSize={10} mr={5}>
-          メッセージ回答数
+          質問回答数
         </Text>
         <Text color="gray" fontSize={10} mr={15}>
           {user.answerCount || 0}
         </Text>
         <Text color="gray" fontSize={10} mr={5}>
-          コメント数
+          ナレッジ投稿数
         </Text>
         <Text color="gray" fontSize={10} mr={15}>
           {user.knowledgeCount || 0}

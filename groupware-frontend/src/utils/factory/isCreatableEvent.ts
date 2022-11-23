@@ -5,7 +5,6 @@ export const isCreatableEvent = (
   userRole?: UserRole,
 ): boolean => {
   switch (type) {
-<<<<<<< HEAD
     case EventType.IMPRESSIVE_UNIVERSITY:
       return userRole === UserRole.ADMIN;
     case EventType.STUDY_MEETING:
@@ -30,28 +29,6 @@ export const isCreatableEvent = (
         userRole === UserRole.INTERNAL_INSTRUCTOR ||
         userRole === UserRole.COMMON
       );
-=======
-    // case EventType.IMPRESSIVE_UNIVERSITY:
-    //   return userRole === UserRole.ADMIN;
-    // case EventType.BOLDAY:
-    //   return userRole === UserRole.ADMIN;
-    // case EventType.STUDY_MEETING:
-    //   return (
-    //     userRole === UserRole.ADMIN || userRole === UserRole.INTERNAL_INSTRUCTOR
-    //   );
-    // case EventType.COACH:
-    //   return userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER;
-    // case EventType.CLUB:
-    //   return (
-    //     userRole === UserRole.ADMIN ||
-    //     userRole === UserRole.INTERNAL_INSTRUCTOR ||
-    //     userRole === UserRole.COMMON
-    //   );
-    // case EventType.SUBMISSION_ETC:
-    //   return userRole === UserRole.ADMIN;
-    default:
-      return false;
->>>>>>> remotes/fanreturn-app/develop
   }
 };
 

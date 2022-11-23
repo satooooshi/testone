@@ -25,7 +25,7 @@ import { FcSportsMode } from 'react-icons/fc';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
-import valleyinLogo from '@/public/fanreturn_logo.png';
+import boldLogo from '@/public/bold-logo.png';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { useRouter } from 'next/router';
 
@@ -46,59 +46,59 @@ const EventCard: React.FC<EventCardProps> = ({
   const [isSmallerThan350] = useMediaQuery('(max-width: 350px)');
   const router = useRouter();
 
-  // const imageSource = useMemo(() => {
-  //   switch (eventSchedule.type) {
-  //     case EventType.STUDY_MEETING:
-  //       return (
-  //         <Image
-  //           src={studyMeeting1Image.src}
-  //           alt="イベント画像"
-  //           borderLeftRadius={10}
-  //         />
-  //       );
-  //     case EventType.BOLDAY:
-  //       return (
-  //         <Image
-  //           src={boldayImage1.src}
-  //           alt="イベント画像"
-  //           borderLeftRadius={10}
-  //         />
-  //       );
-  //     case EventType.CLUB:
-  //       return (
-  //         <FcSportsMode
-  //           style={{ height: '100%', width: '100%' }}
-  //           className={clsx(portalLinkBoxStyles.club_icon)}
-  //         />
-  //       );
-  //     case EventType.IMPRESSIVE_UNIVERSITY:
-  //       return (
-  //         <Image
-  //           src={impressiveUnivertyImage.src}
-  //           alt="イベント画像"
-  //           borderLeftRadius={10}
-  //         />
-  //       );
-  //     case EventType.COACH:
-  //       return (
-  //         <Image
-  //           src={coachImage.src}
-  //           alt="イベント画像"
-  //           borderLeftRadius={10}
-  //         />
-  //       );
-  //     case EventType.SUBMISSION_ETC:
-  //       return (
-  //         <MdAssignment
-  //           style={{ height: '100%', width: '100%' }}
-  //           className={clsx(portalLinkBoxStyles.submission_etc_icon)}
-  //         />
-  //       );
+  const imageSource = useMemo(() => {
+    switch (eventSchedule.type) {
+      case EventType.STUDY_MEETING:
+        return (
+          <Image
+            src={studyMeeting1Image.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
+      case EventType.BOLDAY:
+        return (
+          <Image
+            src={boldayImage1.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
+      case EventType.CLUB:
+        return (
+          <FcSportsMode
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.club_icon)}
+          />
+        );
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return (
+          <Image
+            src={impressiveUnivertyImage.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
+      case EventType.COACH:
+        return (
+          <Image
+            src={coachImage.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
+      case EventType.SUBMISSION_ETC:
+        return (
+          <MdAssignment
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.submission_etc_icon)}
+          />
+        );
 
-  //     default:
-  //       return <Image src={noImage.src} alt="イベント画像" />;
-  //   }
-  // }, [eventSchedule.type]);
+      default:
+        return <Image src={noImage.src} alt="イベント画像" />;
+    }
+  }, [eventSchedule.type]);
 
   return (
     <Box
@@ -137,12 +137,12 @@ const EventCard: React.FC<EventCardProps> = ({
               <Image
                 borderLeftRadius={10}
                 // h="100%"
-                src={valleyinLogo.src}
+                src={boldLogo.src}
                 // src={eventSchedule.imageURL}
                 alt="イベント画像"
               />
             ) : (
-              <Image src={noImage.src} alt="イベント画像" />
+              imageSource
             )}
           </AspectRatio>
         </Box>
@@ -204,20 +204,28 @@ const EventCard: React.FC<EventCardProps> = ({
           </Box>
           <Divider orientation="horizontal" mb={3} />
           <Box display="flex" flexDir="column" justifyContent="space-between">
-            <Text fontSize={isSmallerThan768 ? 10 : 13} color={darkFontColor}>
-              {dateTimeFormatterFromJSDDate({
-                dateTime: new Date(eventSchedule.startAt),
-                format: '開始: yyyy/LL/dd HH:mm ',
-              })}
-            </Text>
+            {eventSchedule.type !== EventType.SUBMISSION_ETC && (
+              <Text fontSize={isSmallerThan768 ? 10 : 13} color={darkFontColor}>
+                {dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(eventSchedule.startAt),
+                  format: '開始: yyyy/LL/dd HH:mm ',
+                })}
+              </Text>
+            )}
             <Text
               fontSize={isSmallerThan768 ? 10 : 13}
               mt="2px"
               color={darkFontColor}>
-              {dateTimeFormatterFromJSDDate({
+              {`
+                  ${
+                    eventSchedule.type !== EventType.SUBMISSION_ETC
+                      ? '終了'
+                      : '締切'
+                  }: ${dateTimeFormatterFromJSDDate({
                 dateTime: new Date(eventSchedule.endAt),
-                format: '終了: yyyy/LL/dd HH:mm',
+                format: 'yyyy/LL/dd HH:mm',
               })}
+                `}
             </Text>
           </Box>
           <Box my="auto" pl={-1}>

@@ -97,21 +97,13 @@ const Home: React.FC = () => {
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
-              type="chat"
-              onPress={() => {
-                navigation.navigate('ChatStack', {
-                  screen: 'RoomList',
-                });
-              }}
-            />
-            {/* <PortalLinkBox
               type="attendance"
               onPress={() => {
                 navigation.navigate('AttendanceStack', {
                   screen: 'Attendance',
                 });
               }}
-            /> */}
+            />
           </Div>
           <Div flex={1} />
         </Div>
@@ -119,7 +111,7 @@ const Home: React.FC = () => {
         <Text fontSize={18} fontWeight="bold" my={12}>
           全体
         </Text>
-        {/* <Div flexDir="row" mb={8}>
+        <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
               type="impressive_university"
@@ -162,20 +154,6 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div> */}
-
-        {/* <Div flexDir="row" mb={8}>
-          <Div flex={1} mr={12}>
-            <PortalLinkBox
-              type="study_meeting"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
-            />
-          </Div>
           <Div flex={1}>
             <PortalLinkBox
               type="coach"
@@ -189,9 +167,9 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div> */}
+        </Div>
 
-        {/* <Div flexDir="row" mb={8}>
+        <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
               type="club"
@@ -218,7 +196,7 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div> */}
+        </Div>
 
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
@@ -234,17 +212,16 @@ const Home: React.FC = () => {
           </Div>
           <Div flex={1}>
             <PortalLinkBox
-              type="users"
+              type="chat"
               onPress={() => {
-                navigation.navigate('UsersStack', {
-                  screen: 'UserList',
-                  params: {},
+                navigation.navigate('ChatStack', {
+                  screen: 'RoomList',
                 });
               }}
             />
           </Div>
         </Div>
-        {/* 
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -258,7 +235,7 @@ const Home: React.FC = () => {
             />
           </Div>
           <Div flex={1} />
-        </Div> */}
+        </Div>
 
         <Text fontSize={18} fontWeight="bold" my={12}>
           管理

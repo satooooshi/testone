@@ -33,9 +33,11 @@ import { FiMessageSquare } from 'react-icons/fi';
 import { BiPaperPlane } from 'react-icons/bi';
 
 export enum PortalLinkType {
-  FANRETURN = '/event/fanreturn',
-  FAN_EVENT = '/event/fan_event',
+  IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
+  STUDY_MEETING = '/event/study_meeting',
+  BOLDAY = '/event/bolday',
   COACH = '/event/coach',
+  CLUB = '/event/club',
   SUBMISSION_ETC = '/event/list?type=submission_etc&from=&to=',
   WIKI = '/wiki',
   RULES = '/wiki/list?type=rule&rule_category=philosophy',
@@ -70,12 +72,30 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
     marginBottom: '16px',
   };
   switch (href) {
-    case PortalLinkType.FANRETURN:
+    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
+      return (
+        <FaSchool
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.impressive_university_icon,
+          )}
+        />
+      );
+    case PortalLinkType.STUDY_MEETING:
       return (
         <GiBookCover
           className={clsx(
             portalLinkBoxStyles.icon,
             portalLinkBoxStyles.study_meeting_icon,
+          )}
+        />
+      );
+    case PortalLinkType.BOLDAY:
+      return (
+        <GiPartyPopper
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.bolday_icon,
           )}
         />
       );
@@ -88,7 +108,7 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
-    case PortalLinkType.FAN_EVENT:
+    case PortalLinkType.CLUB:
       return (
         <FcSportsMode
           className={clsx(
@@ -224,20 +244,28 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
 };
 export const eventTitleText = (href: PortalLinkType): string => {
   switch (href) {
-    case PortalLinkType.FANRETURN:
-      return 'ファンリターン';
+    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
+      return '感動大学';
+    case PortalLinkType.STUDY_MEETING:
+      return '勉強会';
+    case PortalLinkType.BOLDAY:
+      return 'BOLDay';
     case PortalLinkType.COACH:
-      return 'デビューサポート制度';
-    case PortalLinkType.FAN_EVENT:
-      return 'ファンイベント';
+      return 'コーチ制度';
+    case PortalLinkType.CLUB:
+      return '部活動';
     case PortalLinkType.SUBMISSION_ETC:
       return '〆切一覧';
     case PortalLinkType.WIKI:
-      return 'News';
+      return '社内Wiki';
     case PortalLinkType.RULES:
       return '社内規則';
     case PortalLinkType.ALL_POSTAL:
-      return '運営からのお知らせ';
+      return 'オール便';
+    case PortalLinkType.MAIL_MAGAZINE:
+      return 'メルマガ';
+    case PortalLinkType.INTERVIEW:
+      return '全社員インタビュー';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:
@@ -267,12 +295,16 @@ export const eventTitleText = (href: PortalLinkType): string => {
 
 const descriptionText = (href: PortalLinkType): string => {
   switch (href) {
-    case PortalLinkType.FANRETURN:
-      return 'ファンリターンはyoutubeやライバーが自分たちでイベントやレーベルを出すためにみんなの応援を集めるクラウドファンディング事業です。';
+    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
+      return '技術力と人間力を 毎日プロから学ぶことが出来る研修制度です。';
+    case PortalLinkType.STUDY_MEETING:
+      return '社員同士が教え合いながら、知識を深めていく勉強会です。';
+    case PortalLinkType.BOLDAY:
+      return '社員同士が高めあう風土が生まれる帰社日';
     case PortalLinkType.COACH:
-      return 'ファンリターンは始めたばかりのアーティストを世に出すべく、発信したい想いを長年の芸能経験からサポートする制度です。いち早く多くの人に知ってもらいたいアーティストはぜひご利用ください。';
-    case PortalLinkType.FAN_EVENT:
-      return 'ファンリターンが立ち上げるファン交流会です。ライバーなど身近に交流できる至近距離イベントとなります。';
+      return '現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行います。';
+    case PortalLinkType.CLUB:
+      return '17部活、14サークルが活動中。部活として認定された活動には懇親会費を支給しています。フットサルやマラソン等のスポーツ系から、写真や料理等の文化系の部活まで様々な部活動があります。';
     case PortalLinkType.SUBMISSION_ETC:
       return '社内での提出物の日程を確認します';
     case PortalLinkType.WIKI:

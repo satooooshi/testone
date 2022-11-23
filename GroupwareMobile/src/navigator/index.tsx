@@ -9,9 +9,7 @@ import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import {axiosInstance, storage, tokenString} from '../utils/url';
 import BottomTab from './BottomTab';
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
@@ -71,7 +69,7 @@ const Navigator = () => {
   const [onCallUid, setOnCallUid] = useState('');
   const [refusedInvitation, setRefusedInvitation] = useState(false);
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
-  const AGORA_APP_ID = Config.AGORA_APP_ID_TEST;
+  const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
@@ -291,7 +289,7 @@ const Navigator = () => {
       ios: {
         appName: 'Eface',
         supportsVideo: false,
-        imageName: 'fanreturn_logo.png',
+        imageName: 'bold-logo.png',
         maximumCallGroups: '1',
         maximumCallsPerCallGroup: '2',
       },
@@ -303,7 +301,7 @@ const Navigator = () => {
         okButton: 'ok',
         additionalPermissions: [],
         foregroundService: {
-          channelId: 'com.fanreturn',
+          channelId: 'com.groupwaremobile',
           channelName: 'Foreground service for my app',
           notificationTitle: 'バックグラウンドで実行中です',
         },

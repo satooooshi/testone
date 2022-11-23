@@ -1,4 +1,4 @@
-package com.fanreturn.android;
+package com.groupwaremobile;
 
 //react-navigation
 import android.os.Bundle;

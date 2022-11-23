@@ -455,9 +455,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               <Box display="flex" flexDir="column" alignItems="flex-start">
                 {!messageState.isSender && (
                   <Text>
-                    {messageState.sender && messageState.sender?.existence
-                      ? userNameFactory(messageState.sender)
-                      : 'Valleyinくん'}
+                    {userNameFactory(
+                      senderAvatar?.member
+                        ? senderAvatar.member
+                        : messageState.sender,
+                    )}
                   </Text>
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (

@@ -69,14 +69,18 @@ const UserList = () => {
   console.log('ppp', tags);
 
   const initialHeaderValue = {
-    title: 'メンバー',
+    title: '社員名鑑',
     activeTabName:
       query.role === UserRole.ADMIN
         ? '管理者'
         : query.role === UserRole.COMMON
-        ? 'ファン'
-        : query.role === UserRole.INFLUENCER
-        ? 'インフルエンサー'
+        ? '一般社員'
+        : query.role === UserRole.COACH
+        ? 'コーチ'
+        : query.role === UserRole.INTERNAL_INSTRUCTOR
+        ? '講師(社員)'
+        : query.role === UserRole.EXTERNAL_INSTRUCTOR
+        ? '講師(外部)'
         : '全て',
     tabs: tabs,
   };
@@ -101,7 +105,7 @@ const UserList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
       header={initialHeaderValue}>
       <Head>
-        <title>FanReturn | メンバー</title>
+        <title>ボールド | 社員名鑑</title>
       </Head>
       {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
       <SearchForm
@@ -140,9 +144,9 @@ const UserList = () => {
                 }}>
                 <option value="">指定なし</option>
                 <option value="event">イベント参加数順</option>
-                <option value="question">メッセージ数順</option>
+                <option value="question">質問数順</option>
                 <option value="answer">回答数順</option>
-                <option value="knowledge">コメント数順</option>
+                <option value="knowledge">ナレッジ投稿数順</option>
               </Select>
             </FormControl>
             <FormControl w="200px" ml="20px">

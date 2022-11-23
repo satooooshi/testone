@@ -86,7 +86,7 @@ const EventIntroduction: React.FC = () => {
         ];
       case EventType.CLUB:
         return [
-          require('../../../../assets/club_3.jpg'),
+          require('../../../../assets/club_3.png'),
           require('../../../../assets/club_4.jpg'),
           require('../../../../assets/club_6.jpg'),
           require('../../../../assets/club_2.jpg'),

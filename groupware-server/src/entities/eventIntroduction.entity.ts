@@ -27,7 +27,7 @@ export class EventIntroduction {
     name: 'type',
     type: 'enum',
     enum: EventType,
-    default: EventType.ARTIST,
+    default: EventType.STUDY_MEETING,
     nullable: false,
   })
   type: EventType;

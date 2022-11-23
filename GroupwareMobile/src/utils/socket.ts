@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadCh
 import {useAPIGetLastReadChatTime} from '../hooks/api/chat/useAPIGetLastReadChatTime';
 import {getThumbnailOfVideo} from './getThumbnailOfVideo';
 
-export const socket = io('https://www.groupware-develop.tk', {
+export const socket = io('https://www.groupware-develop.tk/', {
   transports: ['websocket'],
   forceNew: true,
   upgrade: false,
@@ -73,7 +73,7 @@ export const useChatSocket = (
 
       setCurrentChatRoomId(room.id);
       isMounted = true;
-      socket.emit('joinRoom', 'valleyin-app' + room.id.toString());
+      socket.emit('joinRoom', room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
         // console.log('readMessageClient called', senderId, myself?.id, room.id);
@@ -173,7 +173,7 @@ export const useChatSocket = (
     },
     leaveRoom: () => {
       setMessages([]);
-      socket.emit('leaveRoom', 'valleyin-app' + room.id.toString());
+      socket.emit('leaveRoom', room.id.toString());
       socket.removeAllListeners();
       isMounted = false;
       setCurrentChatRoomId(undefined);

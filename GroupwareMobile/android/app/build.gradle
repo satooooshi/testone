@@ -133,7 +133,7 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
     // compileSdkVersion 27
-    //react-native-image-crop-pickerr
+    //react-native-image-crop-picker
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     //mmkv
@@ -145,11 +145,11 @@ android {
     }
 
     defaultConfig {
-        resValue "string", "build_config_package", "com.fanreturn.android"
-        applicationId "com.fanreturn.android"
+        resValue "string", "build_config_package", "com.groupwaremobile"
+        applicationId "com.groupwaremobile"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 19
+        versionCode 36
         versionName "1.0"
         //react-native-image-crop-picker
         vectorDrawables.useSupportLibrary = true
@@ -214,7 +214,6 @@ dependencies {
     implementation project(':react-native-config')
 
     compile project(':react-native-file-viewer')
-
     compile project(':react-native-background-timer')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"

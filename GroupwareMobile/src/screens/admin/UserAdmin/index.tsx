@@ -25,7 +25,7 @@ const UserAdmin: React.FC = () => {
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
-    //role: UserRole.INFLUENCER,
+    //role: UserRole.COACH,
   });
   const [selectedTags, setSelectedTags] = useState<UserTag[]>([]);
   const {
@@ -92,7 +92,9 @@ const UserAdmin: React.FC = () => {
     'AllRole',
     UserRole.ADMIN,
     UserRole.COMMON,
-    UserRole.INFLUENCER,
+    UserRole.COACH,
+    UserRole.INTERNAL_INSTRUCTOR,
+    UserRole.EXTERNAL_INSTRUCTOR,
   ];
   return (
     <WholeContainer>
@@ -210,7 +212,7 @@ const UserAdmin: React.FC = () => {
           name={topTabNames[3]}
           children={() => {
             const users = usersForInfiniteScroll.filter(
-              u => u.role === UserRole.INFLUENCER,
+              u => u.role === UserRole.COACH,
             );
             return (
               <Div px={16}>
@@ -229,7 +231,57 @@ const UserAdmin: React.FC = () => {
               </Div>
             );
           }}
-          options={{title: userRoleNameFactory(UserRole.INFLUENCER)}}
+          options={{title: userRoleNameFactory(UserRole.COACH)}}
+        />
+        <TopTab.Screen
+          name={topTabNames[4]}
+          children={() => {
+            const users = usersForInfiniteScroll.filter(
+              u => u.role === UserRole.INTERNAL_INSTRUCTOR,
+            );
+            return (
+              <Div px={16}>
+                {users.length ? (
+                  <FlatList
+                    data={users}
+                    {...{onEndReached}}
+                    onEndReachedThreshold={0.5}
+                    keyExtractor={item => item.id.toString()}
+                    ListHeaderComponent={<Div h={10} />}
+                    renderItem={({item}) => <UserRow user={item} />}
+                  />
+                ) : (
+                  <Text fontSize={16}>検索結果が見つかりませんでした</Text>
+                )}
+              </Div>
+            );
+          }}
+          options={{title: userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}}
+        />
+        <TopTab.Screen
+          name={topTabNames[5]}
+          children={() => {
+            const users = usersForInfiniteScroll.filter(
+              u => u.role === UserRole.EXTERNAL_INSTRUCTOR,
+            );
+            return (
+              <Div px={16}>
+                {users.length ? (
+                  <FlatList
+                    data={users}
+                    {...{onEndReached}}
+                    onEndReachedThreshold={0.5}
+                    keyExtractor={item => item.id.toString()}
+                    ListHeaderComponent={<Div h={10} />}
+                    renderItem={({item}) => <UserRow user={item} />}
+                  />
+                ) : (
+                  <Text fontSize={16}>検索結果が見つかりませんでした</Text>
+                )}
+              </Div>
+            );
+          }}
+          options={{title: userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}}
         />
       </TopTab.Navigator>
       {isLoading && <ActivityIndicator />}

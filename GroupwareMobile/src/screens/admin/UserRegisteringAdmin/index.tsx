@@ -204,11 +204,27 @@ const UserRegisteringAdmin: React.FC = () => {
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          value={UserRole.INFLUENCER}
+          value={UserRole.COACH}
           onPress={() => {
-            setValues(v => ({...v, role: UserRole.INFLUENCER}));
+            setValues(v => ({...v, role: UserRole.COACH}));
           }}>
-          {userRoleNameFactory(UserRole.INFLUENCER)}
+          {userRoleNameFactory(UserRole.COACH)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.INTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.INTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.EXTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.EXTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
         </Dropdown.Option>
       </Dropdown>
 
@@ -221,80 +237,15 @@ const UserRegisteringAdmin: React.FC = () => {
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.ARTIST,
-            }))
-          }
-          value={BranchType.ARTIST}>
-          {branchTypeNameFactory(BranchType.ARTIST)}
+          value={BranchType.TOKYO}
+          onPress={() => setValues(v => ({...v, branch: BranchType.TOKYO}))}>
+          {branchTypeNameFactory(BranchType.TOKYO)}
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.IDOL,
-            }))
-          }
-          value={BranchType.IDOL}>
-          {branchTypeNameFactory(BranchType.IDOL)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.YOUTUBER,
-            }))
-          }
-          value={BranchType.YOUTUBER}>
-          {branchTypeNameFactory(BranchType.YOUTUBER)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.TIKTOKER,
-            }))
-          }
-          value={BranchType.TIKTOKER}>
-          {branchTypeNameFactory(BranchType.TIKTOKER)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.INSTAGRAMER,
-            }))
-          }
-          value={BranchType.INSTAGRAMER}>
-          {branchTypeNameFactory(BranchType.INSTAGRAMER)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.TALENT,
-            }))
-          }
-          value={BranchType.TALENT}>
-          {branchTypeNameFactory(BranchType.TALENT)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setValues(e => ({
-              ...e,
-              type: BranchType.OTHER,
-            }))
-          }
-          value={BranchType.OTHER}>
-          {branchTypeNameFactory(BranchType.OTHER)}
+          value={BranchType.OSAKA}
+          onPress={() => setValues(v => ({...v, branch: BranchType.OSAKA}))}>
+          {branchTypeNameFactory(BranchType.OSAKA)}
         </Dropdown.Option>
       </Dropdown>
       <KeyboardAwareScrollView
@@ -407,7 +358,7 @@ const UserRegisteringAdmin: React.FC = () => {
           </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
-              メンバー区分
+              社員区分
             </Text>
             <DropdownOpenerButton
               fontSize={16}
@@ -419,7 +370,7 @@ const UserRegisteringAdmin: React.FC = () => {
           </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
-              ジャンル
+              所属支社
             </Text>
             <DropdownOpenerButton
               fontSize={16}
@@ -427,7 +378,7 @@ const UserRegisteringAdmin: React.FC = () => {
               onPress={() => branchTypeDropdownRef.current?.open()}
             />
           </Div>
-          {/* <Div mb="xl">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               社員コード
             </Text>
@@ -437,7 +388,7 @@ const UserRegisteringAdmin: React.FC = () => {
               onChangeText={t => setValues({...values, employeeId: t})}
               autoCapitalize="none"
             />
-          </Div> */}
+          </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               パスワード

@@ -276,7 +276,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               )}
               options={{title: '会社理念'}}
             />
-            {/* <TopTab.Screen
+            <TopTab.Screen
               name={'WikiList-' + RuleCategory.ABC}
               children={() => (
                 <RenderWikiCardList
@@ -289,7 +289,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 />
               )}
               options={{title: 'ABC制度'}}
-            /> */}
+            />
             <TopTab.Screen
               name={'WikiList-' + RuleCategory.BENEFITS}
               children={() => (
@@ -360,7 +360,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 ),
               }}
             />
-            {/* <TopTab.Screen
+            <TopTab.Screen
               name={'WikiList-' + BoardCategory.QA}
               children={() => (
                 <RenderWikiCardList
@@ -381,7 +381,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   BoardCategory.QA,
                 ),
               }}
-            /> */}
+            />
             <TopTab.Screen
               name={'WikiList-' + BoardCategory.NEWS}
               children={() => (
@@ -404,7 +404,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 ),
               }}
             />
-            {/* <TopTab.Screen
+            <TopTab.Screen
               name={'WikiList-' + BoardCategory.IMPRESSIVE_UNIVERSITY}
               children={() => (
                 <RenderWikiCardList
@@ -425,7 +425,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   BoardCategory.IMPRESSIVE_UNIVERSITY,
                 ),
               }}
-            /> */}
+            />
             <TopTab.Screen
               name={'WikiList-' + BoardCategory.CLUB}
               children={() => (
@@ -448,7 +448,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 ),
               }}
             />
-            {/* <TopTab.Screen
+            <TopTab.Screen
               name={'WikiList-' + BoardCategory.STUDY_MEETING}
               children={() => (
                 <RenderWikiCardList
@@ -469,7 +469,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   BoardCategory.STUDY_MEETING,
                 ),
               }}
-            /> */}
+            />
             <TopTab.Screen
               name={'WikiList-' + BoardCategory.SELF_IMPROVEMENT}
               children={() => (
@@ -492,7 +492,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 ),
               }}
             />
-            {/* <TopTab.Screen
+            <TopTab.Screen
               name={'WikiList-' + BoardCategory.PERSONAL_ANNOUNCEMENT}
               children={() => (
                 <RenderWikiCardList
@@ -535,7 +535,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   BoardCategory.CELEBRATION,
                 ),
               }}
-            /> */}
+            />
             <TopTab.Screen
               name={'WikiList-' + BoardCategory.OTHER}
               children={() => (

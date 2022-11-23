@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import boldLogo from '@/public/fanreturn_logo.png';
+import boldLogo from '@/public/bold-logo.png';
 import loginLayoutStyles from '@/styles/layouts/Login.module.scss';
 import { Formik } from 'formik';
 import Head from 'next/head';
@@ -37,7 +37,7 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className={loginLayoutStyles.screen_wrapper}>
       <Head>
-        <title>FanReturn | パスワード再発行</title>
+        <title>ボールド | パスワード再発行</title>
       </Head>
       <div className={loginLayoutStyles.logo_image}>
         <Image src={boldLogo} alt="bold logo" />

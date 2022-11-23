@@ -97,12 +97,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.ARTIST,
+          name: EventTab.IMPRESSIVE_UNIVERSITY,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.ARTIST,
+                type: EventType.IMPRESSIVE_UNIVERSITY,
                 personal,
                 from,
                 to,
@@ -110,12 +110,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.IDOL,
+          name: EventTab.STUDY_MEETING,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.IDOL,
+                type: EventType.STUDY_MEETING,
                 personal,
                 from,
                 to,
@@ -123,12 +123,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.YOUTUBER,
+          name: EventTab.BOLDAY,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.YOUTUBER,
+                type: EventType.BOLDAY,
                 personal,
                 from,
                 to,
@@ -136,12 +136,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.TIKTOKER,
+          name: EventTab.COACH,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.TIKTOKER,
+                type: EventType.COACH,
                 personal,
                 from,
                 to,
@@ -149,12 +149,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.INSTAGRAMER,
+          name: EventTab.CLUB,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.INSTAGRAMER,
+                type: EventType.CLUB,
                 personal,
                 from,
                 to,
@@ -162,25 +162,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.TALENT,
+          name: EventTab.SUBMISSION_ETC,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.TALENT,
-                personal,
-                from,
-                to,
-              });
-          },
-        },
-        {
-          name: EventTab.OTHER,
-          onClick: () => {
-            if (queryRefresh)
-              queryRefresh({
-                page: '1',
-                type: EventType.OTHER,
+                type: EventType.SUBMISSION_ETC,
                 personal,
                 from,
                 to,
@@ -231,7 +218,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'wiki':
       return [
         {
-          name: 'News Home',
+          name: '社内Wiki Home',
           href: '/wiki',
         },
       ];
@@ -250,17 +237,30 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: 'ファン',
+          name: '一般社員',
           onClick: () => {
             if (queryRefresh)
               queryRefresh({ role: UserRole.COMMON, page: '1' });
           },
         },
         {
-          name: 'インフルエンサー',
+          name: 'コーチ',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: UserRole.COACH, page: '1' });
+          },
+        },
+        {
+          name: '講師(社員)',
           onClick: () => {
             if (queryRefresh)
-              queryRefresh({ role: UserRole.INFLUENCER, page: '1' });
+              queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR, page: '1' });
+          },
+        },
+        {
+          name: '講師(外部)',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR, page: '1' });
           },
         },
       ];
@@ -270,10 +270,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'ユーザー管理',
           href: '/admin/users',
         },
-        // {
-        //   name: '勤怠報告管理',
-        //   href: '/admin/attendance/verifyReport',
-        // },
+        {
+          name: '勤怠報告管理',
+          href: '/admin/attendance/verifyReport',
+        },
         {
           name: 'タグ管理',
           href: '/admin/tag',
@@ -413,21 +413,21 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
             }
           },
         },
-        // {
-        //   name: '社内規則',
-        //   onClick: () => {
-        //     {
-        //       if (queryRefresh)
-        //         queryRefresh({
-        //           type: WikiType.RULES,
-        //           rule_category: RuleCategory.PHILOSOPHY,
-        //           board_category: undefined,
-        //         });
-        //     }
-        //   },
-        // },
         {
-          name: '運営からのお知らせ',
+          name: '社内規則',
+          onClick: () => {
+            {
+              if (queryRefresh)
+                queryRefresh({
+                  type: WikiType.RULES,
+                  rule_category: RuleCategory.PHILOSOPHY,
+                  board_category: undefined,
+                });
+            }
+          },
+        },
+        {
+          name: 'オール便',
           onClick: () => {
             {
               if (queryRefresh)

@@ -31,12 +31,12 @@ import { User } from './user.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
 
 export enum EventType {
-  ARTIST = 'artist',
-  IDOL = 'idol',
-  YOUTUBER = 'youtuber',
-  TIKTOKER = 'tiktoker',
-  INSTAGRAMER = 'instagramer',
-  TALENT = 'talent',
+  IMPRESSIVE_UNIVERSITY = 'impressive_university',
+  STUDY_MEETING = 'study_meeting',
+  BOLDAY = 'bolday',
+  COACH = 'coach',
+  CLUB = 'club',
+  SUBMISSION_ETC = 'submission_etc',
   OTHER = 'other',
 }
 
@@ -78,7 +78,7 @@ export class EventSchedule {
     name: 'type',
     type: 'enum',
     enum: EventType,
-    default: EventType.ARTIST,
+    default: EventType.STUDY_MEETING,
   })
   type: EventType;
 

@@ -97,7 +97,7 @@ const AttendanceVerifyReportAdmin = () => {
         tabs,
       }}>
       <Head>
-        <title>FanReturn | 勤怠報告</title>
+        <title>ボールド | 勤怠報告</title>
       </Head>
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">
@@ -144,7 +144,7 @@ const AttendanceVerifyReportAdmin = () => {
             <Tr>
               <Th minW={'100px'}>日付</Th>
               <Th>氏名</Th>
-              <Th>メンバー区分</Th>
+              <Th>社員区分</Th>
               <Th>区分</Th>
               <Th>詳細</Th>
             </Tr>

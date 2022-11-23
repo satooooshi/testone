@@ -66,15 +66,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
     <Div px={18} mt="lg">
       {!isLoading ? (
         <>
-          {/* <Div mb={'lg'}>
+          <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
               社員番号
             </Text>
             <Text fontSize={14}>{profile.employeeId || '未登録'}</Text>
-          </Div> */}
+          </Div>
           <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
-              ジャンル
+              所属支社
             </Text>
             <Text fontSize={14}>{branchTypeNameFactory(profile.branch)}</Text>
           </Div>
@@ -317,7 +317,9 @@ const AccountDetail: React.FC = () => {
                 </Button>
               ) : null}
 
-              {profile && profile.id !== user?.id ? (
+              {profile &&
+              profile.id !== user?.id &&
+              profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
                 <Div flexDir="row" mb={20}>
                   <Button
                     rounded="circle"

@@ -1,21 +1,21 @@
 version: '3.7'
 services:
-  fanreturn-mysql8:
-    container_name: fanreturn-mysql8
+  groupware-mysql8:
+    container_name: groupware-mysql8
     image: mysql/mysql-server:8.0.23
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: develop
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: fanreturn-mysql8
+      MYSQL_DATABASE: groupware-mysql8
       TZ: 'Asia/Tokyo'
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - fanreturn-db-data:/var/lib/mysql
+      - groupware-db-data:/var/lib/mysql
     ports:
       - '3306:3306'
     env_file:
       - .development.env
 volumes:
-  fanreturn-db-data:
+  groupware-db-data:

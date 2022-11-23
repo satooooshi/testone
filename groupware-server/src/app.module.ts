@@ -46,7 +46,7 @@ import { UserGoodForBoard } from './entities/userGoodForBord.entity';
 import { UserJoiningEvent } from './entities/userJoiningEvent.entity';
 import { UserTag } from './entities/userTag.entity';
 import { Wiki } from './entities/wiki.entity';
-import { ChatGateway } from './gateway/chat.gateway';
+import { WikiFile } from './entities/wikiFile.entity';
 
 @Module({
   imports: [
@@ -143,6 +143,6 @@ import { ChatGateway } from './gateway/chat.gateway';
     AttendanceModule,
   ],
   controllers: [],
-  providers: [ChatGateway],
+  providers: [],
 })
 export class AppModule {}

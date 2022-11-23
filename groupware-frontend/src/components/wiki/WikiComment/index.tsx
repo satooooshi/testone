@@ -107,7 +107,9 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                   borderRadius="100%"
                   src={boldMascot.src}
                 />
-                <p className={qaCommentStyles.user_name}>vallyeinくん</p>
+                <Text color="gray" ml="8px">
+                  ボールドくん
+                </Text>
               </>
             )}
           </Flex>

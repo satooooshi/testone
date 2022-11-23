@@ -145,7 +145,7 @@ const UserAdmin: React.FC = () => {
         tabs,
       }}>
       <Head>
-        <title>FanReturn | ユーザー管理</title>
+        <title>ボールド | ユーザー管理</title>
       </Head>
       <SearchForm
         onClearTag={() => setSelectedTags([])}
@@ -154,7 +154,14 @@ const UserAdmin: React.FC = () => {
         tags={tags || []}
         selectedTags={selectedTags}
         toggleTag={onToggleTag}
-        selectItems={['全て', '管理者', 'ファン', 'インフルエンサー']}
+        selectItems={[
+          '全て',
+          '管理者',
+          '一般社員',
+          'コーチ',
+          '講師(社員)',
+          '講師(外部)',
+        ]}
         selectingItem={userRoleValueToName(query.role)}
         onSelect={(e) =>
           queryRefresh({
@@ -190,8 +197,8 @@ const UserAdmin: React.FC = () => {
                 <th className={userAdminStyles.table_head}>メールアドレス</th>
               ) : null}
               {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
-              <th className={userAdminStyles.table_head}>メンバー区分</th>
-              {/* <th className={userAdminStyles.table_head}>勤怠</th> */}
+              <th className={userAdminStyles.table_head}>社員区分</th>
+              <th className={userAdminStyles.table_head}>勤怠</th>
               <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head}>削除</th>
               <th className={userAdminStyles.table_head} />
@@ -217,7 +224,7 @@ const UserAdmin: React.FC = () => {
                   {userRoleValueToName(u.role)}
                 </td>
 
-                {/* <td className={userAdminStyles.delete_icon_wrapper}>
+                <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/attendance/view/${u.id}`} passHref>
                     <a>
                       <MdWork
@@ -226,7 +233,7 @@ const UserAdmin: React.FC = () => {
                       />
                     </a>
                   </Link>
-                </td> */}
+                </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
                     <a>

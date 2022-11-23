@@ -4,7 +4,7 @@ import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
 import clubImage2 from '@/public/club_2.jpg';
-import clubImage3 from '@/public/club_3.jpg';
+import clubImage3 from '@/public/club_3.png';
 import clubImage4 from '@/public/club_4.jpg';
 import clubImage5 from '@/public/club_5.jpg';
 import clubImage6 from '@/public/club_6.jpg';
@@ -18,12 +18,12 @@ const Club: React.FC = () => {
     rightButtonName: '予定を見る',
     onClickRightButton: () => router.push('/event/list?type=club&from=&to='),
   };
-  const type = EventType.IDOL;
+  const type = EventType.CLUB;
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type,
   });
   const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
-    EventType.IDOL,
+    EventType.CLUB,
   );
   const headlineImgSource = clubImage5;
   const bottomImgSources = [clubImage3, clubImage4, clubImage6, clubImage2];
