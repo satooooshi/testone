@@ -12,6 +12,7 @@ import {
   Box,
   Flex,
   Spacer,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
@@ -73,13 +74,16 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
   setIsTalkRoom,
   setMembersModal,
 }) => {
+  const [isSmallerThan912] = useMediaQuery('(max-width: 912px)');
   return (
     <Box
-      w="100%"
+      w={isSmallerThan912 ? '100%' : 'calc(100vw - 240px)'}
       bg={tabs?.[0]?.type === 'backButton' ? '#f3f6fb' : 'white'}
       display="flex"
       flexDir="row"
       alignItems="center"
+      position="fixed"
+      zIndex={10}
 
       // borderLeftWidth="3px"
       // borderColor="#f3f6fb"

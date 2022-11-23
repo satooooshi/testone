@@ -34,6 +34,7 @@ const Chat = () => {
         </>
       ) : (
         <Box
+          paddingTop={'45px'}
           w="100%"
           display="flex"
           flexDir="row"
